@@ -35,3 +35,11 @@ Este repositório irá conter o código-fonte de um site inspirado no Letterboxd
 - **Firebase**: Solução baseada em nuvem para armazenamento de dados em tempo real e autenticação de usuários.
 
 ---
+
+## 👥 Membros
+
+- Camila Dalva Cunha Sant Ana (24100917)
+- Fernanda Barros Girade (24100920)
+- Henrique Rafael Sousa de Oliveira (24104283)
+- Bruno Correa Passuello (24105044)
+
