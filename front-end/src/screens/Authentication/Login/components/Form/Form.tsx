@@ -1,34 +1,42 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import * as S from "./styles";
-import { signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import FormFooter from "../FormFooter/FormFooter";
-import { auth } from "@app/config/firebaseConfig";
-import InputField from "@app/screens/Authentication/commonComponents/InputField/InputField";
+import InputField from "@app/screens/CommomComponents/InputField/InputField";
 import ErrorAlert from "@app/screens/Authentication/commonComponents/ErrorAlert/ErrorAlert";
+import FormFooter from "@app/screens/Authentication/commonComponents/FormFooter/FormFooter";
+import { useAppSelector } from "@app/store/rootReducer";
+import { useDispatch } from "react-redux";
+import { login } from "@app/store/slices/LoginSlice";
 
 const LoginForm = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const { loginError, isLoading } = useAppSelector(
+    (state) => state.loginSlice
+  );
 
-  const handleSubmit = async (event) => {
+  const { userId } = useAppSelector(
+    (state) => state.userSlice
+  );
+
+  const handleSubmit = (event) => {
     event.preventDefault();
 
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      navigate("/home");
-    } catch (error) {
-      setError("E-mail ou senha inválidos");
-      console.error("Erro ao fazer login:", error);
-    }
+    dispatch(login({ email, password }));
   };
+
+  useEffect(() => {
+    if (userId) {
+      navigate("/home");
+    }
+  }, [userId, navigate]);
 
   return (
     <S.FormStyled onSubmit={handleSubmit}>
-      {error && <ErrorAlert error={error} />}
+      {loginError && <ErrorAlert error={loginError} />}
 
       <InputField
         icon={"mail"}
@@ -36,6 +44,7 @@ const LoginForm = () => {
         onChange={(e) => setEmail(e.target.value)}
         placeholder="E-mail"
         value={email}
+        name="email"
       />
 
       <InputField
@@ -44,9 +53,15 @@ const LoginForm = () => {
         placeholder="Senha"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
+        name="password"
       />
 
-      <FormFooter />
+      <FormFooter
+        buttonText="Login"
+        footerLink="/sign-up"
+        footerText="Ainda não possui uma conta?"
+        isLoading={isLoading}
+      />
     </S.FormStyled>
   );
 };

@@ -1,6 +1,6 @@
 import * as S from './styles';
 
-const InputField = ({ icon, type, placeholder, value, onChange }) => (
+const InputField = ({ icon, type, placeholder, value, onChange, name }) => (
   <S.InputContainer>
     <S.StyledIcon name={icon}/>
     <S.Input
@@ -8,6 +8,7 @@ const InputField = ({ icon, type, placeholder, value, onChange }) => (
       placeholder={placeholder}
       value={value}
       onChange={onChange}
+      name={name}
     />
   </S.InputContainer>
 );

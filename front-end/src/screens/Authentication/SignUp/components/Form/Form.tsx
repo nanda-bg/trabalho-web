@@ -1,82 +1,47 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import * as S from "./styles";
-import {
-  createUserWithEmailAndPassword,
-  getAuth,
-} from "firebase/auth";
-import { useNavigate } from "react-router-dom";
-import FormFooter from "../FormFooter/FormFooter";
-import InputField from "@app/screens/Authentication/commonComponents/InputField/InputField";
+import InputField from "@app/screens/CommomComponents/InputField/InputField";
 import ErrorAlert from "@app/screens/Authentication/commonComponents/ErrorAlert/ErrorAlert";
+import FormFooter from "@app/screens/Authentication/commonComponents/FormFooter/FormFooter";
+import { useAppSelector } from "@app/store/rootReducer";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { signUp } from "@app/store/slices/SignUpSlice";
 
 const SignUpForm = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { userId } = useAppSelector(
+    (state) => state.userSlice
+  );
+
+  const { defaultError, emailError, passwordError, isLoading } = useAppSelector(
+    (state) => state.signUpSlice
+  );
 
   const [formData, setFormData] = useState({
+    name: "",
     username: "",
     email: "",
     password: "",
   });
-  const [defaultError, setDefaultError] = useState(null);
-  const [usernameError, setUsernameError] = useState(null);
-  const [emailError, setEmailError] = useState(null);
-  const [passwordError, setPasswordError] = useState(null);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const resetErrors = () => {
-    setDefaultError(null);
-    setUsernameError(null);
-    setEmailError(null);
-    setPasswordError(null);
-  };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    resetErrors();
-
-    if (!formData.email || !formData.password || !formData.username) {
-      setDefaultError("Preencha todos os campos.");
-      return;
-    }
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setEmailError("Por favor, insira um endereço de e-mail válido.");
-      return;
-    }
-
-    if (
-      formData.password.length < 8 ||
-      !/\d/.test(formData.password) ||
-      !/[A-Z]/.test(formData.password)
-    ) {
-      setPasswordError(
-        `A senha precisa ter:\n• No mínimo 8 caracteres\n• Um número\n• Uma letra maiúscula`
-      );
-      return;
-    }
-
-    try {
-      const auth = getAuth();
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        formData.email,
-        formData.password
-      );
-      const user = userCredential.user;
-
-      console.log("Usuário cadastrado com sucesso:", user.uid);
-
-      navigate("/");
-    } catch (error) {
-      setDefaultError("Ocorreu um erro ao cadastrar.");
-      console.error("Erro ao adicionar documento: ", error);
-    }
+    dispatch(signUp(formData));
   };
+
+  useEffect(() => {
+    if (userId) {
+      navigate("/home");
+    }
+  }, [userId, navigate]);
 
   return (
     <S.FormStyled onSubmit={handleSubmit}>
@@ -86,11 +51,19 @@ const SignUpForm = () => {
         icon={"user-round"}
         type={"text"}
         onChange={handleChange}
-        placeholder="Username"
-        value={formData.username}
+        placeholder="Name"
+        value={formData.name}
+        name="name"
       />
 
-      {usernameError && <ErrorAlert error={usernameError} />}
+      <InputField
+        icon={"at-sign"}
+        type={"text"}
+        onChange={handleChange}
+        placeholder="Username"
+        value={formData.username}
+        name="username"
+      />
 
       <InputField
         icon={"mail"}
@@ -98,6 +71,7 @@ const SignUpForm = () => {
         onChange={handleChange}
         placeholder="E-mail"
         value={formData.email}
+        name="email"
       />
 
       {emailError && <ErrorAlert error={emailError} />}
@@ -108,11 +82,17 @@ const SignUpForm = () => {
         placeholder="Senha"
         onChange={handleChange}
         value={formData.password}
+        name="password"
       />
 
       {passwordError && <ErrorAlert error={passwordError} />}
 
-      <FormFooter />
+      <FormFooter
+        buttonText="Cadastrar"
+        footerText="Já tem uma conta?"
+        footerLink="/"
+        isLoading={isLoading}
+      />
     </S.FormStyled>
   );
 };

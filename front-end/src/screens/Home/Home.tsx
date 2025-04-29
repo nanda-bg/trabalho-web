@@ -4,47 +4,39 @@ import HorizontalBooksList from "./components/HorizontalBooksList/HorizontalBook
 import ReviewCard from "./components/ReviewCard/ReviewCard";
 import WelcomeCard from "./components/WelcomeCard/WelcomeCard";
 import * as S from "./styles";
-import { Home, Search, Bell, User } from "lucide-react";
+import { useEffect } from "react";
+import { useAppSelector } from "@app/store/rootReducer";
+import { useNavigate } from "react-router-dom";
+import { GlobalStyle } from "@app/styles/GlobalStyles";
 
 export default function HomeScreen() {
-  const user = {
-    name: "Kyran",
-    avatar: "https://i.pravatar.cc/300",
-  };
+  const navigate = useNavigate();
+  const { userId } = useAppSelector((state) => state.userSlice);
+
+  useEffect(() => {
+    if (!userId) {
+      navigate("/");
+    }
+  }, [userId, navigate]);
 
   return (
     <>
-      <S.GlobalStyle />
+      <GlobalStyle />
       <S.AppContainer>
-        <Header profileImgUrl={user.avatar} />
+        <Header />
 
         <S.MainContent>
-          <WelcomeCard name={user.name} />
+          <WelcomeCard />
 
-          <S.SectionTitle>Popular Books This Month</S.SectionTitle>
+          <S.SectionTitle>Livros populares</S.SectionTitle>
           <HorizontalBooksList />
 
-          <S.SectionTitle>Recent Friends Review</S.SectionTitle>
+          <S.SectionTitle>Avaliações de amigos</S.SectionTitle>
 
           {mockedReviews.map((review) => (
             <ReviewCard review={review} key={review.id} />
           ))}
         </S.MainContent>
-
-        <S.BottomNav>
-          <S.NavButton $active>
-            <Home size={20} />
-          </S.NavButton>
-          <S.NavButton>
-            <Search size={20} />
-          </S.NavButton>
-          <S.NavButton>
-            <Bell size={20} />
-          </S.NavButton>
-          <S.NavButton>
-            <User size={20} />
-          </S.NavButton>
-        </S.BottomNav>
       </S.AppContainer>
     </>
   );

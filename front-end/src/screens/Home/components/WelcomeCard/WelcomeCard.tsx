@@ -1,15 +1,13 @@
-import { FC } from "react";
 import * as S from "./styles";
+import { useAppSelector } from "@app/store/rootReducer";
 
-interface WelcomeCardProps {
-    name: string
-}
+const WelcomeCard = () => {
+  const { name } = useAppSelector((state) => state.userSlice);
 
-const WelcomeCard: FC<WelcomeCardProps> = ({name}) => {
   return (
     <S.HeroSection>
-      <S.GreetingText>Hello, {name}!</S.GreetingText>
-      <S.SubText>Review or track books that you read.</S.SubText>
+      <S.GreetingText>Olá, {name}!</S.GreetingText>
+      <S.SubText>Registre e avalie os livros que você leu.</S.SubText>
     </S.HeroSection>
   );
 };

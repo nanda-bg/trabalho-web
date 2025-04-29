@@ -1,19 +1,5 @@
 import { FC } from "react";
-import styled, { createGlobalStyle } from "styled-components";
-
-export const GlobalStyle = createGlobalStyle`
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
-  }
-  
-  body {
-    background-color: #1a1a2e;
-    color: #fff;
-  }
-`;
+import styled from "styled-components";
 
 export const AppContainer = styled.div`
   max-width: 430px;
