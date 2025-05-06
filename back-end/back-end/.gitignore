@@ -1,4 +1,5 @@
 HELP.md
+serviceAccountKey.json
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
@@ -22,6 +23,11 @@ target/
 # misc
 .DS_Store
 *.env
+
+# Ignorar todos os arquivos de configuração sensíveis
+*Key.json
+*.key
+config.json
 
 ### NetBeans ###
 /nbproject/private/
