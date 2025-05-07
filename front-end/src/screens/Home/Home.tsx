@@ -1,13 +1,14 @@
 import { mockedReviews } from "@app/utils/mocks/MockedReview";
 import Header from "./components/Header/Header";
-import HorizontalBooksList from "./components/HorizontalBooksList/HorizontalBooksList";
-import ReviewCard from "./components/ReviewCard/ReviewCard";
+import HorizontalBooksList from "../CommomComponents/HorizontalBooksList/HorizontalBooksList";
+import ReviewCard from "../CommomComponents/ReviewCard/ReviewCard";
 import WelcomeCard from "./components/WelcomeCard/WelcomeCard";
 import * as S from "./styles";
 import { useEffect } from "react";
 import { useAppSelector } from "@app/store/rootReducer";
 import { useNavigate } from "react-router-dom";
 import { GlobalStyle } from "@app/styles/GlobalStyles";
+import { mockedPopularBooks } from "@app/utils/mocks/MockedPopularBooks";
 
 export default function HomeScreen() {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ export default function HomeScreen() {
           <WelcomeCard />
 
           <S.SectionTitle>Livros populares</S.SectionTitle>
-          <HorizontalBooksList />
+          <HorizontalBooksList books={mockedPopularBooks}/>
 
           <S.SectionTitle>Avaliações de amigos</S.SectionTitle>
 

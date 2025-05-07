@@ -4,9 +4,10 @@ export type Book = {
     authors: string[];
     year: number;
     isbn: string;
-    genre: string;
+    genres: string[];
     coverUrl: string;
     pages?: number;
     description?: string;
+    rating?: number;
   };
   
