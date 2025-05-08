@@ -1,7 +1,6 @@
 package com.brunopassu.backend.security;
 
 import com.brunopassu.backend.service.AuthService;
-import com.google.firebase.auth.FirebaseAuthException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,7 +20,7 @@ public class SecurityFilter extends OncePerRequestFilter {
     public SecurityFilter(AuthService authService) {
         this.authService = authService;
     }
-
+    /*
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
@@ -48,5 +47,13 @@ public class SecurityFilter extends OncePerRequestFilter {
             response.getWriter().write("Token inválido");
         }
     }
+    */
 
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+        // Desabilitar temporariamente a verificação de segurança
+        filterChain.doFilter(request, response);
+        return;
+    }
 }

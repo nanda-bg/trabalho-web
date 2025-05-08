@@ -1,10 +1,5 @@
 package com.brunopassu.backend.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-
-@AllArgsConstructor
-@NoArgsConstructor
 public class User {
 
     private String uid; //Chave primária *
@@ -15,6 +10,20 @@ public class User {
     private String bio;
     private Integer followers;
     private Integer following;
+
+    public User() {
+    }
+
+    public User(String uid, String email, String name, String username, String profilePicture, String bio, Integer followers, Integer following) {
+        this.uid = uid;
+        this.email = email;
+        this.name = name;
+        this.username = username;
+        this.profilePicture = profilePicture;
+        this.bio = bio;
+        this.followers = followers;
+        this.following = following;
+    }
 
     //Construtor sem opcionais
     public User (String email, String username) {

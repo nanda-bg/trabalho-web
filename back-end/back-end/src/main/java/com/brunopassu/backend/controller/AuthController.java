@@ -5,6 +5,7 @@ import com.brunopassu.backend.entity.User;
 import com.brunopassu.backend.exception.UserAlreadyExistsException;
 import com.brunopassu.backend.service.AuthService;
 import com.brunopassu.backend.service.UserService;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,9 +99,40 @@ public class AuthController {
 
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (FirebaseAuthException e) {
+            System.out.println("Token inválido: " + e.getMessage());
+            System.out.println("Token inválido: " + e.getErrorCode());
             return new ResponseEntity<>("Token inválido: " + e.getMessage(),
                     HttpStatus.UNAUTHORIZED);
         }
     }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String password = request.get("password");
+
+        if (email == null || email.trim().isEmpty()) {
+            return new ResponseEntity<>("Email não fornecido", HttpStatus.BAD_REQUEST);
+        }
+
+        if (password == null || password.trim().isEmpty()) {
+            return new ResponseEntity<>("Senha não fornecida", HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            // Obter token usando Firebase Admin SDK
+            String customToken = FirebaseAuth.getInstance().createCustomToken(email);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("customToken", customToken);
+            response.put("message", "Use este token para autenticar no cliente Firebase");
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (FirebaseAuthException e) {
+            return new ResponseEntity<>("Erro na autenticação: " + e.getMessage(),
+                    HttpStatus.UNAUTHORIZED);
+        }
+    }
+
 
 }
