@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -41,6 +42,20 @@ public class UserService {
 
     public List<User> getAllUsers() throws ExecutionException, InterruptedException {
         return userRepository.getAllUsers();
+    }
+
+    public boolean updateUser(User user) throws ExecutionException, InterruptedException {
+        // Aqui você pode adicionar validações ou lógica adicional antes da atualização
+        return userRepository.updateUser(user);
+    }
+
+    public boolean updateUserFields(String userId, Map<String, Object> fields) throws ExecutionException, InterruptedException {
+        // Validações adicionais podem ser feitas aqui
+        return userRepository.updateUserFields(userId, fields);
+    }
+
+    public boolean deleteUser(String userId) throws ExecutionException, InterruptedException {
+        return userRepository.deleteUser(userId);
     }
 
     public boolean checkUsernameExists(String username) throws ExecutionException, InterruptedException, IOException {

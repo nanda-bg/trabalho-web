@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @Repository
@@ -76,5 +77,67 @@ public class UserRepository {
         return users;
     }
 
+    public boolean updateUser(User user) throws ExecutionException, InterruptedException {
+        if (user.getUid() == null || user.getUid().isEmpty()) {
+            return false; // Não podemos atualizar sem um ID
+        }
 
+        Firestore firestore = FirestoreClient.getFirestore();
+        DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(user.getUid());
+
+        // Verifica se o documento existe antes de atualizar
+        DocumentSnapshot document = docRef.get().get();
+        if (!document.exists()) {
+            return false;
+        }
+
+        // Atualiza o documento
+        ApiFuture<WriteResult> writeResult = docRef.set(user);
+        writeResult.get(); // Aguarda a operação ser concluída
+
+        return true;
+    }
+
+    // Método alternativo que atualiza apenas campos específicos
+    public boolean updateUserFields(String userId, Map<String, Object> fields) throws ExecutionException, InterruptedException {
+        if (userId == null || userId.isEmpty() || fields == null || fields.isEmpty()) {
+            return false;
+        }
+
+        Firestore firestore = FirestoreClient.getFirestore();
+        DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(userId);
+
+        // Verifica se o documento existe
+        DocumentSnapshot document = docRef.get().get();
+        if (!document.exists()) {
+            return false;
+        }
+
+        // Atualiza apenas os campos fornecidos
+        ApiFuture<WriteResult> writeResult = docRef.update(fields);
+        writeResult.get(); // Aguarda a operação ser concluída
+
+        return true;
+    }
+
+    public boolean deleteUser(String userId) throws ExecutionException, InterruptedException {
+        if (userId == null || userId.isEmpty()) {
+            return false;
+        }
+
+        Firestore firestore = FirestoreClient.getFirestore();
+        DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(userId);
+
+        // Verifica se o documento existe antes de deletar
+        DocumentSnapshot document = docRef.get().get();
+        if (!document.exists()) {
+            return false;
+        }
+
+        // Deleta o documento
+        ApiFuture<WriteResult> writeResult = docRef.delete();
+        writeResult.get(); // Aguarda a operação ser concluída
+
+        return true;
+    }
 }

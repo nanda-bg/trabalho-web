@@ -2,13 +2,13 @@ package com.brunopassu.backend.controller;
 
 import com.brunopassu.backend.entity.User;
 import com.brunopassu.backend.service.UserService;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -70,6 +70,54 @@ public class UserController {
             }
         } catch (ExecutionException | InterruptedException e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/id/{id}")
+    public ResponseEntity<String> updateUser(@PathVariable String id, @RequestBody User user) {
+        try {
+            // Garante que o ID no path seja o mesmo usado para atualização
+            user.setUid(id);
+
+            boolean updated = userService.updateUser(user);
+            if (updated) {
+                return new ResponseEntity<>("Usuário atualizado com sucesso", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Usuário não encontrado", HttpStatus.NOT_FOUND);
+            }
+        } catch (ExecutionException | InterruptedException e) {
+            return new ResponseEntity<>("Erro ao atualizar usuário: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PatchMapping("/id/{id}")
+    public ResponseEntity<String> updateUserFields(@PathVariable String id, @RequestBody Map<String, Object> fields) {
+        try {
+            boolean updated = userService.updateUserFields(id, fields);
+            if (updated) {
+                return new ResponseEntity<>("Campos do usuário atualizados com sucesso", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Usuário não encontrado", HttpStatus.NOT_FOUND);
+            }
+        } catch (ExecutionException | InterruptedException e) {
+            return new ResponseEntity<>("Erro ao atualizar campos do usuário: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/id/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable String id) {
+        try {
+            boolean deleted = userService.deleteUser(id);
+            if (deleted) {
+                return new ResponseEntity<>("Usuário deletado com sucesso", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Usuário não encontrado", HttpStatus.NOT_FOUND);
+            }
+        } catch (ExecutionException | InterruptedException e) {
+            return new ResponseEntity<>("Erro ao deletar usuário: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
