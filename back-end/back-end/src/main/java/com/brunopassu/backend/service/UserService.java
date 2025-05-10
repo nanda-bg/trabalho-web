@@ -2,7 +2,13 @@ package com.brunopassu.backend.service;
 
 import com.brunopassu.backend.config.FirestoreConfig;
 import com.brunopassu.backend.entity.User;
+import com.brunopassu.backend.exception.UserAlreadyExistsException;
+import com.brunopassu.backend.exception.UserEmailmmutableFieldException;
+import com.brunopassu.backend.exception.UserUsernameImmutableFieldException;
 import com.brunopassu.backend.repository.UserRepository;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.UserRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,17 +50,123 @@ public class UserService {
         return userRepository.getAllUsers();
     }
 
-    public boolean updateUser(User user) throws ExecutionException, InterruptedException {
-        // Aqui você pode adicionar validações ou lógica adicional antes da atualização
+    public boolean updateUser(User user) throws ExecutionException, InterruptedException, IOException,
+            UserAlreadyExistsException, UserUsernameImmutableFieldException, UserEmailmmutableFieldException, FirebaseAuthException {
+
+        if (user.getUid() == null || user.getUid().isEmpty()) {
+            return false; // Não podemos atualizar sem um ID
+        }
+
+        // Obter usuário atual para comparação
+        User existingUser = getUserById(user.getUid());
+        if (existingUser == null) {
+            return false;
+        }
+
+        // Verificar se o username foi alterado
+        if (!existingUser.getUsername().equals(user.getUsername())) {
+            // Verificar se o novo username já existe
+            if (checkUsernameExists(user.getUsername())) {
+                throw new UserUsernameImmutableFieldException("Username já está em uso por outro usuário!");
+            }
+        }
+
+        // Verificar se o email foi alterado
+        if (!existingUser.getEmail().equals(user.getEmail())) {
+            // Verificar se o novo email já existe
+            if (checkEmailExists(user.getEmail())) {
+                throw new UserEmailmmutableFieldException("Email já está em uso por outro usuário!");
+            }
+
+            // Atualizar o email no Firebase Authentication
+            try {
+                UserRecord.UpdateRequest request = new UserRecord.UpdateRequest(user.getUid())
+                        .setEmail(user.getEmail());
+                FirebaseAuth.getInstance().updateUser(request);
+            } catch (FirebaseAuthException e) {
+                // Se falhar a atualização no Authentication, não prosseguir com a atualização no Firestore
+                throw new FirebaseAuthException(e);
+            }
+        }
+
+        // Atualiza o documento no Firestore
         return userRepository.updateUser(user);
     }
 
-    public boolean updateUserFields(String userId, Map<String, Object> fields) throws ExecutionException, InterruptedException {
-        // Validações adicionais podem ser feitas aqui
+
+    public boolean updateUserFields(String userId, Map<String, Object> fields)
+            throws ExecutionException, InterruptedException, IOException,
+            UserAlreadyExistsException, UserUsernameImmutableFieldException,
+            UserEmailmmutableFieldException, FirebaseAuthException {
+
+        if (userId == null || userId.isEmpty() || fields == null || fields.isEmpty()) {
+            return false;
+        }
+
+        // Obter usuário atual
+        User existingUser = getUserById(userId);
+        if (existingUser == null) {
+            return false;
+        }
+
+        // Verificar username se estiver nos campos a serem atualizados
+        if (fields.containsKey("username")) {
+            String newUsername = (String) fields.get("username");
+            if (!existingUser.getUsername().equals(newUsername)) {
+                if (checkUsernameExists(newUsername)) {
+                    throw new UserUsernameImmutableFieldException("Username já está em uso por outro usuário!");
+                }
+            }
+        }
+
+        // Verificar email se estiver nos campos a serem atualizados
+        if (fields.containsKey("email")) {
+            String newEmail = (String) fields.get("email");
+            if (!existingUser.getEmail().equals(newEmail)) {
+                if (checkEmailExists(newEmail)) {
+                    throw new UserEmailmmutableFieldException("Email já está em uso por outro usuário!");
+                }
+
+                // Atualizar o email no Firebase Authentication
+                try {
+                    UserRecord.UpdateRequest request = new UserRecord.UpdateRequest(userId)
+                            .setEmail(newEmail);
+                    FirebaseAuth.getInstance().updateUser(request);
+                } catch (FirebaseAuthException e) {
+                    throw new FirebaseAuthException(e);
+                }
+            }
+        }
+
+        // Atualiza apenas os campos fornecidos no Firestore
         return userRepository.updateUserFields(userId, fields);
     }
 
-    public boolean deleteUser(String userId) throws ExecutionException, InterruptedException {
+    public boolean deleteUser(String userId) throws ExecutionException, InterruptedException, FirebaseAuthException {
+        if (userId == null || userId.isEmpty()) {
+            return false;
+        }
+
+        // Primeiro, verifica se o usuário existe no Firestore
+        User user = getUserById(userId);
+        if (user == null) {
+            return false;
+        }
+
+        // Tenta excluir do Authentication primeiro
+        try {
+            FirebaseAuth.getInstance().deleteUser(userId);
+        } catch (FirebaseAuthException e) {
+            // Se o usuário não existir no Authentication, podemos prosseguir com a exclusão do Firestore
+            if (e.getErrorCode().equals("user-not-found")) {
+                System.out.println("Usuário não encontrado no Authentication, prosseguindo com exclusão do Firestore");
+            } else {
+                // Para outros erros, propaga a exceção
+                throw e;
+            }
+        }
+
+        // Exclui do Firestore
         return userRepository.deleteUser(userId);
     }
 
@@ -62,6 +174,16 @@ public class UserService {
         return firestore.firestore().
                 collection("users")
                 .whereEqualTo("username", username)
+                .get()
+                .get() // Segundo get() para obter o resultado do Future
+                .getDocuments()
+                .size() > 0;
+    }
+
+    public boolean checkEmailExists(String email) throws ExecutionException, InterruptedException, IOException {
+        return firestore.firestore()
+                .collection("users")
+                .whereEqualTo("email", email)
                 .get()
                 .get() // Segundo get() para obter o resultado do Future
                 .getDocuments()

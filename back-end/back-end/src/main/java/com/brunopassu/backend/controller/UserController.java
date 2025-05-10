@@ -1,12 +1,17 @@
 package com.brunopassu.backend.controller;
 
 import com.brunopassu.backend.entity.User;
+import com.brunopassu.backend.exception.UserAlreadyExistsException;
+import com.brunopassu.backend.exception.UserEmailmmutableFieldException;
+import com.brunopassu.backend.exception.UserUsernameImmutableFieldException;
 import com.brunopassu.backend.service.UserService;
+import com.google.firebase.auth.FirebaseAuthException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -74,25 +79,32 @@ public class UserController {
     }
 
     @PutMapping("/id/{id}")
-    public ResponseEntity<String> updateUser(@PathVariable String id, @RequestBody User user) {
+    public ResponseEntity<?> updateUser(@PathVariable String id, @RequestBody User user) {
         try {
             // Garante que o ID no path seja o mesmo usado para atualização
             user.setUid(id);
-
             boolean updated = userService.updateUser(user);
+
             if (updated) {
                 return new ResponseEntity<>("Usuário atualizado com sucesso", HttpStatus.OK);
             } else {
                 return new ResponseEntity<>("Usuário não encontrado", HttpStatus.NOT_FOUND);
             }
-        } catch (ExecutionException | InterruptedException e) {
+        } catch (UserAlreadyExistsException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        } catch (UserUsernameImmutableFieldException | UserEmailmmutableFieldException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        } catch (FirebaseAuthException e) {
+            return new ResponseEntity<>("Erro ao atualizar usuário no Authentication: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (ExecutionException | InterruptedException | IOException e) {
             return new ResponseEntity<>("Erro ao atualizar usuário: " + e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PatchMapping("/id/{id}")
-    public ResponseEntity<String> updateUserFields(@PathVariable String id, @RequestBody Map<String, Object> fields) {
+    public ResponseEntity<?> updateUserFields(@PathVariable String id, @RequestBody Map<String, Object> fields) {
         try {
             boolean updated = userService.updateUserFields(id, fields);
             if (updated) {
@@ -100,24 +112,35 @@ public class UserController {
             } else {
                 return new ResponseEntity<>("Usuário não encontrado", HttpStatus.NOT_FOUND);
             }
-        } catch (ExecutionException | InterruptedException e) {
+        } catch (UserAlreadyExistsException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        } catch (UserUsernameImmutableFieldException | UserEmailmmutableFieldException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        } catch (FirebaseAuthException e) {
+            return new ResponseEntity<>("Erro ao atualizar usuário no Authentication: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (ExecutionException | InterruptedException | IOException e) {
             return new ResponseEntity<>("Erro ao atualizar campos do usuário: " + e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @DeleteMapping("/id/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable String id) {
+    public ResponseEntity<?> deleteUser(@PathVariable String id) {
         try {
             boolean deleted = userService.deleteUser(id);
             if (deleted) {
-                return new ResponseEntity<>("Usuário deletado com sucesso", HttpStatus.OK);
+                return new ResponseEntity<>("Usuário deletado com sucesso do Firestore e Authentication", HttpStatus.OK);
             } else {
                 return new ResponseEntity<>("Usuário não encontrado", HttpStatus.NOT_FOUND);
             }
+        } catch (FirebaseAuthException e) {
+            return new ResponseEntity<>("Erro ao deletar usuário do Authentication: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (ExecutionException | InterruptedException e) {
             return new ResponseEntity<>("Erro ao deletar usuário: " + e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 }
