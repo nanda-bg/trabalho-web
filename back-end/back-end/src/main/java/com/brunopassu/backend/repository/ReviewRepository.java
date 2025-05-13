@@ -9,9 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @Repository
@@ -118,27 +116,16 @@ public class ReviewRepository {
         Firestore firestore = firestoreConfig.firestore();
         DocumentReference docRef = firestore.collection("reviews").document(reviewId);
 
-        // Transação para incrementar o contador de forma segura
-        ApiFuture<Transaction> transaction = firestore.runTransaction(transaction1 -> {
-            DocumentSnapshot snapshot = transaction1.get(docRef).get();
-            if (snapshot.exists()) {
-                // Obter o valor atual do contador
-                Integer currentCount = snapshot.getLong("likeCount") != null
-                        ? snapshot.getLong("likeCount").intValue()
-                        : 0;
+        // Primeiro, verifique se o documento existe
+        DocumentSnapshot snapshot = docRef.get().get();
+        if (!snapshot.exists()) {
+            return false;
+        }
 
-                // Incrementar o contador
-                Map<String, Object> updates = new HashMap<>();
-                updates.put("likeCount", currentCount + 1);
+        // Use FieldValue.increment para atualização atômica
+        ApiFuture<WriteResult> writeResult = docRef.update("likeCount", FieldValue.increment(1));
+        writeResult.get();
 
-                // Atualizar o documento
-                transaction1.update(docRef, updates);
-            }
-            return null;
-        });
-
-        // Aguardar conclusão da transação
-        transaction.get();
         return true;
     }
 

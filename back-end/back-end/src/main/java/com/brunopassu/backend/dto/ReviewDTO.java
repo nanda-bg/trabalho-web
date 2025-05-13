@@ -17,5 +17,6 @@ public class ReviewDTO {
     private Timestamp date; // Data de criação
     private Integer likeCount;
     private boolean spoiler;
+    private Timestamp dateLastUpdated;
 
 }

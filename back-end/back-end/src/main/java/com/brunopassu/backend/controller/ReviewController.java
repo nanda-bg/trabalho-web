@@ -1,5 +1,6 @@
 package com.brunopassu.backend.controller;
 
+import com.brunopassu.backend.dto.LikeDTO;
 import com.brunopassu.backend.dto.ReviewDTO;
 import com.brunopassu.backend.service.ReviewService;
 import jakarta.validation.Valid;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -97,6 +99,7 @@ public class ReviewController {
         }
     }
 
+    /*
     @PostMapping("/{reviewId}/like")
     public ResponseEntity<String> likeReview(@PathVariable String reviewId) {
         try {
@@ -108,6 +111,49 @@ public class ReviewController {
             return new ResponseEntity<>("Erro ao processar like: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    */
+    //FUNCIONANDO COM O ID DO USUARIO NO CORPO DA REQUISIÇÃO
+    @PostMapping("/{reviewId}/like")
+    public ResponseEntity<?> toggleLike(@PathVariable String reviewId, @RequestBody LikeDTO likeDto) {
+        try {
+            // Como a autenticação está desabilitada, recebemos o userId como parâmetro
+            // em vez de extraí-lo do token de autenticação
+
+            String userUid = likeDto.getUserUid();
+
+            boolean result = reviewService.toggleLike(userUid, reviewId);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "action", result ? "liked" : "unliked"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Erro ao processar like: " + e.getMessage()));
+        }
+    }
+
+
+    /*
+    TIRAR QUANDO VOLTAR A SEGURANÇA COM TOKEN!
+    @PostMapping("/{reviewId}/like")
+    public ResponseEntity<?> toggleLike(@PathVariable String reviewId, Authentication authentication) {
+        try {
+            // Extrair ID do usuário autenticado
+            String userId = ((FirebaseToken) authentication.getPrincipal()).getUid();
+
+            boolean result = reviewService.toggleLike(userId, reviewId);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "action", result ? "liked" : "unliked"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Erro ao processar like: " + e.getMessage()));
+        }
+    }
+    */
 
     @DeleteMapping("/{reviewId}")
     public ResponseEntity<String> deleteReview(@PathVariable String reviewId) {

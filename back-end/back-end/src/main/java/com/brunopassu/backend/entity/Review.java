@@ -27,10 +27,13 @@ public class Review {
     private Integer likeCount;
     private boolean spoiler;
 
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private Timestamp dateLastUpdated;
+
     public Review (){
     }
 
-    public Review(String reviewID, DocumentReference userRef, DocumentReference bookRef, Integer rating, String reviewText, Timestamp date, Integer likeCount, boolean spoiler) {
+    public Review(String reviewID, DocumentReference userRef, DocumentReference bookRef, Integer rating, String reviewText, Timestamp date, Integer likeCount, boolean spoiler, Timestamp dateLastUpdated) {
         this.reviewId = reviewID;
         this.UserRef = userRef;
         this.BookRef = bookRef;
@@ -39,6 +42,7 @@ public class Review {
         this.date = date;
         this.likeCount = likeCount;
         this.spoiler = spoiler;
+        this.dateLastUpdated = dateLastUpdated;
     }
 
     public String getReviewId() {
@@ -103,5 +107,13 @@ public class Review {
 
     public void setSpoiler(boolean spoiler) {
         this.spoiler = spoiler;
+    }
+
+    public Timestamp getDateLastUpdated() {
+        return dateLastUpdated;
+    }
+
+    public void setDateLastUpdated(Timestamp dateLastUpdated) {
+        this.dateLastUpdated = dateLastUpdated;
     }
 }

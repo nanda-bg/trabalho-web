@@ -1,0 +1,44 @@
+USER:
+http://localhost:8080/auth/register
+POST:
+{
+     "email": "teste10@gmail.com",
+     "password": "12345678",
+     "name": "teste10",
+     "username": "teste10",
+     "profilePicture": null,
+     "bio": "teste10"
+}
+
+BOOK:
+http://localhost:8080/books
+POST:
+{
+    "title": "teste10",
+    "description": "teste10",
+    "authors": ["teste1", "teste0"],
+    "coverUrl": null,
+    "publicationYear": 2010,
+    "genres": ["teste1", "teste0"],
+    "pagesCount": 1010
+}
+
+REVIEWS:
+http://localhost:8080/reviews
+POST:
+{
+    "reviewText": "teste10",
+    "rating": 5,
+    "spoiler": false,
+    "userUid": "NgZ5LTwLB8dpZ4MvH9GaD5TtzQ22",
+    "bookId": "HoWjzDuQcjD9GZvdpqTg"
+}
+//USERID: TESTE10
+//BOOKID: TESTE 10
+
+LIKES:
+http://localhost:8080/reviews/{reviewId}/like
+{
+    "userUid": "NgZ5LTwLB8dpZ4MvH9GaD5TtzQ22"
+}
+//CORPO DA REQUISIÇÃO MOMENTO
