@@ -42,3 +42,10 @@ http://localhost:8080/reviews/{reviewId}/like
     "userUid": "NgZ5LTwLB8dpZ4MvH9GaD5TtzQ22"
 }
 //CORPO DA REQUISIÇÃO MOMENTO
+
+USERRELATIONSHIP:
+following --> follower
+POST:
+DESENVOLVIMENTO: http://localhost:8080/users/{followerId}/follow/{followingId}
+PRODUÇÃO: http://localhost:8080/users/follow/{followingId}
+

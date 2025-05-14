@@ -9,9 +9,7 @@ import com.brunopassu.backend.entity.User;
 import com.brunopassu.backend.repository.LikeRepository;
 import com.brunopassu.backend.repository.ReviewRepository;
 import com.google.cloud.Timestamp;
-import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.DocumentSnapshot;
-import com.google.cloud.firestore.FirestoreException;
+import com.google.cloud.firestore.*;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -46,10 +44,81 @@ public class ReviewService {
             review.setLikeCount(0);
         }
 
+        String reviewId = reviewRepository.saveReview(review);
+
+        //updateBookRatingIncremental(review.getBookRef().getId(), review.getRating(), 0, true);
+        // Atualizar a média de avaliação e contador do livro
+        updateBookRating(review.getBookRef().getId());
 
         // Salvar no repositório
-        return reviewRepository.saveReview(review);
+        return reviewId;
     }
+
+    private void updateBookRating(String bookId) throws ExecutionException, InterruptedException, IOException {
+        // Buscar todas as reviews para este livro
+        List<Review> reviews = reviewRepository.getReviewsByBookId(bookId);
+
+        // Calcular a nova média
+        double sum = 0;
+        for (Review review : reviews) {
+            sum += review.getRating();
+        }
+
+        int count = reviews.size();
+        double average = count > 0 ? sum / count : 0;
+
+        // Arredondar para uma casa decimal
+        average = Math.round(average * 10.0) / 10.0;
+
+        // Atualizar o livro
+        Firestore firestore = this.firestore.firestore();
+        DocumentReference bookRef = firestore.collection("books").document(bookId);
+
+        WriteBatch batch = firestore.batch();
+        batch.update(bookRef, "averageRating", average);
+        batch.update(bookRef, "ratingsCount", count);
+        batch.commit().get();
+    }
+
+    public void updateBookRatingIncremental(String bookId, double newRating, double oldRating, boolean isNew) throws IOException {
+        Firestore firestore = this.firestore.firestore();
+        DocumentReference bookRef = firestore.collection("books").document(bookId);
+
+        firestore.runTransaction(transaction -> {
+            DocumentSnapshot bookSnapshot = transaction.get(bookRef).get();
+            Book book = bookSnapshot.toObject(Book.class);
+
+            double currentAvg = book.getAverageRating();
+            int currentCount = book.getRatingsCount();
+
+            // Calcular nova média e contador
+            int newCount;
+            double newAvg;
+
+            if (isNew) {
+                // Nova review
+                newCount = currentCount + 1;
+                newAvg = ((currentAvg * currentCount) + newRating) / newCount;
+            } else if (oldRating != newRating) {
+                // Atualização de review
+                newCount = currentCount;
+                newAvg = ((currentAvg * currentCount) - oldRating + newRating) / newCount;
+            } else {
+                // Nenhuma mudança necessária
+                return null;
+            }
+
+            // Arredondar para uma casa decimal
+            newAvg = Math.round(newAvg * 10.0) / 10.0;
+
+            // Atualizar o livro
+            transaction.update(bookRef, "averageRating", newAvg);
+            transaction.update(bookRef, "ratingsCount", newCount);
+
+            return null;
+        });
+    }
+
 
     public List<ReviewDTO> getAllReviews() throws ExecutionException, InterruptedException, IOException {
         List<Review> reviews = reviewRepository.getAllReviews();
@@ -79,9 +148,7 @@ public class ReviewService {
 
     public boolean updateReview(ReviewDTO reviewDTO) throws ExecutionException, InterruptedException, IOException {
         //GAMBIARRA DO BRUNÃO:
-
         ReviewDTO existingReview = getReviewById(reviewDTO.getReviewId());
-
         if (existingReview == null) {
             return false;
         }
@@ -89,12 +156,32 @@ public class ReviewService {
         Review review = convertToEntity(reviewDTO);
         review.setDateLastUpdated(Timestamp.now());
         review.setDate(existingReview.getDate());
+        boolean updated = reviewRepository.updateReview(review);
 
-        return reviewRepository.updateReview(review);
+        if (updated) {
+            // Atualizar a média de avaliação e contador do livro
+            updateBookRating(review.getBookRef().getId());
+        }
+
+        return updated;
     }
 
     public boolean deleteReview(String reviewId) throws ExecutionException, InterruptedException, IOException {
-        return reviewRepository.deleteReview(reviewId);
+        // Obter a review antes de excluí-la para saber qual livro atualizar
+        Review review = reviewRepository.getReviewById(reviewId);
+        if (review == null) {
+            return false;
+        }
+
+        String bookId = review.getBookRef().getId();
+        boolean deleted = reviewRepository.deleteReview(reviewId);
+
+        if (deleted) {
+            // Atualizar a média de avaliação e contador do livro
+            updateBookRating(bookId);
+        }
+
+        return deleted;
     }
 
     // Atualizar apenas o contador de likes
