@@ -6,8 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="8e9f613b-8c25-4c30-8cdb-8a962897647d" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/JsonModel.txt" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/JsonModel.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/service/ReviewService.java" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/service/ReviewService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/controller/AuthController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/security/SecurityFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/security/SecurityFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/service/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/service/AuthService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -117,7 +118,8 @@
       <workItem from="1746704055616" duration="7367000" />
       <workItem from="1746975843485" duration="11430000" />
       <workItem from="1747149316809" duration="12935000" />
-      <workItem from="1747236934397" duration="11780000" />
+      <workItem from="1747236934397" duration="12451000" />
+      <workItem from="1747320965622" duration="15194000" />
     </task>
     <servers />
   </component>

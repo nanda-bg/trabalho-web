@@ -24,8 +24,20 @@ public class AuthService {
     }
 
     public String verifyToken(String idToken) throws FirebaseAuthException {
-        return FirebaseAuth.getInstance().verifyIdToken(idToken).getUid();
+        System.out.println("==== AUTH SERVICE - VERIFY TOKEN ====");
+        System.out.println("Verificando token: " + idToken.substring(0, Math.min(idToken.length(), 20)) + "...");
+
+        try {
+            String uid = FirebaseAuth.getInstance().verifyIdToken(idToken).getUid();
+            System.out.println("Token verificado com sucesso. UID: " + uid);
+            return uid;
+        } catch (FirebaseAuthException e) {
+            System.out.println("Erro na verificação do token: " + e.getMessage());
+            System.out.println("Código de erro: " + e.getErrorCode());
+            throw e;
+        }
     }
+
 
     /*
     public String authenticateUser(String email, String password) throws FirebaseAuthException {
