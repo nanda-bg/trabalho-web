@@ -4,6 +4,7 @@ import SignUp from './screens/Authentication/SignUp/SignUp';
 import Home from './screens/Home/Home';
 import EditProfile from './screens/EditProfile/EditProfile';
 import BookDetails from './screens/BookDetails/BookDetails';
+import FavoriteBooks from './screens/Favorites/Favorites';
 
 const router = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
   {
     path: '/book/:id',
     element: <BookDetails />
+  },
+  {
+    path: '/books/favorites',
+    element: <FavoriteBooks />
   }
 ]);
 

@@ -13,7 +13,7 @@ const RatingsBars = ({ book }) => {
 
   return (
     <S.RatingSection>
-      <S.RatingTitle>Ratings</S.RatingTitle>
+      <S.RatingTitle>Avaliações</S.RatingTitle>
       <S.RatingValue>{book.rating}</S.RatingValue>
       <S.RatingStars>
         {[1, 2, 3, 4, 5].map((star) => (

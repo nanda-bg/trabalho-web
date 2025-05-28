@@ -8,4 +8,5 @@ export type Review = {
     createdAt: string;
     user: User;
     book: Book;
+    has_spoiler?: boolean;
   };

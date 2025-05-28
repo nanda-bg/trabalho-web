@@ -1,5 +1,3 @@
-"use client";
-
 import { FC, useState } from "react";
 import { BookOpen, Heart, ArrowLeft } from "lucide-react";
 import { bookDetails } from "@app/utils/mocks/MockedBookDetails";
@@ -30,19 +28,19 @@ const BookDetails: FC = () => {
           <S.SaveButton onClick={handleGoBack}>
             <ArrowLeft size={20} />
           </S.SaveButton>
-          <S.HeaderTitle>Book Details</S.HeaderTitle>
+          <S.HeaderTitle>Detalhes</S.HeaderTitle>
         </S.Header>
 
-        <Header bookDetails={bookDetails}/>
+        <Header bookDetails={bookDetails} />
 
         <S.ActionButtons>
           <S.ActionButton $primary>
             <BookOpen size={16} />
-            Add to Reading List
+            Adicionar a lista de leitura
           </S.ActionButton>
           <S.ActionButton>
             <Heart size={16} />
-            Favorite
+            Favoritar
           </S.ActionButton>
         </S.ActionButtons>
 
@@ -96,8 +94,8 @@ const BookDetails: FC = () => {
           {activeTab === "reviews" && (
             <S.ReviewsSection>
               <S.ReviewsHeader>
-                <S.ReviewsTitle>All Reviews</S.ReviewsTitle>
-                <S.SeeAllLink href="#">See All</S.SeeAllLink>
+                <S.ReviewsTitle>Avaliações</S.ReviewsTitle>
+                <S.SeeAllLink href="#">Ver mais</S.SeeAllLink>
               </S.ReviewsHeader>
 
               {bookDetails.reviews.map((review) => (
@@ -109,8 +107,8 @@ const BookDetails: FC = () => {
 
         <S.RecommendedSection>
           <S.RecommendedHeader>
-            <S.RecommendedTitle>Recommended Books</S.RecommendedTitle>
-            <S.SeeAllLink href="#">See All</S.SeeAllLink>
+            <S.RecommendedTitle>Recomendados</S.RecommendedTitle>
+            <S.SeeAllLink href="#">Ver mais</S.SeeAllLink>
           </S.RecommendedHeader>
 
           <HorizontalBooksList books={recommendedBooks} />

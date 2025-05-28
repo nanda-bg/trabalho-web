@@ -5,7 +5,8 @@ export const mockedReviews: Review[] = [
     id: "rev123456",
     rating: 4.5,
     comment:
-      "Um livro fascinante que me manteve envolvido do início ao fim. A narrativa é cativante e os personagens são bem desenvolvidos.",
+      "Um livro fascinante que me manteve envolvido do início ao fim. A narrativa é cativante e os personagens são bem desenvolvidos. SPOILER: Fiquei surpreso quando descobri que o detetive era, na verdade, irmão perdido da protagonista!",
+    has_spoiler: true,
     createdAt: "2025-03-20T14:30:00Z",
     user: {
       id: "user789",
@@ -29,6 +30,7 @@ export const mockedReviews: Review[] = [
     rating: 3.5,
     comment:
       "Uma leitura interessante, mas um pouco previsível. O autor tem um estilo agradável, mas a trama poderia ser mais elaborada.",
+    has_spoiler: false,
     createdAt: "2025-03-22T10:15:00Z",
     user: {
       id: "user456",
@@ -51,7 +53,8 @@ export const mockedReviews: Review[] = [
     id: "rev345678",
     rating: 5.0,
     comment:
-      "Simplesmente incrível! Este livro mudou minha perspectiva sobre o tema. A pesquisa do autor é impressionante e a escrita é envolvente.",
+      "Simplesmente incrível! Este livro mudou minha perspectiva sobre o tema. A pesquisa do autor é impressionante e a escrita é envolvente. SPOILER: A revelação de que o experimento quântico havia alterado a própria realidade dos personagens foi sensacional.",
+    has_spoiler: true,
     createdAt: "2025-03-23T18:45:00Z",
     user: {
       id: "user123",
@@ -74,7 +77,8 @@ export const mockedReviews: Review[] = [
     id: "rev456789",
     rating: 2.0,
     comment:
-      "Decepcionante. O livro promete muito, mas entrega pouco. A história é confusa e os personagens são rasos.",
+      "Decepcionante. O livro promete muito, mas entrega pouco. A história é confusa e os personagens são rasos. SPOILER: No final, tudo era apenas um sonho da protagonista, o que me deixou frustrada.",
+    has_spoiler: true,
     createdAt: "2025-03-24T09:30:00Z",
     user: {
       id: "user234",
@@ -98,6 +102,7 @@ export const mockedReviews: Review[] = [
     rating: 4.0,
     comment:
       "Uma ótima leitura para quem gosta de romance histórico. A autora fez um trabalho excelente na recriação da época.",
+    has_spoiler: false,
     createdAt: "2025-03-24T14:20:00Z",
     user: {
       id: "user345",

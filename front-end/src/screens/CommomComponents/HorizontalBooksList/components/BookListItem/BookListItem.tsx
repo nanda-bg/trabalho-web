@@ -1,5 +1,3 @@
-"use client";
-
 import * as S from "./styles";
 import { Star } from "lucide-react";
 import { Book } from "@app/types/Book";

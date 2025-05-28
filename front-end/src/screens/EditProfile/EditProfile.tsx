@@ -1,5 +1,3 @@
-"use client";
-
 import type React from "react";
 
 import { useState, useRef } from "react";
@@ -58,7 +56,7 @@ export default function EditProfile() {
     if (e.target.files && e.target.files[0]) {
       const reader = new FileReader();
       reader.onload = (event) => {
-        if ((event.target?.result)) {
+        if (event.target?.result) {
           setProfile((prev) => ({
             ...prev,
             profileImage: event.target.result as string,
