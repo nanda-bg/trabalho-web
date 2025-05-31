@@ -115,49 +115,6 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/login-direct")
-    public ResponseEntity<?> loginDirect(@RequestBody Map<String, String> request) {
-        String email = request.get("email");
-        String password = request.get("password");
-
-        if (email == null || password == null) {
-            return new ResponseEntity<>("Credenciais incompletas", HttpStatus.BAD_REQUEST);
-        }
-
-        try {
-            URL url = new URL("https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyC2AJWdGjTKoCd4OB_dODSosbtfZ3w4aUs");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/json");
-            conn.setDoOutput(true);
-
-            String payload = String.format("{\"email\":\"%s\",\"password\":\"%s\",\"returnSecureToken\":true}",
-                    email, password);
-
-            try (OutputStream os = conn.getOutputStream()) {
-                byte[] input = payload.getBytes(StandardCharsets.UTF_8);
-                os.write(input, 0, input.length);
-            }
-
-            if (conn.getResponseCode() == 200) {
-                ObjectMapper mapper = new ObjectMapper();
-                JsonNode response = mapper.readTree(new InputStreamReader(conn.getInputStream()));
-
-                Map<String, String> tokenResponse = new HashMap<>();
-                tokenResponse.put("idToken", response.get("idToken").asText());
-                tokenResponse.put("refreshToken", response.get("refreshToken").asText());
-                tokenResponse.put("expiresIn", response.get("expiresIn").asText());
-
-                return new ResponseEntity<>(tokenResponse, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>("Erro na autenticação: " + conn.getResponseCode(),
-                        HttpStatus.UNAUTHORIZED);
-            }
-        } catch (Exception e) {
-            return new ResponseEntity<>("Erro: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
         String email = request.get("email");
@@ -168,8 +125,6 @@ public class AuthController {
         }
 
         try {
-            // 1. Autenticar o usuário (você precisaria implementar isso)
-            // 2. Gerar custom token
             String customToken = FirebaseAuth.getInstance().createCustomToken(email);
 
             Map<String, String> response = new HashMap<>();
@@ -261,7 +216,7 @@ public class AuthController {
 
 
     @GetMapping("/test-auth")
-    public ResponseEntity<?> testAuth(HttpServletRequest request) {
+    public ResponseEntity<Map<String, String>> testAuth(HttpServletRequest request) {
         System.out.println("==== AUTH CONTROLLER - TEST AUTH ====");
         String userId = (String) request.getAttribute("userId");
         System.out.println("UserId do request: " + userId);

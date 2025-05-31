@@ -1,0 +1,7 @@
+GET http://localhost:8080/auth/test-auth
+User-Agent: IntelliJ HTTP Client/IntelliJ IDEA 2025.1.1.1
+Accept-Encoding: br, deflate, gzip, x-gzip
+Accept: */*
+
+###
+

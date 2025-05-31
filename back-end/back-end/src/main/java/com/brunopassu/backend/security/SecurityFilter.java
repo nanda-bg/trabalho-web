@@ -1,86 +1,74 @@
 package com.brunopassu.backend.security;
 
 import com.brunopassu.backend.service.AuthService;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
 
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
 
+    private final FirebaseAuth firebaseAuth;
     private final AuthService authService;
 
-    @Autowired
-    public SecurityFilter(AuthService authService) {
+    public SecurityFilter(FirebaseAuth firebaseAuth, AuthService authService) {
+        this.firebaseAuth = firebaseAuth;
         this.authService = authService;
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
 
-        System.out.println("==== SECURITY FILTER ====");
-        System.out.println("URI: " + request.getRequestURI());
-
-        // Exceção apenas para rotas específicas de autenticação, não para todas as rotas /auth
-        if (request.getRequestURI().equals("/auth/register") ||
-                request.getRequestURI().equals("/auth/login") ||
-                request.getRequestURI().equals("/auth/exchange-token") ||
-                request.getRequestURI().equals("/auth/verify-token") ||
-                request.getMethod().equals("OPTIONS")) {
-
-            System.out.println("Rota pública ou OPTIONS - Permitindo acesso sem verificação");
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        System.out.println("Rota protegida - Verificando token");
-
-        // Verificar token de autenticação
-        String authHeader = request.getHeader("Authorization");
-        System.out.println("Authorization Header: " + authHeader);
-
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            System.out.println("Token não fornecido ou formato inválido");
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Token não fornecido");
-            return;
-        }
-
-        String token = authHeader.substring(7);
-        System.out.println("Token extraído: " + token.substring(0, Math.min(token.length(), 20)) + "...");
-
+        // Extrai e valida token
+        String token = extractToken(request);
         try {
-            System.out.println("Verificando token com Firebase...");
+            if (token != null) {
+
             String userId = authService.verifyToken(token);
-            System.out.println("Token válido! UserId: " + userId);
-            request.setAttribute("userId", userId);
-            filterChain.doFilter(request, response);
+            // Criar autenticação Spring Security
+            UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            request.setAttribute("userId", userId); //
+
+            }
         } catch (FirebaseAuthException e) {
-            System.out.println("Erro ao verificar token: " + e.getMessage());
-            System.out.println("Código de erro: " + e.getErrorCode());
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Token inválido: " + e.getMessage());
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\":\"UNAUTHORIZED\",\"message\":\"Token inválido\"}");
+            return;
         }
-    }
-
-
-
-    /*
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
-        // Desabilitar temporariamente a verificação de segurança
         filterChain.doFilter(request, response);
-        return;
     }
 
-     */
+    private String extractToken(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+        return null;
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        return path.startsWith("/auth/register") ||
+                path.startsWith("/auth/login") ||
+                path.startsWith("/auth/exchange-token");
+    }
 }
+

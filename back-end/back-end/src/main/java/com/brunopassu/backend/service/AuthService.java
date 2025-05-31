@@ -4,10 +4,14 @@ import com.brunopassu.backend.exception.UserAlreadyExistsException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
+
+    @Autowired
+    private FirebaseAuth firebaseAuth;
 
     public UserRecord createUser(String email, String password) throws FirebaseAuthException, UserAlreadyExistsException {
 
@@ -38,55 +42,4 @@ public class AuthService {
         }
     }
 
-
-    /*
-    public String authenticateUser(String email, String password) throws FirebaseAuthException {
-        try {
-            // Verificar se o usuário existe
-            UserRecord userRecord = FirebaseAuth.getInstance().getUserByEmail(email);
-
-            // Usar HTTP Client para chamar a API REST do Firebase
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/json");
-            conn.setDoOutput(true);
-
-            // Criar payload
-            String payload = String.format("{\"email\":\"%s\",\"password\":\"%s\",\"returnSecureToken\":true}",
-                    email, password);
-
-            // Enviar requisição
-            try (OutputStream os = conn.getOutputStream()) {
-                byte[] input = payload.getBytes(StandardCharsets.UTF_8);
-                os.write(input, 0, input.length);
-            }
-
-            // Ler resposta
-            if (conn.getResponseCode() == 200) {
-                try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
-                    StringBuilder response = new StringBuilder();
-                    String responseLine;
-                    while ((responseLine = br.readLine()) != null) {
-                        response.append(responseLine.trim());
-                    }
-
-                    // Extrair idToken da resposta JSON
-                    // Nota: Em produção, use uma biblioteca JSON adequada
-                    String responseStr = response.toString();
-                    int idTokenStart = responseStr.indexOf("\"idToken\":\"") + 11;
-                    int idTokenEnd = responseStr.indexOf("\"", idTokenStart);
-                    String idToken = responseStr.substring(idTokenStart, idTokenEnd);
-
-                    return idToken;
-                }
-            } else {
-                throw new FirebaseAuthException("authentication-error",
-                        "Falha na autenticação: " + conn.getResponseCode());
-            }
-        } catch (IOException e) {
-            throw new FirebaseAuthException("network-error",
-                    "Erro de conexão: " + e.getMessage());
-        }
-    }
-    */
 }
