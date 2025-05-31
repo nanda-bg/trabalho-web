@@ -5,9 +5,6 @@ import com.brunopassu.backend.entity.User;
 import com.brunopassu.backend.exception.UserAlreadyExistsException;
 import com.brunopassu.backend.service.AuthService;
 import com.brunopassu.backend.service.UserService;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,13 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -115,106 +106,6 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
-        String email = request.get("email");
-        String password = request.get("password");
-
-        if (email == null || password == null) {
-            return new ResponseEntity<>("Credenciais incompletas", HttpStatus.BAD_REQUEST);
-        }
-
-        try {
-            String customToken = FirebaseAuth.getInstance().createCustomToken(email);
-
-            Map<String, String> response = new HashMap<>();
-            response.put("customToken", customToken);
-            response.put("message", "Use este token para trocar por um ID token");
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (FirebaseAuthException e) {
-            return new ResponseEntity<>("Erro: " + e.getMessage(), HttpStatus.UNAUTHORIZED);
-        }
-    }
-
-    /*
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
-        String email = request.get("email");
-        String password = request.get("password");
-
-        if (email == null || email.trim().isEmpty()) {
-            return new ResponseEntity<>("Email não fornecido", HttpStatus.BAD_REQUEST);
-        }
-
-        if (password == null || password.trim().isEmpty()) {
-            return new ResponseEntity<>("Senha não fornecida", HttpStatus.BAD_REQUEST);
-        }
-
-        try {
-            // Obter token usando Firebase Admin SDK
-            String customToken = FirebaseAuth.getInstance().createCustomToken(email);
-
-            Map<String, Object> response = new HashMap<>();
-            response.put("customToken", customToken);
-            response.put("message", "Use este token para autenticar no cliente Firebase");
-
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } catch (FirebaseAuthException e) {
-            return new ResponseEntity<>("Erro na autenticação: " + e.getMessage(),
-                    HttpStatus.UNAUTHORIZED);
-        }
-    }
-    */
-
-    @PostMapping("/exchange-token")
-    public ResponseEntity<?> exchangeToken(@RequestBody Map<String, String> request) {
-        String customToken = request.get("customToken");
-
-        if (customToken == null) {
-            return new ResponseEntity<>("Token não fornecido", HttpStatus.BAD_REQUEST);
-        }
-
-        try {
-            // Esta parte deve ser feita no cliente, mas para testes podemos implementar no servidor
-            URL url = new URL("https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=AIzaSyC2AJWdGjTKoCd4OB_dODSosbtfZ3w4aUs");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setRequestProperty("Content-Type", "application/json");
-            conn.setDoOutput(true);
-
-            String payload = String.format("{\"token\":\"%s\",\"returnSecureToken\":true}", customToken);
-
-            try (OutputStream os = conn.getOutputStream()) {
-                byte[] input = payload.getBytes(StandardCharsets.UTF_8);
-                os.write(input, 0, input.length);
-            }
-
-            if (conn.getResponseCode() == 200) {
-                try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8))) {
-                    StringBuilder response = new StringBuilder();
-                    String responseLine;
-                    while ((responseLine = br.readLine()) != null) {
-                        response.append(responseLine.trim());
-                    }
-
-                    // Extrair idToken (em produção use uma biblioteca JSON)
-                    ObjectMapper mapper = new ObjectMapper();
-                    JsonNode root = mapper.readTree(response.toString());
-                    String idToken = root.get("idToken").asText();
-
-                    Map<String, String> tokenResponse = new HashMap<>();
-                    tokenResponse.put("idToken", idToken);
-                    return new ResponseEntity<>(tokenResponse, HttpStatus.OK);
-                }
-            } else {
-                return new ResponseEntity<>("Erro na troca de token: " + conn.getResponseCode(), HttpStatus.BAD_REQUEST);
-            }
-        } catch (Exception e) {
-            return new ResponseEntity<>("Erro: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-
     @GetMapping("/test-auth")
     public ResponseEntity<Map<String, String>> testAuth(HttpServletRequest request) {
         System.out.println("==== AUTH CONTROLLER - TEST AUTH ====");
@@ -236,6 +127,4 @@ public class AuthController {
         System.out.println("Resposta de autenticação bem-sucedida para userId: " + userId);
         return ResponseEntity.ok(response);
     }
-
-
 }
