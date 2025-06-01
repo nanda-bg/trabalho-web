@@ -63,12 +63,17 @@ public class SecurityFilter extends OncePerRequestFilter {
         return null;
     }
 
+
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        return path.startsWith("/auth/register") ||
-                path.startsWith("/auth/login") ||
-                path.startsWith("/auth/exchange-token");
+        return path.startsWith("/auth/")
+                || path.startsWith("/api/public/")
+                || path.startsWith("/swagger-ui/")
+                || path.startsWith("/swagger-ui.html")
+                || path.startsWith("/v3/api-docs");
+
     }
+
 }
 

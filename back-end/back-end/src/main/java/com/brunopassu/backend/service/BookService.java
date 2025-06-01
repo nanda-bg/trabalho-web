@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -47,10 +46,6 @@ public class BookService {
 
     public boolean updateBook(Book book) throws ExecutionException, InterruptedException {
         return bookRepository.updateBook(book);
-    }
-
-    public boolean updateBookFields(String bookId, Map<String, Object> fields) throws ExecutionException, InterruptedException {
-        return bookRepository.updateBookFields(bookId, fields);
     }
 
     public boolean deleteBook(String bookId) throws ExecutionException, InterruptedException {

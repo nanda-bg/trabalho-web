@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -86,21 +85,6 @@ public class BookController {
             }
         } catch (ExecutionException | InterruptedException e) {
             return new ResponseEntity<>("Erro ao atualizar livro: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @PatchMapping("/id/{bookId}")
-    public ResponseEntity<String> UpdateBookFields(@PathVariable("bookId") String bookId, @RequestBody Map<String, Object> fields) {
-        try {
-            boolean updated = bookService.updateBookFields(bookId, fields);
-
-            if (updated) {
-                return new ResponseEntity<>("Campos do livro atualizados com sucesso", HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>("Livro não encontrado", HttpStatus.NOT_FOUND);
-            }
-        } catch (ExecutionException | InterruptedException e) {
-            return new ResponseEntity<>("Erro ao atualizar campos do livro: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

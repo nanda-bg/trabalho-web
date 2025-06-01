@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -91,55 +90,6 @@ public class UserService {
 
         // Atualiza o documento no Firestore
         return userRepository.updateUser(user);
-    }
-
-
-    public boolean updateUserFields(String userId, Map<String, Object> fields)
-            throws ExecutionException, InterruptedException, IOException,
-            UserAlreadyExistsException, UserUsernameImmutableFieldException,
-            UserEmailmmutableFieldException, FirebaseAuthException {
-
-        if (userId == null || userId.isEmpty() || fields == null || fields.isEmpty()) {
-            return false;
-        }
-
-        // Obter usuário atual
-        User existingUser = getUserById(userId);
-        if (existingUser == null) {
-            return false;
-        }
-
-        // Verificar username se estiver nos campos a serem atualizados
-        if (fields.containsKey("username")) {
-            String newUsername = (String) fields.get("username");
-            if (!existingUser.getUsername().equals(newUsername)) {
-                if (checkUsernameExists(newUsername)) {
-                    throw new UserUsernameImmutableFieldException("Username já está em uso por outro usuário!");
-                }
-            }
-        }
-
-        // Verificar email se estiver nos campos a serem atualizados
-        if (fields.containsKey("email")) {
-            String newEmail = (String) fields.get("email");
-            if (!existingUser.getEmail().equals(newEmail)) {
-                if (checkEmailExists(newEmail)) {
-                    throw new UserEmailmmutableFieldException("Email já está em uso por outro usuário!");
-                }
-
-                // Atualizar o email no Firebase Authentication
-                try {
-                    UserRecord.UpdateRequest request = new UserRecord.UpdateRequest(userId)
-                            .setEmail(newEmail);
-                    FirebaseAuth.getInstance().updateUser(request);
-                } catch (FirebaseAuthException e) {
-                    throw new FirebaseAuthException(e);
-                }
-            }
-        }
-
-        // Atualiza apenas os campos fornecidos no Firestore
-        return userRepository.updateUserFields(userId, fields);
     }
 
     public boolean deleteUser(String userId) throws ExecutionException, InterruptedException, FirebaseAuthException {
