@@ -3,6 +3,12 @@ package com.brunopassu.backend.controller;
 import com.brunopassu.backend.entity.Book;
 import com.brunopassu.backend.exception.BookTitleImmutableFieldException;
 import com.brunopassu.backend.service.BookService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +29,7 @@ import java.util.concurrent.ExecutionException;
                         RequestMethod.DELETE, RequestMethod.PATCH},
              allowedHeaders = "*")
  */
+@Tag(name = "Livros", description = "Gerenciamento de livros")
 public class BookController {
 
     @Autowired
@@ -33,6 +40,83 @@ public class BookController {
     }
 
     @PostMapping
+    @Operation(
+            summary = "Criar novo livro",
+            description = "Adiciona um novo livro ao sistema. O título deve ser único."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Livro criado com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Livro criado",
+                                    value = "Livro criado com ID: abc123def456"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Dados inválidos fornecidos",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Erro de validação",
+                                            value = "Erro de validação: [Field error in object 'book' on field 'title': rejected value []; codes [NotBlank.book.title]]"
+                                    ),
+                                    @ExampleObject(
+                                            name = "Título obrigatório",
+                                            value = "Erro de validação: Titulo é obrigatório!"
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Título já existe",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Título duplicado",
+                                    value = "O título: 'Dom Casmurro' já existe!"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Erro interno do servidor",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Erro interno",
+                                    value = "Erro ao criar livro: Connection timeout"
+                            )
+                    )
+            )
+    })
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Dados do livro a ser criado",
+            required = true,
+            content = @Content(
+                    mediaType = "application/json",
+                    examples = @ExampleObject(
+                            name = "Exemplo de livro",
+                            value = """
+            {
+                "title": "Dom Casmurro",
+                "description": "Romance clássico da literatura brasileira",
+                "authors": ["Machado de Assis"],
+                "coverUrl": "https://example.com/dom-casmurro.jpg",
+                "publicationYear": 1899,
+                "genres": ["Romance", "Literatura Brasileira"],
+                "pagesCount": 256
+            }
+            """
+                    )
+            )
+    )
     public ResponseEntity<String> createBook(@Valid @RequestBody Book book, BindingResult result) {
         if (result.hasErrors()) {
             return new ResponseEntity<>("Erro de validação: " + result.getAllErrors(), HttpStatus.BAD_REQUEST);
@@ -49,6 +133,60 @@ public class BookController {
     }
 
     @GetMapping
+    @Operation(
+            summary = "Listar todos os livros",
+            description = "Retorna uma lista com todos os livros cadastrados no sistema"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Lista de livros retornada com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Lista de livros",
+                                    value = """
+                [
+                    {
+                        "bookId": "abc123def456",
+                        "title": "Dom Casmurro",
+                        "description": "Romance clássico da literatura brasileira",
+                        "authors": ["Machado de Assis"],
+                        "coverUrl": "https://example.com/dom-casmurro.jpg",
+                        "publicationYear": 1899,
+                        "genres": ["Romance", "Literatura Brasileira"],
+                        "averageRating": 4.5,
+                        "ratingsCount": 150,
+                        "pagesCount": 256
+                    },
+                    {
+                        "bookId": "def456ghi789",
+                        "title": "O Cortiço",
+                        "description": "Romance naturalista brasileiro",
+                        "authors": ["Aluísio Azevedo"],
+                        "coverUrl": "https://example.com/o-cortico.jpg",
+                        "publicationYear": 1890,
+                        "genres": ["Romance", "Naturalismo"],
+                        "averageRating": 4.2,
+                        "ratingsCount": 89,
+                        "pagesCount": 312
+                    }
+                ]
+                """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Erro interno do servidor",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "null"
+                            )
+                    )
+            )
+    })
     public ResponseEntity<List<Book>> getAllBooks() {
         try {
             List<Book> books = bookService.getAllBooks();
@@ -59,6 +197,56 @@ public class BookController {
     }
 
     @GetMapping("/id/{bookId}")
+    @Operation(
+            summary = "Buscar livro por ID",
+            description = "Retorna os dados de um livro específico baseado no ID fornecido"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Livro encontrado com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Livro encontrado",
+                                    value = """
+                {
+                    "bookId": "abc123def456",
+                    "title": "Dom Casmurro",
+                    "description": "Romance clássico da literatura brasileira",
+                    "authors": ["Machado de Assis"],
+                    "coverUrl": "https://example.com/dom-casmurro.jpg",
+                    "publicationYear": 1899,
+                    "genres": ["Romance", "Literatura Brasileira"],
+                    "averageRating": 4.5,
+                    "ratingsCount": 150,
+                    "pagesCount": 256
+                }
+                """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Livro não encontrado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "null"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Erro interno do servidor",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "null"
+                            )
+                    )
+            )
+    })
     public ResponseEntity<Book> getBookById(@PathVariable("bookId") String bookId) {
         try {
             Book book = bookService.getBookById(bookId);
@@ -73,6 +261,66 @@ public class BookController {
     }
 
     @PutMapping("/id/{bookId}")
+    @Operation(
+            summary = "Atualizar dados do livro",
+            description = "Atualiza os dados de um livro existente. O ID do livro será definido automaticamente."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Livro atualizado com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Livro atualizado",
+                                    value = "\"Livro atualizado com sucesso\""
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Livro não encontrado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Livro não encontrado",
+                                    value = "\"Livro não encontrado\""
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Erro interno do servidor",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Erro interno",
+                                    value = "\"Erro ao atualizar livro: Connection timeout\""
+                            )
+                    )
+            )
+    })
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Dados atualizados do livro",
+            required = true,
+            content = @Content(
+                    mediaType = "application/json",
+                    examples = @ExampleObject(
+                            name = "Exemplo de atualização",
+                            value = """
+            {
+                "title": "Dom Casmurro - Edição Revisada",
+                "description": "Romance clássico da literatura brasileira - Nova edição com notas",
+                "authors": ["Machado de Assis"],
+                "coverUrl": "https://example.com/dom-casmurro-nova.jpg",
+                "publicationYear": 1899,
+                "genres": ["Romance", "Literatura Brasileira", "Clássicos"],
+                "pagesCount": 280
+            }
+            """
+                    )
+            )
+    )
     public ResponseEntity<String> updateBook(@PathVariable("bookId") String bookId, @RequestBody Book book) {
         try {
             book.setBookId(bookId);
@@ -89,6 +337,45 @@ public class BookController {
     }
 
     @DeleteMapping("/id/{bookId}")
+    @Operation(
+            summary = "Deletar livro",
+            description = "Remove um livro do sistema baseado no ID fornecido"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Livro deletado com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Livro deletado",
+                                    value = "\"Livro deletado com sucesso\""
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Livro não encontrado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Livro não encontrado",
+                                    value = "\"Livro não encontrado\""
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Erro interno do servidor",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Erro interno",
+                                    value = "\"Erro ao deletar livro: Connection timeout\""
+                            )
+                    )
+            )
+    })
     public ResponseEntity<String> deleteBook(@PathVariable("bookId") String bookId) {
         try {
             boolean deleted = bookService.deleteBook(bookId);

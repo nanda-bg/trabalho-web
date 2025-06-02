@@ -1,36 +1,48 @@
 package com.brunopassu.backend.entity;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
+@Schema(description = "Entidade de livro do sistema")
 public class Book {
 
+    @Schema(description = "ID único do livro", example = "book123def456")
     private String bookId;
 
+    @Schema(description = "Título do livro", example = "Dom Casmurro", required = true)
     @NotBlank(message = "Titulo é obrigatório!")
     private String title;
 
+    @Schema(description = "Descrição/sinopse do livro", maxLength = 1000, example = "Romance clássico da literatura brasileira")
     @Size(max = 1000)
     private String description;
 
+    @Schema(description = "Lista de autores do livro", example = "[\"Machado de Assis\"]", required = true)
     @NotEmpty(message = "Pelo menos um autor deve ser informado")
     private List<String> authors = new ArrayList<>();
 
+    @Schema(description = "URL da capa do livro", example = "https://example.com/capa.jpg")
     private String coverUrl;
 
+    @Schema(description = "Ano de publicação", minimum = "0", maximum = "2100", example = "1899")
     @Min(value = 0, message = "Ano de publicação inválido")
     @Max(value = 2100, message = "Ano de publicação inválido")
     private Integer publicationYear;
 
+    @Schema(description = "Lista de gêneros do livro", example = "[\"Romance\", \"Literatura Brasileira\"]", required = true)
     @NotEmpty(message = "Pelo menos um gênero deve ser informado")
     private List<String> genres = new ArrayList<>();
 
-    private Double averageRating; //MEDIA DAS NOTAS!
-    private Integer ratingsCount; //QUANTIDADE DE NOTAS
+    @Schema(description = "Média das avaliações do livro", example = "4.5")
+    private Double averageRating;
 
+    @Schema(description = "Quantidade total de avaliações", example = "150")
+    private Integer ratingsCount;
+
+    @Schema(description = "Número de páginas do livro", minimum = "1", example = "256")
     @Min(value = 1, message = "Número de páginas deve ser maior que zero")
     private Integer pagesCount;
 

@@ -1,14 +1,40 @@
 package com.brunopassu.backend.entity;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+
+@Schema(description = "Entidade de usuário do sistema")
 public class User {
 
-    private String uid; //Chave primária *
-    private String email; //*
+    @Schema(description = "UID único do usuário (chave primária)", example = "abc123def456")
+    private String uid;
+
+    @Schema(description = "Email do usuário", example = "[email protected]", required = true)
+    @NotBlank(message = "Email Obrigatório")
+    @NotEmpty(message = "Email não pode ser branco!")
+    private String email;
+
+    @Schema(description = "Nome completo do usuário", example = "João Silva", required = true)
+    @NotBlank(message = "Nome Obrigatório")
+    @NotEmpty(message = "Nome não pode ser branco!")
     private String name;
-    private String username; //NOME ÚNICO
-    private String profilePicture; //URL
+
+    @Schema(description = "Username único do usuário", example = "joao123", required = true)
+    @NotBlank(message = "Username Obrigatório")
+    @NotEmpty(message = "Username não pode ser branco!")
+    private String username;
+
+    @Schema(description = "URL da foto de perfil", example = "https://example.com/foto.jpg")
+    private String profilePicture;
+
+    @Schema(description = "Biografia do usuário", example = "Amante de livros e literatura clássica")
     private String bio;
+
+    @Schema(description = "Número de seguidores", example = "150")
     private Integer followers;
+
+    @Schema(description = "Número de usuários seguindo", example = "75")
     private Integer following;
 
     public User() {

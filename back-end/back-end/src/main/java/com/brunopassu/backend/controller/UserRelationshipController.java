@@ -2,6 +2,14 @@ package com.brunopassu.backend.controller;
 
 import com.brunopassu.backend.entity.User;
 import com.brunopassu.backend.service.UserRelationshipService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,124 +22,147 @@ import java.util.concurrent.ExecutionException;
 @RestController
 @RequestMapping("/users")
 @CrossOrigin(origins = "*")
+@Tag(name = "User Relationships", description = "Operações relacionadas aos relacionamentos entre usuários (seguir/deixar de seguir)")
 public class UserRelationshipController {
     private final UserRelationshipService relationshipService;
-
 
     @Autowired
     public UserRelationshipController(UserRelationshipService relationshipService) {
         this.relationshipService = relationshipService;
     }
 
-    // Endpoint para ambiente de desenvolvimento (sem autenticação)
-    @PostMapping("/{followerId}/follow/{followingId}")
-    public ResponseEntity<Map<String, Object>> toggleFollow(
-            @PathVariable String followerId,
-            @PathVariable String followingId) {
+    @PostMapping("/follow/{followingId}")
+    @Operation(
+            summary = "Seguir/deixar de seguir usuário",
+            description = "Alterna entre seguir e deixar de seguir um usuário. Usa autenticação via token Bearer para identificar o usuário que está fazendo a ação. Atualiza automaticamente os contadores de seguidores e seguindo."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Operação realizada com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Usuário seguido",
+                                            value = """
+                    {
+                        "success": true,
+                        "action": "followed"
+                    }
+                    """
+                                    ),
+                                    @ExampleObject(
+                                            name = "Deixou de seguir",
+                                            value = """
+                    {
+                        "success": true,
+                        "action": "unfollowed"
+                    }
+                    """
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Erro interno do servidor",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Erro interno",
+                                    value = """
+                {
+                    "error": "Erro ao processar follow/unfollow: Token inválido"
+                }
+                """
+                            )
+                    )
+            )
+    })
+    @Parameter(
+            name = "followingId",
+            description = "ID do usuário que será seguido/deixará de ser seguido",
+            example = "def456ghi789",
+            required = true
+    )
+    @Parameter(
+            name = "Authorization",
+            description = "Token Bearer do usuário autenticado",
+            example = "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjE2NzAyN...",
+            required = true,
+            in = ParameterIn.HEADER
+    )
+    public ResponseEntity<Map<String, Object>> toggleFollowWithAuth(@PathVariable String followingId, @RequestHeader ("Authorization") String token) {
         try {
-            boolean result = relationshipService.toggleFollow(followerId, followingId);
-
-            //Verificação se ele seguiu ele mesmo
-            if (!result) {
-                return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(Map.of("error", "O usuário não pode seguir ele mesmo!")
-                );
-            }
-
+            boolean result = relationshipService.toggleFollowWithAuth(followingId, token);
             return ResponseEntity.ok(Map.of(
                     "success", true,
-                    "action", "followed"
+                    "action", result ? "followed" : "unfollowed"
             ));
-
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Erro ao processar follow/unfollow: " + e.getMessage()));
         }
     }
-    /*
-        // Endpoint para ambiente de produção (com autenticação)
-        @PostMapping("/follow/{followingId}")
-        public ResponseEntity<Map<String, Object>> toggleFollowWithAuth(
-                @PathVariable String followingId,
-                Authentication authentication) {
-            try {
-                // Extrair token do usuário autenticado
-                FirebaseToken token = (FirebaseToken) authentication.getPrincipal();
 
-                boolean result = relationshipService.toggleFollowWithAuth(followingId, token);
-                return ResponseEntity.ok(Map.of(
-                        "success", true,
-                        "action", result ? "followed" : "unfollowed"
-                ));
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(Map.of("error", "Erro ao processar follow/unfollow: " + e.getMessage()));
-            }
-        }
-      /*
-
-        // Endpoint sem autenticação (para desenvolvimento)
-        @PostMapping("/{followerId}/follow/{followingId}")
-        public ResponseEntity<String> followUser(@PathVariable String followerId, @PathVariable String followingId) {
-            try {
-                boolean success = relationshipService.followUser(followerId, followingId);
-                if (success) {
-                    return new ResponseEntity<>("Usuário seguido com sucesso", HttpStatus.OK);
-                } else {
-                    return new ResponseEntity<>("Não foi possível seguir o usuário", HttpStatus.BAD_REQUEST);
-                }
-            } catch (ExecutionException | InterruptedException e) {
-                return new ResponseEntity<>("Erro ao seguir usuário: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        // Endpoint sem autenticação (para desenvolvimento)
-        @DeleteMapping("/{followerId}/unfollow/{followingId}")
-        public ResponseEntity<String> unfollowUser(@PathVariable String followerId, @PathVariable String followingId) {
-            try {
-                boolean success = relationshipService.unfollowUser(followerId, followingId);
-                if (success) {
-                    return new ResponseEntity<>("Deixou de seguir o usuário com sucesso", HttpStatus.OK);
-                } else {
-                    return new ResponseEntity<>("Não foi possível deixar de seguir o usuário", HttpStatus.BAD_REQUEST);
-                }
-            } catch (ExecutionException | InterruptedException e) {
-                return new ResponseEntity<>("Erro ao deixar de seguir usuário: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-
-        // Endpoint com autenticação (para produção)
-        @PostMapping("/follow/{followingId}")
-        public ResponseEntity<String> followUserWithAuth(@PathVariable String followingId) {
-            try {
-                boolean success = relationshipService.followUserWithAuth(followingId);
-                if (success) {
-                    return new ResponseEntity<>("Usuário seguido com sucesso", HttpStatus.OK);
-                } else {
-                    return new ResponseEntity<>("Não foi possível seguir o usuário", HttpStatus.BAD_REQUEST);
-                }
-            } catch (ExecutionException | InterruptedException | FirebaseAuthException e) {
-                return new ResponseEntity<>("Erro ao seguir usuário: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-
-        // Endpoint com autenticação (para produção)
-        @DeleteMapping("/unfollow/{followingId}")
-        public ResponseEntity<String> unfollowUserWithAuth(@PathVariable String followingId) {
-            try {
-                boolean success = relationshipService.unfollowUserWithAuth(followingId);
-                if (success) {
-                    return new ResponseEntity<>("Deixou de seguir o usuário com sucesso", HttpStatus.OK);
-                } else {
-                    return new ResponseEntity<>("Não foi possível deixar de seguir o usuário", HttpStatus.BAD_REQUEST);
-                }
-            } catch (ExecutionException | InterruptedException | FirebaseAuthException e) {
-                return new ResponseEntity<>("Erro ao deixar de seguir usuário: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-    */
     @GetMapping("/{userId}/followers")
+    @Operation(
+            summary = "Listar seguidores do usuário",
+            description = "Retorna uma lista com todos os usuários que seguem o usuário especificado"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Lista de seguidores retornada com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Lista de seguidores",
+                                    value = """
+                [
+                    {
+                        "uid": "follower1",
+                        "email": "seguidor1@gmail.com",
+                        "name": "João Silva",
+                        "username": "joao123",
+                        "profilePicture": "https://example.com/joao.jpg",
+                        "bio": "Amante de livros",
+                        "followers": 50,
+                        "following": 30
+                    },
+                    {
+                        "uid": "follower2",
+                        "email": "seguidor2@gmail.com",
+                        "name": "Maria Santos",
+                        "username": "maria456",
+                        "profilePicture": null,
+                        "bio": "Leitora voraz",
+                        "followers": 75,
+                        "following": 45
+                    }
+                ]
+                """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Erro interno do servidor",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "null"
+                            )
+                    )
+            )
+    })
+    @Parameter(
+            name = "userId",
+            description = "ID do usuário para listar seus seguidores",
+            example = "abc123def456",
+            required = true
+    )
     public ResponseEntity<List<User>> getUserFollowers(@PathVariable String userId) {
         try {
             List<User> followers = relationshipService.getUserFollowers(userId);
@@ -142,6 +173,62 @@ public class UserRelationshipController {
     }
 
     @GetMapping("/{userId}/following")
+    @Operation(
+            summary = "Listar usuários seguidos",
+            description = "Retorna uma lista com todos os usuários que o usuário especificado está seguindo"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Lista de usuários seguidos retornada com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Lista de seguindo",
+                                    value = """
+                [
+                    {
+                        "uid": "following1",
+                        "email": "seguido1@gmail.com",
+                        "name": "Carlos Oliveira",
+                        "username": "carlos789",
+                        "profilePicture": "https://example.com/carlos.jpg",
+                        "bio": "Escritor e crítico literário",
+                        "followers": 120,
+                        "following": 80
+                    },
+                    {
+                        "uid": "following2",
+                        "email": "seguido2@gmail.com",
+                        "name": "Ana Costa",
+                        "username": "ana321",
+                        "profilePicture": "https://example.com/ana.jpg",
+                        "bio": "Professora de literatura",
+                        "followers": 200,
+                        "following": 150
+                    }
+                ]
+                """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Erro interno do servidor",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "null"
+                            )
+                    )
+            )
+    })
+    @Parameter(
+            name = "userId",
+            description = "ID do usuário para listar quem está seguindo",
+            example = "abc123def456",
+            required = true
+    )
     public ResponseEntity<List<User>> getUserFollowing(@PathVariable String userId) {
         try {
             List<User> following = relationshipService.getUserFollowing(userId);

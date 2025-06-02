@@ -12,7 +12,6 @@ import org.springframework.stereotype.Repository;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 @Repository
@@ -24,66 +23,6 @@ public class UserRelationshipRepository {
     @Autowired
     public UserRelationshipRepository(FirestoreConfig firestoreConfig) {
         this.firestoreConfig = firestoreConfig;
-    }
-
-    /*
-    public boolean toggleFollow(String followerId, String followingId) throws ExecutionException, InterruptedException {
-        Firestore firestore = FirestoreClient.getFirestore();
-        String relationshipId = followerId + "_" + followingId;
-
-        DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(relationshipId);
-        DocumentSnapshot snapshot = docRef.get().get();
-
-        WriteBatch batch = firestore.batch();
-
-        if (snapshot.exists()) {
-            // Relacionamento existe - remover (unfollow)
-            batch.delete(docRef);
-
-            // Decrementar contadores
-            batch.update(firestore.collection("users").document(followerId),
-                    "following", FieldValue.increment(-1));
-            batch.update(firestore.collection("users").document(followingId),
-                    "followers", FieldValue.increment(-1));
-
-            batch.commit().get();
-            return false; // Indica que o usuário deixou de seguir
-        } else {
-            // Relacionamento não existe - criar (follow)
-            UserRelationship relationship = new UserRelationship();
-            relationship.setUserRelationshipId(relationshipId);
-            relationship.setFollowerId(followerId);
-            relationship.setFollowingId(followingId);
-            relationship.setCreatedAt(Timestamp.now());
-
-            batch.set(docRef, relationship);
-
-            // Incrementar contadores
-            batch.update(firestore.collection("users").document(followerId),
-                    "following", FieldValue.increment(1));
-            batch.update(firestore.collection("users").document(followingId),
-                    "followers", FieldValue.increment(1));
-
-            batch.commit().get();
-            return true; // Indica que o usuário começou a seguir
-        }
-    }
-    */
-
-    public Optional<UserRelationship> findByFollowerIdAndFollowingId(String followerId, String followingId)
-            throws ExecutionException, InterruptedException, IOException {
-        Firestore firestore = firestoreConfig.firestore();
-        String relationshipId = followerId + "_" + followingId;
-
-        DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(relationshipId);
-        DocumentSnapshot snapshot = docRef.get().get();
-
-        if (snapshot.exists()) {
-            UserRelationship relationship = snapshot.toObject(UserRelationship.class);
-            return Optional.ofNullable(relationship);
-        }
-
-        return Optional.empty();
     }
 
     public boolean toggleFollow(String followerId, String followingId) throws IOException, ExecutionException, InterruptedException {
@@ -132,46 +71,6 @@ public class UserRelationshipRepository {
             batch.commit().get();
             return true; // Indica que o usuário começou a seguir
         }
-    }
-
-    public String saveRelationship(UserRelationship relationship) throws ExecutionException, InterruptedException {
-        Firestore firestore = FirestoreClient.getFirestore();
-
-        // Criamos um ID composto para garantir unicidade e facilitar consultas
-        String relationshipId = relationship.getFollowerId() + "_" + relationship.getFollowingId();
-        relationship.setUserRelationshipId(relationshipId);
-
-        DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(relationshipId);
-        ApiFuture<WriteResult> result = docRef.set(relationship);
-        result.get();
-
-        return relationshipId;
-    }
-
-    public boolean deleteRelationship(String followerId, String followingId) throws ExecutionException, InterruptedException {
-        Firestore firestore = FirestoreClient.getFirestore();
-        String relationshipId = followerId + "_" + followingId;
-
-        DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(relationshipId);
-        DocumentSnapshot document = docRef.get().get();
-
-        if (!document.exists()) {
-            return false;
-        }
-
-        ApiFuture<WriteResult> writeResult = docRef.delete();
-        writeResult.get();
-        return true;
-    }
-
-    public boolean checkRelationshipExists(String followerId, String followingId) throws ExecutionException, InterruptedException {
-        Firestore firestore = FirestoreClient.getFirestore();
-        String relationshipId = followerId + "_" + followingId;
-
-        DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(relationshipId);
-        DocumentSnapshot document = docRef.get().get();
-
-        return document.exists();
     }
 
     public List<UserRelationship> getFollowers(String userId) throws ExecutionException, InterruptedException {

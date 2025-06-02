@@ -1,5 +1,6 @@
 package com.brunopassu.backend.controller;
 
+import com.brunopassu.backend.dto.VerifyTokenRequestDTO;
 import com.brunopassu.backend.entity.AuthRequest;
 import com.brunopassu.backend.entity.User;
 import com.brunopassu.backend.exception.UserAlreadyExistsException;
@@ -7,7 +8,13 @@ import com.brunopassu.backend.service.AuthService;
 import com.brunopassu.backend.service.UserService;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,10 +40,104 @@ public class AuthController {
     @Autowired
     public UserService userService;
 
+
     @PostMapping("/register")
-    //REQUESTBODY -> nome, email, senha
-    //email, senha -> autentiação
-    //nome -> id unico (além do uid)
+    @Operation(
+            summary = "Registrar novo usuário",
+            description = "Cria um novo usuário no Firebase Authentication e no Firestore. " +
+                    "O usuário deve fornecer email, senha e username. O nome é opcional."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "Usuário criado com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Usuário criado",
+                                    value = """
+                {
+                    "uid": "iw6CbUxMxahnjBdgeN2NLz5Idte2",
+                    "email": "email@gmail.com"
+                }
+                """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Dados inválidos fornecidos",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Email inválido",
+                                            value = "Email não pode ser nulo ou vazio"
+                                    ),
+                                    @ExampleObject(
+                                            name = "Senha inválida",
+                                            value = "Senha não pode ser nula ou vazia"
+                                    ),
+                                    @ExampleObject(
+                                            name = "Username inválido",
+                                            value = "O usuário deve possuir um username"
+                                    ),
+                                    @ExampleObject(
+                                            name = "Erro Firebase",
+                                            value = "Erro ao criar usuário: The email address is badly formatted"
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Usuário já existe",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Email já cadastrado",
+                                            value = "\"Usuário já cadastrado com esse email!\""
+                                    ),
+                                    @ExampleObject(
+                                            name = "Username já existe",
+                                            value = "\"Username já cadastrado!\""
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Erro interno do servidor",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Erro no Firestore",
+                                    value = "\"Erro ao salvar usuário no Firestore: Connection timeout\""
+                            )
+                    )
+            )
+    })
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Dados para criação do usuário",
+            required = true,
+            content = @Content(
+                    mediaType = "application/json",
+                    examples = @ExampleObject(
+                            name = "Exemplo de cadastro",
+                            value = """
+                            {
+                                "email": "teste10@gmail.com",
+                                "password": "12345678",
+                                "name": "teste10",
+                                "username": "teste10",
+                                "profilePicture": null,
+                                "bio": "teste10"
+                            }
+                            """
+                    )
+            )
+    )
     public ResponseEntity<?> register(@RequestBody AuthRequest request) {
         if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
             return new ResponseEntity<>("Email não pode ser nulo ou vazio", HttpStatus.BAD_REQUEST);
@@ -91,21 +192,106 @@ public class AuthController {
 
 
     @PostMapping("/verify-token")
-    public ResponseEntity<?> verifyToken(@RequestBody Map<String, String> request) {
+    @Operation(
+            summary = "Verificar token Firebase",
+            description = "Valida um token ID do Firebase Authentication e retorna o UID do usuário. " +
+                    "Este endpoint é usado para verificar se um token ainda é válido e obter informações do usuário."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Token válido - dados do usuário",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = """
+                {
+                  "uid": "abc123def456ghi789"
+                }
+                """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Token não fornecido ou inválido",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = """
+                {
+                  "error": "BAD_REQUEST",
+                  "message": "Token é obrigatório"
+                }
+                """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Token inválido ou expirado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = """
+                {
+                  "INVALID_TOKEN": "Token Firebase inválido: Token has expired"
+                }
+                """
+                            )
+                    )
+            )
+    })
+    public ResponseEntity<?> verifyToken(@RequestBody @Valid VerifyTokenRequestDTO request) {
         try {
-            String uid = authService.verifyToken(request.get("token"));
+            String uid = authService.verifyToken(request.getToken());
             Map<String, String> response = new HashMap<>();
             response.put("uid", uid);
-
             return new ResponseEntity<>(response, HttpStatus.OK);
+
         } catch (FirebaseAuthException e) {
             System.out.println("Token inválido: " + e.getMessage());
             System.out.println("Token inválido: " + e.getErrorCode());
-            return new ResponseEntity<>("Token inválido: " + e.getMessage(),
-                    HttpStatus.UNAUTHORIZED);
+
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("INVALID_TOKEN", "Token Firebase inválido: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
         }
     }
 
+    @Operation(
+            summary = "Testar autenticação",
+            description = "Endpoint para testar a autenticação. Retorna o userId do usuário autenticado."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Autenticação bem-sucedida",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = """
+                                           {
+                                            "message": "Autenticação bem-sucedida",
+                                            "userId": "abc123def456ghi789"
+                                           }"""
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Token inválido ou não fornecido",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = """
+                                           {
+                                            "message": "Falha na autenticação: userId não encontrado"
+                                           }"""
+                            )
+                    )
+            )
+    })
     @GetMapping("/test-auth")
     public ResponseEntity<Map<String, String>> testAuth(HttpServletRequest request) {
         System.out.println("==== AUTH CONTROLLER - TEST AUTH ====");

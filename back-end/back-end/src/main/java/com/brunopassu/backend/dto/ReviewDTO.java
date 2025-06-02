@@ -1,22 +1,47 @@
 package com.brunopassu.backend.dto;
 
 import com.google.cloud.Timestamp;
-import lombok.*;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Schema(description = "DTO para reviews de livros")
 public class ReviewDTO {
-    private String reviewId;
-    private String userUid;     // ID do usuário (em vez da referência)
-    private String bookId;      // ID do livro (em vez da referência)
-    private Integer rating;         // Avaliação (1-5 estrelas)
-    private String reviewText;     // Comentário da avaliação
-    private Timestamp date; // Data de criação
-    private Integer likeCount;
-    private boolean spoiler;
-    private Timestamp dateLastUpdated;
 
+    @Schema(description = "ID único da review", example = "abc123def456")
+    private String reviewId;
+
+    @Schema(description = "UID do usuário que fez a review", example = "user123", required = true)
+    private String userUid;
+
+    @Schema(description = "ID do livro avaliado", example = "book456", required = true)
+    private String bookId;
+
+    @Schema(description = "Avaliação do livro (0-5 estrelas)", minimum = "0", maximum = "5", example = "4", required = true)
+    @Min(0)
+    @Max(5)
+    private Integer rating;
+
+    @Schema(description = "Texto da review/comentário", example = "Livro excelente! Recomendo muito.")
+    private String reviewText;
+
+    @Schema(description = "Data de criação da review", example = "2025-06-01T18:41:00Z")
+    private Timestamp date;
+
+    @Schema(description = "Número de likes na review", example = "15")
+    private Integer likeCount;
+
+    @Schema(description = "Indica se a review contém spoilers", example = "false")
+    private boolean spoiler;
+
+    @Schema(description = "Data da última atualização", example = "2025-06-01T20:30:00Z")
+    private Timestamp dateLastUpdated;
 
     public String getReviewId() {
         return reviewId;

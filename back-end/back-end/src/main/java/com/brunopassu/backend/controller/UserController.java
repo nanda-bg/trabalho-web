@@ -6,6 +6,11 @@ import com.brunopassu.backend.exception.UserEmailmmutableFieldException;
 import com.brunopassu.backend.exception.UserUsernameImmutableFieldException;
 import com.brunopassu.backend.service.UserService;
 import com.google.firebase.auth.FirebaseAuthException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,6 +35,56 @@ public class UserController {
     }
 
     @GetMapping
+    @Operation(
+            summary = "Listar todos os usuários",
+            description = "Retorna uma lista com todos os usuários cadastrados no sistema"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Lista de usuários retornada com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Lista de usuários",
+                                    value = """
+                [
+                    {
+                        "uid": "abc123def456",
+                        "email": "usuario1@gmail.com",
+                        "name": "Usuario Um",
+                        "username": "usuario1",
+                        "profilePicture": "https://example.com/foto1.jpg",
+                        "bio": "Biografia do usuário 1",
+                        "followers": 10,
+                        "following": 5
+                    },
+                    {
+                        "uid": "def456ghi789",
+                        "email": "usuario2@gmail.com",
+                        "name": "Usuario Dois",
+                        "username": "usuario2",
+                        "profilePicture": null,
+                        "bio": "Biografia do usuário 2",
+                        "followers": 20,
+                        "following": 15
+                    }
+                ]
+                """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Erro interno do servidor",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "null"
+                            )
+                    )
+            )
+    })
     public ResponseEntity<List<User>> getAllUsers() {
         try {
             List<User> users = userService.getAllUsers();
@@ -40,6 +95,54 @@ public class UserController {
     }
 
     @GetMapping("/{username}")
+    @Operation(
+            summary = "Buscar usuário por username",
+            description = "Retorna os dados de um usuário específico baseado no username fornecido"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Usuário encontrado com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Usuário encontrado",
+                                    value = """
+                {
+                    "uid": "abc123def456",
+                    "email": "usuario@gmail.com",
+                    "name": "Nome Usuario",
+                    "username": "usuario123",
+                    "profilePicture": "https://example.com/foto.jpg",
+                    "bio": "Minha biografia",
+                    "followers": 50,
+                    "following": 30
+                }
+                """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Usuário não encontrado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "null"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Erro interno do servidor",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "null"
+                            )
+                    )
+            )
+    })
     public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
         try {
             User user = userService.getUserByUsername(username);
@@ -54,6 +157,54 @@ public class UserController {
     }
 
     @GetMapping("/id/{userId}")
+    @Operation(
+            summary = "Buscar usuário por ID",
+            description = "Retorna os dados de um usuário específico baseado no UID fornecido"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Usuário encontrado com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Usuário encontrado",
+                                    value = """
+                {
+                    "uid": "abc123def456",
+                    "email": "usuario@gmail.com",
+                    "name": "Nome Usuario",
+                    "username": "usuario123",
+                    "profilePicture": "https://example.com/foto.jpg",
+                    "bio": "Minha biografia",
+                    "followers": 50,
+                    "following": 30
+                }
+                """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Usuário não encontrado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "null"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Erro interno do servidor",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "null"
+                            )
+                    )
+            )
+    })
     public ResponseEntity<User> getUserById(@PathVariable String userId) {
         try {
             User user = userService.getUserById(userId);
@@ -67,7 +218,89 @@ public class UserController {
         }
     }
 
+
     @PutMapping("/id/{id}")
+    @Operation(
+            summary = "Atualizar dados do usuário",
+            description = "Atualiza os dados de um usuário existente. Email e username são validados para evitar duplicatas."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Usuário atualizado com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Usuário atualizado",
+                                    value = "\"Usuário atualizado com sucesso\""
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Usuário não encontrado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Usuário não encontrado",
+                                    value = "\"Usuário não encontrado\""
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Conflito - dados já existem",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Username já existe",
+                                            value = "\"Username já está em uso por outro usuário!\""
+                                    ),
+                                    @ExampleObject(
+                                            name = "Email já existe",
+                                            value = "\"Email já está em uso por outro usuário!\""
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Erro interno do servidor",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Erro Firebase Auth",
+                                            value = "\"Erro ao atualizar usuário no Authentication: Token has expired\""
+                                    ),
+                                    @ExampleObject(
+                                            name = "Erro geral",
+                                            value = "\"Erro ao atualizar usuário: Connection timeout\""
+                                    )
+                            }
+                    )
+            )
+    })
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Dados para atualização do usuário",
+            required = true,
+            content = @Content(
+                    mediaType = "application/json",
+                    examples = @ExampleObject(
+                            name = "Exemplo de cadastro",
+                            value = """
+            {
+               "email": "testeput@gmail.com",
+               "name": "testeput",
+               "username": "testeput",
+               "profilePicture": "testeput",
+               "bio": "testeput"
+            }
+            """
+                    )
+            )
+    )
     public ResponseEntity<?> updateUser(@PathVariable String id, @RequestBody User user) {
         try {
             // Garante que o ID no path seja o mesmo usado para atualização
@@ -93,6 +326,51 @@ public class UserController {
     }
 
     @DeleteMapping("/id/{id}")
+    @Operation(
+            summary = "Deletar usuário",
+            description = "Remove um usuário do sistema, incluindo dados do Firestore e Firebase Authentication"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Usuário deletado com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Usuário deletado",
+                                    value = "\"Usuário deletado com sucesso do Firestore e Authentication\""
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Usuário não encontrado",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Usuário não encontrado",
+                                    value = "\"Usuário não encontrado\""
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Erro interno do servidor",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(
+                                            name = "Erro Firebase Auth",
+                                            value = "\"Erro ao deletar usuário do Authentication: User not found\""
+                                    ),
+                                    @ExampleObject(
+                                            name = "Erro geral",
+                                            value = "\"Erro ao deletar usuário: Connection timeout\""
+                                    )
+                            }
+                    )
+            )
+    })
     public ResponseEntity<?> deleteUser(@PathVariable String id) {
         try {
             boolean deleted = userService.deleteUser(id);
