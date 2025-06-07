@@ -4,6 +4,7 @@ import com.brunopassu.backend.dto.ReviewDTO;
 import com.brunopassu.backend.service.AuthService;
 import com.brunopassu.backend.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -478,7 +479,7 @@ public class ReviewController {
                     )
             )
     })
-    public ResponseEntity<?> toggleLike(@PathVariable String reviewId, @RequestHeader ("Authorization") String token) {
+    public ResponseEntity<?> toggleLike(@PathVariable String reviewId, @Parameter(hidden = true) @RequestHeader ("Authorization") String token) {
         try {
             // Extrair ID do usuário autenticado
             String userId = authService.getUserIdFromToken(token);

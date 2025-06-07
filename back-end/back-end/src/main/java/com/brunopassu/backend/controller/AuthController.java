@@ -13,15 +13,15 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -242,7 +242,7 @@ public class AuthController {
                     )
             )
     })
-    public ResponseEntity<?> verifyToken(@RequestBody @Valid VerifyTokenRequestDTO request) {
+    public ResponseEntity<?> verifyToken(@RequestBody VerifyTokenRequestDTO request) {
         try {
             String uid = authService.verifyToken(request.getToken());
             Map<String, String> response = new HashMap<>();
@@ -293,24 +293,35 @@ public class AuthController {
             )
     })
     @GetMapping("/test-auth")
-    public ResponseEntity<Map<String, String>> testAuth(HttpServletRequest request) {
-        System.out.println("==== AUTH CONTROLLER - TEST AUTH ====");
-        String userId = (String) request.getAttribute("userId");
-        System.out.println("UserId do request: " + userId);
+    public ResponseEntity<Map<String, String>> testAuth(@RequestHeader HttpHeaders request) {
+            System.out.println(request);
+            System.out.println(request.get("authorization"));
+            System.out.println("==== AUTH CONTROLLER - TEST AUTH ====");
 
-        if (userId == null) {
-            System.out.println("ALERTA: userId é null!");
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("message", "Falha na autenticação: userId não encontrado");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
-        }
 
-        // Usando HashMap em vez de Map.of() para evitar NullPointerException
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Autenticação bem-sucedida");
-        response.put("userId", userId);
+            List<String> list = request.get("authorization");
+            if (list.isEmpty() || list.get(0) == null) {
+                Map<String, String> errorResponse = new HashMap<>();
+                errorResponse.put("message", "Falha na autenticação: TOKEN NÃO ENCONTRADO");
+                System.out.println("Falha na autenticação: TOKEN NÃO ENCONTRADO");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+            }
+            String token = list.get(0);
+            String userId = authService.getUserIdFromToken(token);
+            System.out.println("UserId do request: " + userId);
 
-        System.out.println("Resposta de autenticação bem-sucedida para userId: " + userId);
-        return ResponseEntity.ok(response);
+            if (userId == null) {
+                System.out.println("ALERTA: userId é null!");
+                Map<String, String> errorResponse = new HashMap<>();
+                errorResponse.put("message", "Falha na autenticação: userId não encontrado");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+            }
+
+            // Usando HashMap em vez de Map.of() para evitar NullPointerException
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Autenticação bem-sucedida");
+            response.put("userId", userId);
+            System.out.println("Resposta de autenticação bem-sucedida para userId: " + userId);
+            return ResponseEntity.ok(response);
     }
 }
