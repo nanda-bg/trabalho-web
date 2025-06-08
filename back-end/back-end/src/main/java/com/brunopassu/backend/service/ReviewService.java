@@ -8,12 +8,15 @@ import com.brunopassu.backend.entity.Review;
 import com.brunopassu.backend.entity.User;
 import com.brunopassu.backend.repository.LikeRepository;
 import com.brunopassu.backend.repository.ReviewRepository;
+import com.google.api.core.ApiFuture;
 import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.*;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
@@ -121,28 +124,97 @@ public class ReviewService {
 
 
     public List<ReviewDTO> getAllReviews() throws ExecutionException, InterruptedException, IOException {
-        List<Review> reviews = reviewRepository.getAllReviews();
-        return reviews.stream()
-                .map(this::convertToDTO)
-                .toList();
+        return getAllReviewsWithDetails();
     }
 
     public ReviewDTO getReviewById(String reviewId) throws ExecutionException, InterruptedException, IOException {
         Review review = reviewRepository.getReviewById(reviewId);
-        return review != null ? convertToDTO(review) : null;
+        return review != null ? convertToDTOAsync(review) : null;
     }
 
     public List<ReviewDTO> getReviewsByBookId(String bookId) throws ExecutionException, InterruptedException, IOException {
         List<Review> reviews = reviewRepository.getReviewsByBookId(bookId);
+
+        // Otimização para buscar usuários em lote
+        Map<String, ApiFuture<DocumentSnapshot>> userFutures = new HashMap<>();
+        Firestore firestore = this.firestore.firestore();
+
+        for (Review review : reviews) {
+            String userId = review.getUserRef().getId();
+            if (!userFutures.containsKey(userId)) {
+                userFutures.put(userId, firestore.collection("users").document(userId).get());
+            }
+        }
+
+        // Cache dos usuários
+        Map<String, User> userCache = new HashMap<>();
+        for (Map.Entry<String, ApiFuture<DocumentSnapshot>> entry : userFutures.entrySet()) {
+            User user = entry.getValue().get().toObject(User.class);
+            userCache.put(entry.getKey(), user);
+        }
+
+        // Buscar dados do livro uma única vez
+        DocumentSnapshot bookSnapshot = firestore.collection("books").document(bookId).get().get();
+        Book book = bookSnapshot.toObject(Book.class);
+
         return reviews.stream()
-                .map(this::convertToDTO)
+                .map(review -> {
+                    ReviewDTO dto = new ReviewDTO();
+                    dto.setReviewId(review.getReviewId());
+                    dto.setUserUid(review.getUserRef().getId());
+                    dto.setBookId(review.getBookRef().getId());
+                    dto.setRating(review.getRating());
+                    dto.setReviewText(review.getReviewText());
+                    dto.setDate(review.getDate());
+                    dto.setLikeCount(review.getLikeCount());
+                    dto.setSpoiler(review.isSpoiler());
+                    dto.setUser(userCache.get(review.getUserRef().getId()));
+                    dto.setBook(book);
+                    return dto;
+                })
                 .toList();
     }
 
     public List<ReviewDTO> getReviewsByUserId(String userId) throws ExecutionException, InterruptedException, IOException {
         List<Review> reviews = reviewRepository.getReviewsByUserId(userId);
+
+        // Otimização para buscar livros em lote
+        Map<String, ApiFuture<DocumentSnapshot>> bookFutures = new HashMap<>();
+        Firestore firestore = this.firestore.firestore();
+
+        for (Review review : reviews) {
+            String bookId = review.getBookRef().getId();
+            if (!bookFutures.containsKey(bookId)) {
+                bookFutures.put(bookId, firestore.collection("books").document(bookId).get());
+            }
+        }
+
+        // Cache dos livros
+        Map<String, Book> bookCache = new HashMap<>();
+        for (Map.Entry<String, ApiFuture<DocumentSnapshot>> entry : bookFutures.entrySet()) {
+            Book book = entry.getValue().get().toObject(Book.class);
+            bookCache.put(entry.getKey(), book);
+        }
+
+        // Buscar dados do usuário uma única vez
+        DocumentSnapshot userSnapshot = firestore.collection("users").document(userId).get().get();
+        User user = userSnapshot.toObject(User.class);
+
         return reviews.stream()
-                .map(this::convertToDTO)
+                .map(review -> {
+                    ReviewDTO dto = new ReviewDTO();
+                    dto.setReviewId(review.getReviewId());
+                    dto.setUserUid(review.getUserRef().getId());
+                    dto.setBookId(review.getBookRef().getId());
+                    dto.setRating(review.getRating());
+                    dto.setReviewText(review.getReviewText());
+                    dto.setDate(review.getDate());
+                    dto.setLikeCount(review.getLikeCount());
+                    dto.setSpoiler(review.isSpoiler());
+                    dto.setUser(user);
+                    dto.setBook(bookCache.get(review.getBookRef().getId()));
+                    return dto;
+                })
                 .toList();
     }
 
@@ -235,7 +307,7 @@ public class ReviewService {
         return entity;
     }
 
-    private ReviewDTO convertToDTO(Review entity) {
+    private ReviewDTO convertToDTO(Review entity) throws ExecutionException, InterruptedException {
         ReviewDTO dto = new ReviewDTO();
         dto.setReviewId(entity.getReviewId());
         dto.setUserUid(entity.getUserRef().getId());
@@ -245,7 +317,95 @@ public class ReviewService {
         dto.setDate(entity.getDate());
         dto.setLikeCount(entity.getLikeCount());
         dto.setSpoiler(entity.isSpoiler());
+
+        User user = getUserFromReview(entity);
+        Book book = getBookFromReview(entity);
+
+        dto.setUser(user);
+        dto.setBook(book);
+
         return dto;
+    }
+
+    private ReviewDTO convertToDTOAsync(Review entity) throws ExecutionException, InterruptedException {
+        ReviewDTO dto = new ReviewDTO();
+        dto.setReviewId(entity.getReviewId());
+        dto.setUserUid(entity.getUserRef().getId());
+        dto.setBookId(entity.getBookRef().getId());
+        dto.setRating(entity.getRating());
+        dto.setReviewText(entity.getReviewText());
+        dto.setDate(entity.getDate());
+        dto.setLikeCount(entity.getLikeCount());
+        dto.setSpoiler(entity.isSpoiler());
+
+        // Buscar dados em paralelo para melhor performance
+        ApiFuture<DocumentSnapshot> userFuture = entity.getUserRef().get();
+        ApiFuture<DocumentSnapshot> bookFuture = entity.getBookRef().get();
+
+        // Aguardar ambas as consultas
+        User user = userFuture.get().toObject(User.class);
+        Book book = bookFuture.get().toObject(Book.class);
+
+        dto.setUser(user);
+        dto.setBook(book);
+
+        return dto;
+    }
+
+    public List<ReviewDTO> getAllReviewsWithDetails() throws ExecutionException, InterruptedException, IOException {
+        List<Review> reviews = reviewRepository.getAllReviews();
+
+        // Buscar todos os usuários e livros únicos de uma vez
+        Map<String, ApiFuture<DocumentSnapshot>> userFutures = new HashMap<>();
+        Map<String, ApiFuture<DocumentSnapshot>> bookFutures = new HashMap<>();
+
+        Firestore firestore = this.firestore.firestore();
+
+        // Preparar todas as consultas
+        for (Review review : reviews) {
+            String userId = review.getUserRef().getId();
+            String bookId = review.getBookRef().getId();
+
+            if (!userFutures.containsKey(userId)) {
+                userFutures.put(userId, firestore.collection("users").document(userId).get());
+            }
+
+            if (!bookFutures.containsKey(bookId)) {
+                bookFutures.put(bookId, firestore.collection("books").document(bookId).get());
+            }
+        }
+
+        // Aguardar todas as consultas e criar mapas de cache
+        Map<String, User> userCache = new HashMap<>();
+        Map<String, Book> bookCache = new HashMap<>();
+
+        for (Map.Entry<String, ApiFuture<DocumentSnapshot>> entry : userFutures.entrySet()) {
+            User user = entry.getValue().get().toObject(User.class);
+            userCache.put(entry.getKey(), user);
+        }
+
+        for (Map.Entry<String, ApiFuture<DocumentSnapshot>> entry : bookFutures.entrySet()) {
+            Book book = entry.getValue().get().toObject(Book.class);
+            bookCache.put(entry.getKey(), book);
+        }
+
+        // Converter para DTOs usando o cache
+        return reviews.stream()
+                .map(review -> {
+                    ReviewDTO dto = new ReviewDTO();
+                    dto.setReviewId(review.getReviewId());
+                    dto.setUserUid(review.getUserRef().getId());
+                    dto.setBookId(review.getBookRef().getId());
+                    dto.setRating(review.getRating());
+                    dto.setReviewText(review.getReviewText());
+                    dto.setDate(review.getDate());
+                    dto.setLikeCount(review.getLikeCount());
+                    dto.setSpoiler(review.isSpoiler());
+                    dto.setUser(userCache.get(review.getUserRef().getId()));
+                    dto.setBook(bookCache.get(review.getBookRef().getId()));
+                    return dto;
+                })
+                .toList();
     }
 
     public User getUserFromReview(Review review) throws ExecutionException, InterruptedException {

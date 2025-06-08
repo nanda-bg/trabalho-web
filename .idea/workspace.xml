@@ -6,7 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="8e9f613b-8c25-4c30-8cdb-8a962897647d" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/controller/AuthController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/dto/ReviewDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/dto/ReviewDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/service/ReviewService.java" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/service/ReviewService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,6 +48,9 @@
   }
 }</component>
   <component name="KubernetesApiPersistence">{}</component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
+}</component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 7
@@ -141,6 +145,9 @@
       <workItem from="1748699311768" duration="9514000" />
       <workItem from="1748713789263" duration="1707000" />
       <workItem from="1748801720263" duration="3042000" />
+      <workItem from="1749331759106" duration="491000" />
+      <workItem from="1749340029788" duration="1236000" />
+      <workItem from="1749400897460" duration="920000" />
     </task>
     <servers />
   </component>

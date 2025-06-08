@@ -1,5 +1,7 @@
 package com.brunopassu.backend.dto;
 
+import com.brunopassu.backend.entity.Book;
+import com.brunopassu.backend.entity.User;
 import com.google.cloud.Timestamp;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
@@ -42,6 +44,25 @@ public class ReviewDTO {
 
     @Schema(description = "Data da última atualização", example = "2025-06-01T20:30:00Z")
     private Timestamp dateLastUpdated;
+
+    private User user;
+    private Book book;
+
+    public ReviewDTO(String bookId, String reviewId, String userUid, Integer rating, String reviewText, Timestamp date, Integer likeCount, boolean spoiler, Timestamp dateLastUpdated, User user, Book book) {
+        this.bookId = bookId;
+        this.reviewId = reviewId;
+        this.userUid = userUid;
+        this.rating = rating;
+        this.reviewText = reviewText;
+        this.date = date;
+        this.likeCount = likeCount;
+        this.spoiler = spoiler;
+        this.dateLastUpdated = dateLastUpdated;
+        this.user = user;
+        this.book = book;
+    }
+
+    public ReviewDTO(){}
 
     public String getReviewId() {
         return reviewId;
@@ -113,5 +134,21 @@ public class ReviewDTO {
 
     public void setDateLastUpdated(Timestamp dateLastUpdated) {
         this.dateLastUpdated = dateLastUpdated;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Book getBook() {
+        return book;
+    }
+
+    public void setBook(Book book) {
+        this.book = book;
     }
 }
