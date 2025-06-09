@@ -1,5 +1,9 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { UpdateProfilePayloadAction, UserState } from "./types";
+import {
+  FetchUserInfoPayloadAction,
+  UpdateProfilePayloadAction,
+  UserState,
+} from "./types";
 import {
   setStateSliceFieldReducer,
   SetStateSliceFieldReducerPayload,
@@ -12,6 +16,8 @@ export const initialState: UserState = {
   email: null,
   name: null,
   isLoading: false,
+  followers: 0,
+  following: 0,
 };
 
 const userSlice = createSlice({
@@ -24,10 +30,11 @@ const userSlice = createSlice({
     ) => setStateSliceFieldReducer<UserState>(state, action),
     setUserSlice: (state, action: PayloadAction<Partial<UserState>>) =>
       setStateSliceReducer<UserState>(state, action),
-    fetchUserInfo: () => {},
+    fetchUserInfo: (_state, _action: FetchUserInfoPayloadAction) => {},
     updateProfile: (_state, _action: UpdateProfilePayloadAction) => {},
   },
 });
 
-export const { setUserSliceField, setUserSlice, fetchUserInfo, updateProfile } = userSlice.actions;
+export const { setUserSliceField, setUserSlice, fetchUserInfo, updateProfile } =
+  userSlice.actions;
 export default userSlice;

@@ -1,15 +1,15 @@
 import * as S from "./styles";
 import Header from "./components/Header/Header";
-import type { Review } from "@app/types/Review";
 import { type FC, useState } from "react";
 import { AlertTriangle, Eye } from "lucide-react";
+import { Review } from "@app/store/slices/ReviewsSlice/types";
 
 interface ReviewCardProps {
   review: Review;
 }
 
 const ReviewCard: FC<ReviewCardProps> = ({ review }) => {
-  const [showSpoiler, setShowSpoiler] = useState(!review.has_spoiler);
+  const [showSpoiler, setShowSpoiler] = useState(!review.spoiler);
 
   const handleShowSpoiler = () => {
     setShowSpoiler(true);
@@ -17,16 +17,16 @@ const ReviewCard: FC<ReviewCardProps> = ({ review }) => {
 
   return (
     <S.ReviewCard>
-      <Header createdAt={review.createdAt} user={review.user} />
+      <Header createdAt={review.date} user={review.user} />
       <S.InfoContainer>
         <S.BookCover
-          src={new URL(review.book.coverUrl).toString()}
-          alt={`Cover of the book ${review.book.title}`}
+          src={review.book?.coverUrl}
+          alt={`Cover of the book ${review.book?.title}`}
         />
 
         <S.ReviewInfo>
           <div>
-            <S.BookTitle>{review.book.title}</S.BookTitle>
+            <S.BookTitle>{review.book?.title}</S.BookTitle>
 
             <S.Rating>
               {[1, 2, 3, 4, 5].map((star) => (
@@ -42,7 +42,7 @@ const ReviewCard: FC<ReviewCardProps> = ({ review }) => {
             </S.Rating>
           </div>
 
-          {review.has_spoiler && !showSpoiler && (
+          {review.spoiler && !showSpoiler && (
             <S.SpoilerContainer>
               <S.SpoilerAlert>
                 <AlertTriangle size={16} />
@@ -56,7 +56,7 @@ const ReviewCard: FC<ReviewCardProps> = ({ review }) => {
           )}
 
           <S.ReviewContent spoiler={!showSpoiler}>
-            {review.comment}
+            {review.reviewText}
           </S.ReviewContent>
         </S.ReviewInfo>
       </S.InfoContainer>

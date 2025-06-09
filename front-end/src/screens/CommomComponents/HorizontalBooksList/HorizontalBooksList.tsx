@@ -1,17 +1,17 @@
+import { Book } from "@app/store/slices/BooksSlice/types";
 import BookListItem from "./components/BookListItem/BookListItem";
 import * as S from "./styles";
-import { Book } from "@app/types/Book";
 import { FC } from "react";
 
 interface HorizontalBooksListProps {
   books: Book[];
 }
 
-const HorizontalBooksList: FC<HorizontalBooksListProps> = ({books}) => {
+const HorizontalBooksList: FC<HorizontalBooksListProps> = ({ books }) => {
   return (
     <S.HorizontalScroll>
       {books.map((book) => (
-        <BookListItem key={book.id} book={book} />
+        <BookListItem key={book.bookId} book={book} />
       ))}
     </S.HorizontalScroll>
   );

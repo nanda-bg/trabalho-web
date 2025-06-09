@@ -8,6 +8,7 @@ import { setStateSliceReducer } from "../../utils/setStateSliceReducer";
 
 export const initialState: SignUpState = {
   isLoading: false,
+  isSuccessfull: false,
 };
 
 const signUpSlice = createSlice({

@@ -11,9 +11,8 @@ import { signUp } from "@app/store/slices/SignUpSlice";
 const SignUpForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { userId } = useAppSelector(
-    (state) => state.userSlice
-  );
+
+  const { isSuccessfull } = useAppSelector((state) => state.signUpSlice);
 
   const { defaultError, emailError, passwordError, isLoading } = useAppSelector(
     (state) => state.signUpSlice
@@ -38,10 +37,10 @@ const SignUpForm = () => {
   };
 
   useEffect(() => {
-    if (userId) {
+    if (isSuccessfull) {
       navigate("/home");
     }
-  }, [userId, navigate]);
+  }, [isSuccessfull, navigate]);
 
   return (
     <S.FormStyled onSubmit={handleSubmit}>

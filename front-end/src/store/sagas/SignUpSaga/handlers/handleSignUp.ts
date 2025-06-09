@@ -1,10 +1,12 @@
-import { put } from "redux-saga/effects";
+import { call, put } from "redux-saga/effects";
 import {
   setSignUpSlice,
   setSignUpSliceField,
 } from "@app/store/slices/SignUpSlice";
 import { SignUpPayloadAction } from "@app/store/slices/SignUpSlice/types";
 import { fetchUserInfo } from "@app/store/slices/UserSlice";
+import axios from "axios";
+import { getToken } from "../../TokenSaga/handlers/getToken";
 
 function isEmailValide(email) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -25,6 +27,7 @@ function isPasswordValide(password) {
 export function* handleSignUp({ payload }: SignUpPayloadAction) {
   try {
     yield put(setSignUpSliceField({ key: "isLoading", value: true }));
+
     yield put(
       setSignUpSlice({
         emailError: null,
@@ -80,7 +83,18 @@ export function* handleSignUp({ payload }: SignUpPayloadAction) {
       return;
     }
 
-    yield put(fetchUserInfo());
+    yield call(
+      axios.post,
+      "/auth/register",
+      {
+        email,
+        password,
+        name,
+        username,
+      }
+    );
+
+    yield put(setSignUpSliceField({ key: "isSuccessfull", value: true }));
   } catch (error) {
     yield put(
       setSignUpSliceField({

@@ -36,21 +36,21 @@ export const Author = styled.p`
   margin: 0 0 12px 0;
 `;
 
-export const Description = styled.p<{ expanded: boolean }>`
+export const Description = styled.p`
   font-size: 14px;
   color: #8e95a9;
   margin: 0 0 12px 0;
   display: -webkit-box;
-  -webkit-line-clamp: ${(props) => (props.expanded ? "unset" : "3")};
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
-  overflow: ${(props) => (props.expanded ? "visible" : "hidden")};
+  overflow: hidden;
   transition: all 0.3s ease;
 `;
 
 export const ReadMoreButton = styled.button`
   background: none;
   border: none;
-  color:  #ff0080;
+  color: #ff0080;
   font-size: 14px;
   padding: 0;
   margin: 0 0 12px 0;

@@ -1,17 +1,27 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { BookOpen, Heart, ArrowLeft } from "lucide-react";
-import { bookDetails } from "@app/utils/mocks/MockedBookDetails";
-import { recommendedBooks } from "@app/utils/mocks/MockedRecommendedBooks";
 import { GlobalStyle } from "@app/styles/GlobalStyles";
 import * as S from "./styles";
-import ReviewCard from "../CommomComponents/ReviewCard/ReviewCard";
 import HorizontalBooksList from "../CommomComponents/HorizontalBooksList/HorizontalBooksList";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Header from "./components/Header/Header";
+import { useAppSelector } from "@app/store/rootReducer";
 import RatingsBars from "./components/RatingBars/RatingsBar";
+import DetailsSection from "./components/DetailsSection/DetailsSection";
+import ReviewsSection from "./components/ReviewsSection/ReviewsSection";
+import { useDispatch } from "react-redux";
+import { getBook } from "@app/store/slices/BooksSlice";
+import { listReviewsByBook } from "@app/store/slices/ReviewsSlice";
 
 const BookDetails: FC = () => {
   const navigation = useNavigate();
+  const dispatch = useDispatch();
+
+  const { id } = useParams();
+
+  const { selectedBook, books } = useAppSelector((state) => state.bookSlice);
+  const { reviews } = useAppSelector((state) => state.reviewSlice);
+
   const [activeTab, setActiveTab] = useState<"summary" | "details" | "reviews">(
     "summary"
   );
@@ -20,23 +30,39 @@ const BookDetails: FC = () => {
     navigation(-1);
   };
 
+  useEffect(() => {
+    dispatch(getBook({ uid: id }));
+    dispatch(listReviewsByBook({ bookId: id }));
+
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth",
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  if (!selectedBook) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <>
       <GlobalStyle />
       <S.Container>
         <S.Header>
-          <S.SaveButton onClick={handleGoBack}>
+          <S.GoBack onClick={handleGoBack}>
             <ArrowLeft size={20} />
-          </S.SaveButton>
+          </S.GoBack>
           <S.HeaderTitle>Detalhes</S.HeaderTitle>
         </S.Header>
 
-        <Header bookDetails={bookDetails} />
+        <Header bookDetails={selectedBook} />
 
         <S.ActionButtons>
           <S.ActionButton $primary>
             <BookOpen size={16} />
-            Adicionar a lista de leitura
+            Adicionar a lista de leituras
           </S.ActionButton>
           <S.ActionButton>
             <Heart size={16} />
@@ -44,65 +70,46 @@ const BookDetails: FC = () => {
           </S.ActionButton>
         </S.ActionButtons>
 
-        <RatingsBars book={bookDetails} />
+        {reviews && (
+          <RatingsBars
+            bookRating={selectedBook.averageRating}
+            reviews={reviews}
+          />
+        )}
 
         <S.TabsContainer>
           <S.Tab
             active={activeTab === "summary"}
             onClick={() => setActiveTab("summary")}
           >
-            Summary
+            Descrição
           </S.Tab>
           <S.Tab
             active={activeTab === "details"}
             onClick={() => setActiveTab("details")}
           >
-            Details
+            Detalhes
           </S.Tab>
           <S.Tab
             active={activeTab === "reviews"}
             onClick={() => setActiveTab("reviews")}
           >
-            Reviews
+            Avaliações
           </S.Tab>
         </S.TabsContainer>
 
         <S.TabContent>
           {activeTab === "summary" && (
             <div>
-              <p>{bookDetails.description}</p>
+              <p>{selectedBook.description}</p>
             </div>
           )}
 
           {activeTab === "details" && (
-            <div>
-              <p>
-                <strong>Author(s):</strong> {bookDetails.authors.join(", ")}
-              </p>
-              <p>
-                <strong>Published:</strong> {bookDetails.year}
-              </p>
-              <p>
-                <strong>Pages:</strong> {bookDetails.pages}
-              </p>
-              <p>
-                <strong>Genres:</strong> {bookDetails.genres.join(", ")}
-              </p>
-            </div>
+            <DetailsSection selectedBook={selectedBook} />
           )}
 
-          {activeTab === "reviews" && (
-            <S.ReviewsSection>
-              <S.ReviewsHeader>
-                <S.ReviewsTitle>Avaliações</S.ReviewsTitle>
-                <S.SeeAllLink href="#">Ver mais</S.SeeAllLink>
-              </S.ReviewsHeader>
-
-              {bookDetails.reviews.map((review) => (
-                <ReviewCard review={review} />
-              ))}
-            </S.ReviewsSection>
-          )}
+          {activeTab === "reviews" && <ReviewsSection reviews={reviews} />}
         </S.TabContent>
 
         <S.RecommendedSection>
@@ -111,7 +118,7 @@ const BookDetails: FC = () => {
             <S.SeeAllLink href="#">Ver mais</S.SeeAllLink>
           </S.RecommendedHeader>
 
-          <HorizontalBooksList books={recommendedBooks} />
+          {books && <HorizontalBooksList books={books} />}
         </S.RecommendedSection>
       </S.Container>
     </>

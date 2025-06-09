@@ -31,12 +31,15 @@ export const ReviewInfo = styled.div`
 export const BookTitle = styled.h5`
   font-size: 14px;
   font-weight: 600;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 `
 
 export const Rating = styled.div`
   display: flex;
   align-items: center;
-  gap: 4px;
 `
 
 export const SpoilerContainer = styled.div`

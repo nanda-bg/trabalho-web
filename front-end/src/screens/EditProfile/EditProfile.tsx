@@ -11,6 +11,7 @@ import TextArea from "../CommomComponents/TextArea/TextArea";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { updateProfile } from "@app/store/slices/UserSlice";
+import Loading from "./components/LoadingAnimations";
 
 interface ProfileData {
   name: string;
@@ -24,15 +25,17 @@ export default function EditProfile() {
   const navigation = useNavigate();
   const dispatch = useDispatch();
 
-  const { email, username, name, profilePicture } = useAppSelector(
+  const { email, username, name, profilePicture, bio } = useAppSelector(
     (state) => state.userSlice
   );
+
+  const { isLoading } = useAppSelector((state) => state.userSlice);
 
   const [profile, setProfile] = useState<ProfileData>({
     name: name,
     username: username,
     email: email,
-    bio: "Film enthusiast and critic. I love discussing cinema and sharing my thoughts on the latest releases.",
+    bio: bio,
     profileImage: profilePicture,
   });
 
@@ -81,6 +84,7 @@ export default function EditProfile() {
   return (
     <S.Container>
       <GlobalStyle />
+      <Loading active={isLoading} />
       <S.Header>
         <S.SaveButton onClick={handleGoBack}>
           <ArrowLeft size={20} />

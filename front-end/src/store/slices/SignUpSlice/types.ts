@@ -5,6 +5,7 @@ export interface SignUpState {
   emailError?: string;
   passwordError?: string;
   defaultError?: string;
+  isSuccessfull?: boolean;
 }
 
 export type SignUpPayloadAction = PayloadAction<{

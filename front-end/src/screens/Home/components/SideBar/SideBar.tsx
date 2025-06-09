@@ -16,11 +16,13 @@ import * as S from "./styles";
 import { useDispatch } from "react-redux";
 import { logout } from "@app/store/slices/LoginSlice";
 import { useNavigate } from "react-router-dom";
+import { useAppSelector } from "@app/store/rootReducer";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const user = useAppSelector((state) => state.userSlice);
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -52,7 +54,7 @@ const Sidebar = () => {
       )}
 
       <S.SidebarContainer isOpen={isOpen}>
-        <ProfileSection followers={1087} following={430} />
+        <ProfileSection followers={user.followers || 0 } following={user.following || 0} />
 
         <S.NavContainer>
           <NavItem
