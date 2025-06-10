@@ -1,5 +1,6 @@
 package com.brunopassu.backend.entity;
 
+import com.brunopassu.backend.entity.enums.UserType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -37,10 +38,15 @@ public class User {
     @Schema(description = "Número de usuários seguindo", example = "75")
     private Integer following;
 
+    @Schema(description = "Tipo de Usuário, receber 'PADRAO' caso seja um usuário normal ou 'CONTRIBUIDOR' caso seja um usuário que pode cadastrar livros", example = "CONTRIBUIDOR", required = true)
+    @NotBlank(message = "UserType deve ter um tipo!")
+    @NotEmpty(message = "UserType não pode ser branco!")
+    private UserType userType;
+
     public User() {
     }
 
-    public User(String uid, String email, String name, String username, String profilePicture, String bio, Integer followers, Integer following) {
+    public User(String uid, String email, String name, String username, String profilePicture, String bio, Integer followers, Integer following, UserType userType) {
         this.uid = uid;
         this.email = email;
         this.name = name;
@@ -49,12 +55,21 @@ public class User {
         this.bio = bio;
         this.followers = followers;
         this.following = following;
+        this.userType = userType;
     }
 
     //Construtor sem opcionais
     public User (String email, String username) {
         this.email = email;
         this.username = username;
+    }
+
+    public UserType getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
     }
 
     public String getUid() {

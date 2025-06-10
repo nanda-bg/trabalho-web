@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -42,7 +43,7 @@ public class BookController {
     @PostMapping
     @Operation(
             summary = "Criar novo livro",
-            description = "Adiciona um novo livro ao sistema. O título deve ser único."
+            description = "APENAS USUÁRIOS COM 'CONTRIBUIDOR' adiciona um novo livro ao sistema. O título deve ser único."
     )
     @ApiResponses({
             @ApiResponse(
@@ -85,8 +86,19 @@ public class BookController {
                     )
             ),
             @ApiResponse(
+                    responseCode = "403",
+                    description = "Usuário não tem permissão para adicionar livros",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Usuário sem permissão!",
+                                    value = "Apenas usuários com 'CONTRIBUIDOR' podem adicionar livros."
+                            )
+                    )
+            ),
+            @ApiResponse(
                     responseCode = "500",
-                    description = "Erro interno do servidor",
+                    description = "",
                     content = @Content(
                             mediaType = "application/json",
                             examples = @ExampleObject(
@@ -117,14 +129,18 @@ public class BookController {
                     )
             )
     )
-    public ResponseEntity<String> createBook(@Valid @RequestBody Book book, BindingResult result) {
+    public ResponseEntity<String> createBook(@Valid @RequestBody Book book, BindingResult result, @RequestHeader HttpHeaders request) throws InterruptedException, ExecutionException {
         if (result.hasErrors()) {
             return new ResponseEntity<>("Erro de validação: " + result.getAllErrors(), HttpStatus.BAD_REQUEST);
         }
-
         try {
-            String bookId = bookService.addBook(book);
-            return new ResponseEntity<>("Livro criado com ID: " + bookId, HttpStatus.CREATED);
+            if (bookService.checkUserType(request)) {
+                String bookId = bookService.addBook(book);
+                return new ResponseEntity<>("Livro criado com ID: " + bookId, HttpStatus.CREATED);
+            }
+            else {
+                return new ResponseEntity<>("Apenas usuários com 'CONTRIBUIDOR' podem adicionar livros.", HttpStatus.FORBIDDEN);
+            }
         } catch (BookTitleImmutableFieldException e) {
             return new ResponseEntity<>("O título: '" + e.getMessage() + "' já existe!", HttpStatus.CONFLICT);
         } catch (ExecutionException | InterruptedException | IOException e) {

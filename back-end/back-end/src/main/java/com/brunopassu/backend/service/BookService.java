@@ -2,9 +2,14 @@ package com.brunopassu.backend.service;
 
 import com.brunopassu.backend.config.FirestoreConfig;
 import com.brunopassu.backend.entity.Book;
+import com.brunopassu.backend.entity.User;
+import com.brunopassu.backend.entity.enums.UserType;
 import com.brunopassu.backend.exception.BookTitleImmutableFieldException;
 import com.brunopassu.backend.repository.BookRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.io.IOException;
 import java.util.List;
@@ -15,10 +20,13 @@ public class BookService {
 
     private BookRepository bookRepository;
     private final FirestoreConfig firestore;
+    private UserService userService;
 
-    public BookService(BookRepository bookRepository, FirestoreConfig firestore) {
+    @Autowired
+    public BookService(BookRepository bookRepository, FirestoreConfig firestore, UserService userService) {
         this.bookRepository = bookRepository;
         this.firestore = firestore;
+        this.userService = userService;
     }
 
     public String addBook(Book book) throws ExecutionException, InterruptedException, IOException, BookTitleImmutableFieldException {
@@ -62,4 +70,23 @@ public class BookService {
                 .size() > 0;
     }
 
+    public boolean checkUserType(@RequestHeader HttpHeaders request) throws ExecutionException, InterruptedException {
+        //PEGA O TOKEN DO HEADER
+        List<String> list = request.get("authorization");
+        String token = list.get(0);
+        String userId = userService.getUserIdFromToken(token);
+        //VERIFICA SE O USUÁRIO N É NULO
+        if (userId == null || userId.isEmpty()) {
+            return false; // Usuário não autenticado
+        }
+
+        User user = userService.getUserById(userId);
+
+        if (user.getUserType() == UserType.CONTRIBUIDOR) {
+            return true; // USUARIO CONTRIBUIDOR PODE ADICIONAR LIVROS
+        }
+        else {
+            return false;
+        }
+    }
 }

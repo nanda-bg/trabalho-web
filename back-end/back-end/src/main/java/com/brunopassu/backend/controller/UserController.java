@@ -178,7 +178,8 @@ public class UserController {
                     "profilePicture": "https://example.com/foto.jpg",
                     "bio": "Minha biografia",
                     "followers": 50,
-                    "following": 30
+                    "following": 30,
+                    "userType": "PADRAO"
                 }
                 """
                             )

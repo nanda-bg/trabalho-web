@@ -132,7 +132,8 @@ public class AuthController {
                                 "name": "teste10",
                                 "username": "teste10",
                                 "profilePicture": null,
-                                "bio": "teste10"
+                                "bio": "teste10",
+                                "userType": "CONTRIBUIDOR"
                             }
                             """
                     )
@@ -170,6 +171,7 @@ public class AuthController {
             user.setUsername(request.getUsername());
             user.setFollowers(0);
             user.setFollowing(0);
+            user.setUserType(request.getUserType());
 
             userService.AddUser(user);
 
