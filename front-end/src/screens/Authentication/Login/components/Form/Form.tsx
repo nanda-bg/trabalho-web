@@ -14,13 +14,9 @@ const LoginForm = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { loginError, isLoading } = useAppSelector(
-    (state) => state.loginSlice
-  );
+  const { loginError, isLoading } = useAppSelector((state) => state.loginSlice);
 
-  const { userId } = useAppSelector(
-    (state) => state.userSlice
-  );
+  const { isAuthenticated } = useAppSelector((state) => state.authSlice);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -29,10 +25,16 @@ const LoginForm = () => {
   };
 
   useEffect(() => {
-    if (userId) {
-      navigate("/home");
+    if (isAuthenticated && !isLoading) {
+      const redirectPath = localStorage.getItem('redirectAfterLogin');
+      if (redirectPath) {
+        localStorage.removeItem('redirectAfterLogin');
+        navigate(redirectPath);
+      } else {
+        navigate("/home");
+      }
     }
-  }, [userId, navigate]);
+  }, [isAuthenticated, isLoading, navigate]);
 
   return (
     <S.FormStyled onSubmit={handleSubmit}>

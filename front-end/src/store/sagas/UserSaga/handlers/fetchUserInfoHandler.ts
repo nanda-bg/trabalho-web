@@ -1,29 +1,40 @@
 import { setUserSlice, setUserSliceField } from "@app/store/slices/UserSlice";
-import { mockedUser } from "@app/utils/mocks/MockedUser";
-import { put } from "redux-saga/effects";
+import { FetchUserInfoPayloadAction } from "@app/store/slices/UserSlice/types";
+import axios from "axios";
+import { call, put, select } from "redux-saga/effects";
 
-export function* fetchUserInfoHandler() {
+export function* fetchUserInfoHandler({ payload }: FetchUserInfoPayloadAction) {
   try {
     yield put(setUserSliceField({ key: "isLoading", value: true }));
 
+    const token = localStorage.getItem("token");
+
+    const { data } = yield call(axios.get, `/users/id/${payload.uid}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
     yield put(
       setUserSlice({
-        userId: mockedUser.userId,
-        email: mockedUser.email,
-        username: mockedUser.username,
-        name: mockedUser.name,
-        profilePicture: mockedUser.profilePicture,
-        bio: mockedUser.bio
+        userId: data.uid,
+        email: data.email,
+        username: data.username,
+        name: data.name,
+        profilePicture: data.profilePicture,
+        bio: data.bio,
+        followers: data.followers,
+        following: data.following,
       })
     );
   } catch (error) {
-      yield put(
-        setUserSliceField({
-          key: "error",
-          value: "Erro ao resgatar informações do usuário, tente novamente.",
-        })
-      );
-    } finally {
-      yield put(setUserSliceField({ key: "isLoading", value: false }));
-    }
+    yield put(
+      setUserSliceField({
+        key: "error",
+        value: "Erro ao resgatar informações do usuário, tente novamente.",
+      })
+    );
+  } finally {
+    yield put(setUserSliceField({ key: "isLoading", value: false }));
+  }
 }

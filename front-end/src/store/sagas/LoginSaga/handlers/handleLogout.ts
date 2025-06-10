@@ -1,26 +1,22 @@
-import { auth } from "@app/config/firebaseConfig";
+import { setAuthSlice } from "@app/store/slices/Auth";
 import { setLoginSliceField } from "@app/store/slices/LoginSlice";
-import { setUserSlice } from "@app/store/slices/UserSlice";
-import { call, put } from "redux-saga/effects";
-
-function signOut() {
-  auth.signOut();
-}
+import { persistor } from "@app/store/store";
+import { put } from "redux-saga/effects";
 
 export function* handleLogout() {
   try {
     yield put(setLoginSliceField({ key: "isLoading", value: true }));
     yield put(setLoginSliceField({ key: "logoutError", value: null }));
 
-    yield call(signOut);
+    localStorage.removeItem("token");
 
     yield put(
-      setUserSlice({
-        userId: null,
-        email: null,
-        username: null,
+      setAuthSlice({
+        isAuthenticated: false,
       })
     );
+
+    yield persistor.purge();
   } catch (error) {
     yield put(
       setLoginSliceField({

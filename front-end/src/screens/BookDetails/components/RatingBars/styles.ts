@@ -82,9 +82,15 @@ export const RatingBarFill = styled.div<{ width: number; value: number }>`
   height: 100%;
   width: ${(props) => props.width}%;
   background-color: ${(props) => {
-    if (props.value >= 4) return "#FF8700";
-    if (props.value >= 3) return "#FFD700";
-    return "#8E95A9";
+    const colors = {
+      5: "#FF8700",
+      4: "#E6A03E",
+      3: "#CCB97D",
+      2: "#B3D2BB",
+      1: "#8E95A9",
+      0: "#767A87",
+    };
+    return colors[props.value as keyof typeof colors];
   }};
   border-radius: 3px;
 `;

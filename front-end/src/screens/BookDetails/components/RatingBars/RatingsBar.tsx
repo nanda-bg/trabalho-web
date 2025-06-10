@@ -1,33 +1,42 @@
+import { Review } from "@app/store/slices/ReviewsSlice/types";
 import * as S from "./styles";
+import { FC } from "react";
 
-const RatingsBars = ({ book }) => {
-  const ratingCounts: Record<number, number> = [5, 4, 3, 2, 1].reduce(
+interface RatingsBarsProps {
+  bookRating: number;
+  reviews: Review[];
+}
+const RatingsBars: FC<RatingsBarsProps> = ({ reviews }) => {
+  const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
+  const bookRating = Math.round(totalRating / (reviews.length || 1));
+
+  const ratingCounts: Record<number, number> = [5, 4, 3, 2, 1, 0].reduce(
     (acc, value) => {
-      acc[value] = book.reviews.filter((r) => r.rating === value).length;
+      acc[value] = reviews.filter((r) => Math.floor(r.rating) === value).length;
       return acc;
     },
-    {}
+    {} as Record<number, number>
   );
 
-  const reviewsCount = book.reviews.length;
+  const reviewsCount = reviews.length;
 
   return (
     <S.RatingSection>
       <S.RatingTitle>Avaliações</S.RatingTitle>
-      <S.RatingValue>{book.rating}</S.RatingValue>
+      <S.RatingValue>{bookRating}</S.RatingValue>
       <S.RatingStars>
         {[1, 2, 3, 4, 5].map((star) => (
           <S.Star
             key={star}
-            filled={star <= Math.floor(book.rating)}
+            filled={star <= Math.floor(bookRating)}
             half={
-              star === Math.ceil(book.rating) && !Number.isInteger(book.rating)
+              star === Math.ceil(bookRating) && !Number.isInteger(bookRating)
             }
           />
         ))}
       </S.RatingStars>
       <S.RatingGraph>
-        {[5, 4, 3, 2, 1].map((value) => (
+        {[5, 4, 3, 2, 1, 0].map((value) => (
           <S.RatingBar key={value}>
             <S.RatingBarValue>{value}</S.RatingBarValue>
             <S.RatingBarGraph>

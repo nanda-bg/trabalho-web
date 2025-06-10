@@ -1,24 +1,34 @@
-import { put } from "redux-saga/effects";
+import { call, put, select } from "redux-saga/effects";
 import { UpdateProfilePayloadAction } from "@app/store/slices/UserSlice/types";
-import { setUserSlice, setUserSliceField } from "@app/store/slices/UserSlice";
-import { mockedUser } from "@app/utils/mocks/MockedUser";
+import { fetchUserInfo, setUserSliceField } from "@app/store/slices/UserSlice";
+import axios from "axios";
 
 export function* updateProfileHandler({ payload }: UpdateProfilePayloadAction) {
   try {
     yield put(setUserSliceField({ key: "isLoading", value: true }));
 
     const { email, name, username, profileImage, bio } = payload;
+    const userId = yield select((state) => state.userSlice.userId);
+    const token = localStorage.getItem("token");
 
-    yield put(
-      setUserSlice({
-        userId: mockedUser.userId,
+    yield call(
+      axios.put,
+      `/users/id/${userId}`,
+      {
         email: email,
-        username: username,
         name: name,
+        username: username,
         profilePicture: profileImage,
         bio: bio,
-      })
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
+
+    yield put(fetchUserInfo({ uid: userId }));
   } catch (error) {
     yield put(
       setUserSliceField({

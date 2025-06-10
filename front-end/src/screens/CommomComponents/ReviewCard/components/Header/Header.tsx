@@ -1,6 +1,5 @@
 import UserAvatar from "@app/screens/CommomComponents/UserAvatar/UserAvatar";
 import * as S from "./styles";
-import { User } from "@app/types/User";
 import { FC, useMemo } from "react";
 import {
   format,
@@ -11,6 +10,7 @@ import {
   differenceInMonths,
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { User } from "@app/store/slices/UserSlice/types";
 
 interface HeaderProps {
   user: User;
@@ -44,9 +44,9 @@ const Header: FC<HeaderProps> = ({ user, createdAt }) => {
 
   return (
     <S.ReviewHeader>
-      <UserAvatar profileImgUrl={user.profileImgUrl} />
+      <UserAvatar profileImgUrl={user.profilePicture} />
       <S.ReviewUserInfo>
-        <S.ReviewUserName>{user.userName}</S.ReviewUserName>
+        <S.ReviewUserName>{user.username}</S.ReviewUserName>
         <S.ReviewTime>{formattedCreatedAt}</S.ReviewTime>
       </S.ReviewUserInfo>
     </S.ReviewHeader>

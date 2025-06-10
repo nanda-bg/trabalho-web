@@ -11,13 +11,11 @@ import { signUp } from "@app/store/slices/SignUpSlice";
 const SignUpForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { userId } = useAppSelector(
-    (state) => state.userSlice
-  );
 
-  const { defaultError, emailError, passwordError, isLoading } = useAppSelector(
-    (state) => state.signUpSlice
-  );
+  const { isSuccessfull } = useAppSelector((state) => state.signUpSlice);
+
+  const { defaultError, emailError, passwordError, usernameError, isLoading } =
+    useAppSelector((state) => state.signUpSlice);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -38,10 +36,10 @@ const SignUpForm = () => {
   };
 
   useEffect(() => {
-    if (userId) {
+    if (isSuccessfull) {
       navigate("/home");
     }
-  }, [userId, navigate]);
+  }, [isSuccessfull, navigate]);
 
   return (
     <S.FormStyled onSubmit={handleSubmit}>
@@ -64,6 +62,7 @@ const SignUpForm = () => {
         value={formData.username}
         name="username"
       />
+      {usernameError && <ErrorAlert error={usernameError} />}
 
       <InputField
         icon={"mail"}
