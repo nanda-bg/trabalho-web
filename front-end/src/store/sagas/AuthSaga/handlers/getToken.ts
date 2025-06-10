@@ -19,15 +19,16 @@ export function* getToken(email: string, password: string) {
       }
     );
 
+    localStorage.setItem("token", response.data.idToken);
+
     yield put(
-      setAuthSlice({ token: response.data.idToken, isAuthenticated: true })
+      setAuthSlice({ isAuthenticated: true })
     );
     return response.data.idToken;
   } catch (error) {
     yield put(
       setAuthSlice({
         isAuthenticated: false,
-        token: null,
         error: "Erro ao autenticar usuário, tente novamente mais tarde.",
       })
     );

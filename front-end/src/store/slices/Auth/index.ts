@@ -7,8 +7,8 @@ import {
 import { setStateSliceReducer } from "../../utils/setStateSliceReducer";
 
 export const initialState: AuthState = {
-  token: null,
   isAuthenticated: false,
+  error: undefined,
 };
 
 const authSlice = createSlice({

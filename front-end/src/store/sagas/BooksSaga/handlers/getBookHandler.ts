@@ -8,7 +8,7 @@ export function* getBookHandler({ payload }: GetBookPayloadAction) {
     yield put(setBookSliceField({ key: "isLoading", value: true }));
     yield put(setBookSliceField({ key: "error", value: null }));
 
-    const token = yield select((state) => state.authSlice.token);
+    const token = localStorage.getItem("token");
 
     const { data } = yield call(axios.get, `/books/id/${payload.uid}`, {
       headers: {

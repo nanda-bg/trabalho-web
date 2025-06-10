@@ -8,7 +8,7 @@ export function* getReviewHandler({ payload }: GetReviewPayloadAction) {
     yield put(setReviewSliceField({ key: "isLoading", value: true }));
     yield put(setReviewSliceField({ key: "error", value: null }));
 
-    const token = yield select((state) => state.authSlice.token);
+    const token = localStorage.getItem("token");
 
     const { data } = yield call(axios.get, `/reviews/id/${payload.uid}`, {
       headers: {

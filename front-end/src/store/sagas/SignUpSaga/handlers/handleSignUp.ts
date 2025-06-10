@@ -4,9 +4,7 @@ import {
   setSignUpSliceField,
 } from "@app/store/slices/SignUpSlice";
 import { SignUpPayloadAction } from "@app/store/slices/SignUpSlice/types";
-import { fetchUserInfo } from "@app/store/slices/UserSlice";
 import axios from "axios";
-import { getToken } from "../../TokenSaga/handlers/getToken";
 
 function isEmailValide(email) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -33,6 +31,7 @@ export function* handleSignUp({ payload }: SignUpPayloadAction) {
         emailError: null,
         passwordError: null,
         defaultError: null,
+        usernameError: null,
       })
     );
 
@@ -83,19 +82,40 @@ export function* handleSignUp({ payload }: SignUpPayloadAction) {
       return;
     }
 
-    yield call(
-      axios.post,
-      "/auth/register",
-      {
-        email,
-        password,
-        name,
-        username,
-      }
-    );
+    yield call(axios.post, "/auth/register", {
+      email,
+      password,
+      name,
+      username,
+    });
 
     yield put(setSignUpSliceField({ key: "isSuccessfull", value: true }));
   } catch (error) {
+    console.error("Erro ao cadastrar usuário:", error);
+    console.log(error.response?.data);
+
+    if (error.response.data === "Usuário já cadastrado com esse email!") {
+      yield put(
+        setSignUpSliceField({
+          key: "emailError",
+          value: "Email já cadastrado.",
+        })
+      );
+
+      return;
+    }
+
+    if (error.response.data === "Username já cadastrado!") {
+      yield put(
+        setSignUpSliceField({
+          key: "usernameError",
+          value: "Este nome de usuário já está em uso.",
+        })
+      );
+
+      return;
+    }
+
     yield put(
       setSignUpSliceField({
         key: "defaultError",

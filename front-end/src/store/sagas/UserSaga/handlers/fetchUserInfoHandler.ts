@@ -7,7 +7,7 @@ export function* fetchUserInfoHandler({ payload }: FetchUserInfoPayloadAction) {
   try {
     yield put(setUserSliceField({ key: "isLoading", value: true }));
 
-    const token = yield select((state) => state.authSlice.token);
+    const token = localStorage.getItem("token");
 
     const { data } = yield call(axios.get, `/users/id/${payload.uid}`, {
       headers: {

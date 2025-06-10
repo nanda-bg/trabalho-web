@@ -7,7 +7,7 @@ export function* listBooksHandler() {
     yield put(setBookSliceField({ key: "isLoading", value: true }));
     yield put(setBookSliceField({ key: "error", value: null }));
 
-    const token = yield select((state) => state.authSlice.token);
+    const token = localStorage.getItem("token");
 
     const { data } = yield call(axios.get, `/books`, {
       headers: {
@@ -20,7 +20,7 @@ export function* listBooksHandler() {
         key: "books",
         value: data,
       })
-    )
+    );
   } catch (error) {
     yield put(
       setBookSliceField({

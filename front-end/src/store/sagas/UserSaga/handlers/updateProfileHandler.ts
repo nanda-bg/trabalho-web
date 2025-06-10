@@ -9,7 +9,7 @@ export function* updateProfileHandler({ payload }: UpdateProfilePayloadAction) {
 
     const { email, name, username, profileImage, bio } = payload;
     const userId = yield select((state) => state.userSlice.userId);
-    const token = yield select((state) => state.authSlice.token);
+    const token = localStorage.getItem("token");
 
     yield call(
       axios.put,

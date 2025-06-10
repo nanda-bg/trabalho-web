@@ -14,9 +14,8 @@ const SignUpForm = () => {
 
   const { isSuccessfull } = useAppSelector((state) => state.signUpSlice);
 
-  const { defaultError, emailError, passwordError, isLoading } = useAppSelector(
-    (state) => state.signUpSlice
-  );
+  const { defaultError, emailError, passwordError, usernameError, isLoading } =
+    useAppSelector((state) => state.signUpSlice);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -63,6 +62,7 @@ const SignUpForm = () => {
         value={formData.username}
         name="username"
       />
+      {usernameError && <ErrorAlert error={usernameError} />}
 
       <InputField
         icon={"mail"}

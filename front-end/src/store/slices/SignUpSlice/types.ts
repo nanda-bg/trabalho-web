@@ -5,6 +5,7 @@ export interface SignUpState {
   emailError?: string;
   passwordError?: string;
   defaultError?: string;
+  usernameError?: string;
   isSuccessfull?: boolean;
 }
 
