@@ -1,8 +1,13 @@
+import { FC } from "react";
 import * as S from "./styles";
 
-const ErrorAlert = ({ error }) => (
+interface ErrorAlertProps {
+  error: string;
+  size?: "sm" | "md" | "lg";
+}
+const ErrorAlert: FC<ErrorAlertProps> = ({ error, size}) => (
   <S.ErrorAlert>
-    <S.ErrorText>{error}</S.ErrorText>
+    <S.ErrorText $size={size}>{error}</S.ErrorText>
   </S.ErrorAlert>
 );
 

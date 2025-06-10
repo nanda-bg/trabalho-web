@@ -1,3 +1,4 @@
+import { FC } from "react";
 import styled from "styled-components";
 
 export const ErrorAlert = styled.section`
@@ -5,7 +6,14 @@ export const ErrorAlert = styled.section`
   white-space: pre-line;
 `;
 
-export const ErrorText = styled.p`
+interface ErrorTextProps extends React.HTMLAttributes<HTMLParagraphElement> {
+  $size?: "sm" | "md" | "lg";
+}
+
+export const ErrorText: FC<ErrorTextProps> = styled.p<ErrorTextProps>`
   color: red;
-  font-size: 10px;
+  font-size: ${({ $size }) =>
+    $size === "lg" ? "14px" :
+    $size === "md" ? "12px" :
+    "10px"};
 `;

@@ -1,7 +1,7 @@
 import { setReviewSliceField } from "@app/store/slices/ReviewsSlice";
 import { ListReviewsByBookPayloadAction } from "@app/store/slices/ReviewsSlice/types";
 import axios from "axios";
-import { call, put, select } from "redux-saga/effects";
+import { call, put } from "redux-saga/effects";
 
 export function* listReviewsByReviewHandler({
   payload,

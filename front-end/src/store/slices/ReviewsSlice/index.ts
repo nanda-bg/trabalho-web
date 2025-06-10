@@ -8,6 +8,7 @@ import {
   ReviewsState,
   GetReviewPayloadAction,
   ListReviewsByBookPayloadAction,
+  CreateReviewPayloadAction,
 } from "./types";
 
 export const initialState: ReviewsState = {
@@ -15,6 +16,8 @@ export const initialState: ReviewsState = {
   isLoading: false,
   error: null,
   selectedReview: null,
+  createReviewError: null,
+  createReviewSuccess: false,
 };
 
 const reviewSlice = createSlice({
@@ -29,6 +32,7 @@ const reviewSlice = createSlice({
       setStateSliceReducer<ReviewsState>(state, action),
     getReview: (_state, _action: GetReviewPayloadAction) => {},
     listReviewsByBook: (_state, _action: ListReviewsByBookPayloadAction) => {},
+    createReview: (_state, _action: CreateReviewPayloadAction) => {},
   },
 });
 
@@ -37,5 +41,6 @@ export const {
   setReviewSlice,
   getReview,
   listReviewsByBook,
+  createReview,
 } = reviewSlice.actions;
 export default reviewSlice;

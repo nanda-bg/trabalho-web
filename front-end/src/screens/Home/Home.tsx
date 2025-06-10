@@ -18,6 +18,10 @@ export default function HomeScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const popularBooks = [...books]
+    .sort((a, b) => b.averageRating - a.averageRating)
+    .slice(0, 20);
+
   return (
     <>
       <GlobalStyle />
@@ -28,7 +32,7 @@ export default function HomeScreen() {
           <WelcomeCard />
 
           <S.SectionTitle>Livros populares</S.SectionTitle>
-          {books && <HorizontalBooksList books={books} />}
+          {books && <HorizontalBooksList books={popularBooks} />}
 
           <S.SectionTitle>Avaliações de amigos</S.SectionTitle>
 

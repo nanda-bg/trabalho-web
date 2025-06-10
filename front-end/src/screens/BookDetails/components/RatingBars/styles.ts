@@ -94,3 +94,26 @@ export const RatingBarFill = styled.div<{ width: number; value: number }>`
   }};
   border-radius: 3px;
 `;
+
+
+export const EvaluateButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 8px auto;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  width: max-content;
+  border: none;
+  cursor: pointer;
+  background-color: #ffd700;
+  color: #000;
+  transition: all 0.2s ease;
+
+  &:hover {
+    opacity: 0.9;
+  }
+`;

@@ -1,6 +1,6 @@
 import { setBookSliceField } from "@app/store/slices/BooksSlice";
 import axios from "axios";
-import { call, put, select } from "redux-saga/effects";
+import { call, put } from "redux-saga/effects";
 
 export function* listBooksHandler() {
   try {

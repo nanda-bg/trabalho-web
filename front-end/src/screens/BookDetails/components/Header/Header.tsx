@@ -14,7 +14,7 @@ const Header: FC<HeaderProps> = ({ bookDetails }) => {
         <S.Title>{bookDetails.title}</S.Title>
         <S.Subtitle>{bookDetails.publicationYear}</S.Subtitle>
 
-        <S.Author>Written by {bookDetails.authors.join(", ")}</S.Author>
+        <S.Author>{bookDetails.authors.join(", ")}</S.Author>
         <S.Description>
           {bookDetails.description}
         </S.Description>

@@ -1,12 +1,16 @@
 import { Review } from "@app/store/slices/ReviewsSlice/types";
 import * as S from "./styles";
 import { FC } from "react";
+import { Star } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
 
 interface RatingsBarsProps {
   bookRating: number;
   reviews: Review[];
 }
 const RatingsBars: FC<RatingsBarsProps> = ({ reviews }) => {
+  const navigate = useNavigate();
+  const { id: bookId } = useParams();
   const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
   const bookRating = Math.round(totalRating / (reviews.length || 1));
 
@@ -19,6 +23,10 @@ const RatingsBars: FC<RatingsBarsProps> = ({ reviews }) => {
   );
 
   const reviewsCount = reviews.length;
+
+  const onEvaluateClick = () => {
+    navigate(`/reviews/create/${bookId}`);
+  };
 
   return (
     <S.RatingSection>
@@ -51,6 +59,11 @@ const RatingsBars: FC<RatingsBarsProps> = ({ reviews }) => {
           </S.RatingBar>
         ))}
       </S.RatingGraph>
+
+      <S.EvaluateButton onClick={onEvaluateClick}>
+        <Star size={16} />
+        Avaliar
+      </S.EvaluateButton>
     </S.RatingSection>
   );
 };

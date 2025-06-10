@@ -9,6 +9,7 @@ import EditProfile from "./screens/EditProfile/EditProfile";
 import BookDetails from "./screens/BookDetails/BookDetails";
 import FavoriteBooks from "./screens/Favorites/Favorites";
 import ReviewsScreen from "./screens/Reviews/ReviewsScreen";
+import CreateReviewScreen from "./screens/CreateReviewScreen/CreateReviewScreen";
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
   const { isAuthenticated } = useAppSelector((state) => state.authSlice);
@@ -64,10 +65,18 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/reviews/:id",
+    path: "/reviews/:bookId",
     element: (
       <ProtectedRoute>
         <ReviewsScreen />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/reviews/create/:bookId",
+    element: (
+      <ProtectedRoute>
+        <CreateReviewScreen />
       </ProtectedRoute>
     ),
   },

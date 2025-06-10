@@ -1,4 +1,4 @@
-import { call, put, select } from "redux-saga/effects";
+import { call, put } from "redux-saga/effects";
 import axios from "axios";
 import { GetReviewPayloadAction } from "@app/store/slices/ReviewsSlice/types";
 import { setReviewSliceField } from "@app/store/slices/ReviewsSlice";

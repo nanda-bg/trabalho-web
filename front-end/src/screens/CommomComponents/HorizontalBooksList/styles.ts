@@ -10,6 +10,11 @@ export const HorizontalScroll = styled.div`
   padding-top: 10px;
 
   &::-webkit-scrollbar {
-    height: 0px;
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
   }
 `;
