@@ -1,5 +1,7 @@
 package com.brunopassu.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.cloud.firestore.annotation.Exclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 
@@ -32,9 +34,9 @@ public class Book {
     @Max(value = 2100, message = "Ano de publicação inválido")
     private Integer publicationYear;
 
-    @Schema(description = "Lista de gêneros do livro", example = "[\"Romance\", \"Literatura Brasileira\"]", required = true)
+    @Schema(description = "gênero do livro", example = "Romance", required = true)
     @NotEmpty(message = "Pelo menos um gênero deve ser informado")
-    private List<String> genres = new ArrayList<>();
+    private String genre;
 
     @Schema(description = "Média das avaliações do livro", example = "4.5")
     private Double averageRating;
@@ -46,20 +48,32 @@ public class Book {
     @Min(value = 1, message = "Número de páginas deve ser maior que zero")
     private Integer pagesCount;
 
+    @Exclude
+    @JsonIgnore
+    private String uniqueKey;
+
     public Book() {
     }
 
-    public Book(String book_id, String title, String description, List<String> authors, String coverUrl, Integer publicationYear, List<String> genres, Double averageRating, Integer ratingsCount, Integer pagesCount) {
+    public Book(String book_id, String title, String description, List<String> authors, String coverUrl, Integer publicationYear, String genre, Double averageRating, Integer ratingsCount, Integer pagesCount) {
         this.bookId = book_id;
         this.title = title;
         this.description = description;
         this.authors = authors;
         this.coverUrl = coverUrl;
         this.publicationYear = publicationYear;
-        this.genres = genres;
+        this.genre = genre;
         this.averageRating = 0.0; //MEDIA DAS NOTAS!
         this.ratingsCount = 0; //QUANTIDADE DE NOTAS
         this.pagesCount = pagesCount;
+    }
+
+    public String getUniqueKey() {
+        return uniqueKey;
+    }
+
+    public void setUniqueKey(String uniqueKey) {
+        this.uniqueKey = uniqueKey;
     }
 
     public String getBookId() {
@@ -110,12 +124,12 @@ public class Book {
         this.publicationYear = publicationYear;
     }
 
-    public List<String> getGenres() {
-        return genres;
+    public String getGenre() {
+        return genre;
     }
 
-    public void setGenres(List<String> genres) {
-        this.genres = genres;
+    public void setGenres(String genre) {
+        this.genre = genre;
     }
 
     public Double getAverageRating() {

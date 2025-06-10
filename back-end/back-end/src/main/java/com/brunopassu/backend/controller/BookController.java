@@ -170,7 +170,7 @@ public class BookController {
                         "authors": ["Machado de Assis"],
                         "coverUrl": "https://example.com/dom-casmurro.jpg",
                         "publicationYear": 1899,
-                        "genres": ["Romance", "Literatura Brasileira"],
+                        "genre": "Literatura Brasileira",
                         "averageRating": 4.5,
                         "ratingsCount": 150,
                         "pagesCount": 256
@@ -182,7 +182,7 @@ public class BookController {
                         "authors": ["Aluísio Azevedo"],
                         "coverUrl": "https://example.com/o-cortico.jpg",
                         "publicationYear": 1890,
-                        "genres": ["Romance", "Naturalismo"],
+                        "genre": "Romance",
                         "averageRating": 4.2,
                         "ratingsCount": 89,
                         "pagesCount": 312
@@ -268,6 +268,74 @@ public class BookController {
             Book book = bookService.getBookById(bookId);
             if (book != null) {
                 return new ResponseEntity<>(book, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+            }
+        } catch (ExecutionException | InterruptedException e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/genre")
+    @Operation(
+            summary = "Listar todos os livros de um certo gênero",
+            description = "Retorna uma lista com todos os livros de um mesmo gênero especificado"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Lista de livros retornada com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Lista de livros",
+                                    value = """
+                [
+                    {
+                        "bookId": "abc123def456",
+                        "title": "Dom Casmurro",
+                        "description": "Romance clássico da literatura brasileira",
+                        "authors": ["Machado de Assis"],
+                        "coverUrl": "https://example.com/dom-casmurro.jpg",
+                        "publicationYear": 1899,
+                        "genre": "Literatura Brasileira",
+                        "averageRating": 4.5,
+                        "ratingsCount": 150,
+                        "pagesCount": 256
+                    },
+                    {
+                        "bookId": "def456ghi789",
+                        "title": "O Cortiço",
+                        "description": "Romance naturalista brasileiro",
+                        "authors": ["Aluísio Azevedo"],
+                        "coverUrl": "https://example.com/o-cortico.jpg",
+                        "publicationYear": 1890,
+                        "genre": "Literatura Brasileira",
+                        "averageRating": 4.2,
+                        "ratingsCount": 89,
+                        "pagesCount": 312
+                    }
+                ]
+                """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Erro interno do servidor",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "null"
+                            )
+                    )
+            )
+    })
+    public ResponseEntity<List<Book>> getBooksByGenre(@RequestParam String genre) {
+        try {
+            List<Book> books = bookService.getBooksByGenre(genre);
+            if (books != null) {
+                return new ResponseEntity<>(books, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
             }

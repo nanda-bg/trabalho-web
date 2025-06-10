@@ -61,6 +61,23 @@ public class BookRepository {
         }
     }
 
+    public List<Book> getBooksByGenre(String genre) throws ExecutionException, InterruptedException {
+        Firestore firestore = FirestoreClient.getFirestore();
+
+        // Query para buscar onde o campo 'genre' é igual ao gênero
+        ApiFuture<QuerySnapshot> future = firestore.collection(COLLECTION_NAME)
+                .whereEqualTo("genre", genre)
+                .get();
+
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+        List<Book> books = new ArrayList<>();
+
+        for (QueryDocumentSnapshot document : documents) {
+            books.add(document.toObject(Book.class));
+        }
+        return books;
+    }
+
     public boolean updateBook(Book book) throws ExecutionException, InterruptedException {
         if (book.getBookId() == null || book.getBookId().isEmpty()) {
             return false; // Não podemos atualizar sem um ID

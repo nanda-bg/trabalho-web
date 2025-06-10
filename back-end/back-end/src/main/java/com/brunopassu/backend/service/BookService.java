@@ -51,6 +51,10 @@ public class BookService {
         return bookRepository.getBookById(bookId);
     }
 
+    public List<Book> getBooksByGenre(String genre) throws ExecutionException, InterruptedException {
+
+        return bookRepository.getBooksByGenre(genre);
+    }
 
     public boolean updateBook(Book book) throws ExecutionException, InterruptedException {
         return bookRepository.updateBook(book);
