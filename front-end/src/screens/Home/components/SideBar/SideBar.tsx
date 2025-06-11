@@ -44,8 +44,7 @@ const Sidebar = () => {
     <>
       {isOpen ? (
         <S.CloseIcon onClick={toggleSidebar}>
-          {" "}
-          <X size={24} />{" "}
+          <X size={24} />
         </S.CloseIcon>
       ) : (
         <S.MenuToggle onClick={toggleSidebar}>

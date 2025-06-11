@@ -14,7 +14,7 @@ import { combineReducers } from "redux";
 import { watchBooksSagas } from "./sagas/BooksSaga";
 import { watchReviewsSagas } from "./sagas/ReviewsSaga";
 import reviewSlice from "./slices/ReviewsSlice";
-import { persistReducer, persistStore } from "redux-persist";
+import { FLUSH, PAUSE, PERSIST, persistReducer, persistStore, PURGE, REGISTER, REHYDRATE } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // defaults to localStorage
 
 function* rootSaga() {
@@ -35,7 +35,6 @@ const persistConfig = {
 
 const sagaMiddleware = createSagaMiddleware();
 
-
 const rootReducer = combineReducers({
   userSlice: userSlice.reducer,
   loginSlice: loginSlice.reducer,
@@ -50,7 +49,12 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({ thunk: false }).concat(sagaMiddleware),
+    getDefaultMiddleware({
+      thunk: false,
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    }).concat(sagaMiddleware),
 });
 
 export const persistor = persistStore(store);

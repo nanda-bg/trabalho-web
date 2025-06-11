@@ -25,9 +25,10 @@ const bookSlice = createSlice({
       setStateSliceReducer<BooksState>(state, action),
     getBook: (_state, _action: GetBookPayloadAction) => {},
     listBooks: () => {},
+    resetBookSlice: () => initialState,
   },
 });
 
-export const { setBookSliceField, setBookSlice, getBook, listBooks} =
+export const { setBookSliceField, setBookSlice, getBook, listBooks, resetBookSlice } =
   bookSlice.actions;
 export default bookSlice;

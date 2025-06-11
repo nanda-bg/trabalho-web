@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { LoginPayloadAction, LoginState, } from "./types";
+import { LoginPayloadAction, LoginState } from "./types";
 import {
   setStateSliceFieldReducer,
   SetStateSliceFieldReducerPayload,
@@ -8,6 +8,8 @@ import { setStateSliceReducer } from "../../utils/setStateSliceReducer";
 
 export const initialState: LoginState = {
   isLoading: false,
+  loginError: undefined,
+  logoutError: undefined,
 };
 
 const loginSlice = createSlice({
@@ -22,9 +24,15 @@ const loginSlice = createSlice({
       setStateSliceReducer<LoginState>(state, action),
     login: (_state, _action: LoginPayloadAction) => {},
     logout: () => {},
+    resetLoginSlice: () => initialState,
   },
 });
 
-export const { setLoginSliceField, setLoginSlice, login, logout } =
-  loginSlice.actions;
+export const {
+  setLoginSliceField,
+  setLoginSlice,
+  login,
+  logout,
+  resetLoginSlice,
+} = loginSlice.actions;
 export default loginSlice;
