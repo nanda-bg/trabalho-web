@@ -49,7 +49,6 @@ public class ReviewService {
 
         String reviewId = reviewRepository.saveReview(review);
 
-        //updateBookRatingIncremental(review.getBookRef().getId(), review.getRating(), 0, true);
         // Atualizar a média de avaliação e contador do livro
         updateBookRating(review.getBookRef().getId());
 
@@ -73,55 +72,29 @@ public class ReviewService {
         // Arredondar para uma casa decimal
         average = Math.round(average * 10.0) / 10.0;
 
-        // Atualizar o livro
+        double relevanceScore = calculateRelevanceScore(average, count);
+
+        // Atualizar o livro com AMBOS os campos
         Firestore firestore = this.firestore.firestore();
         DocumentReference bookRef = firestore.collection("books").document(bookId);
-
         WriteBatch batch = firestore.batch();
         batch.update(bookRef, "averageRating", average);
         batch.update(bookRef, "ratingsCount", count);
+        batch.update(bookRef, "relevanceScore", relevanceScore); // NOVA LINHA
         batch.commit().get();
+
     }
 
-    public void updateBookRatingIncremental(String bookId, double newRating, double oldRating, boolean isNew) throws IOException {
-        Firestore firestore = this.firestore.firestore();
-        DocumentReference bookRef = firestore.collection("books").document(bookId);
+    private double calculateRelevanceScore(Double averageRating, Integer ratingsCount) {
+        double R = 3.0; // Rating médio assumido (escala 1-5)
+        double W = 10.0; // Peso do prior (equivale a 10 ratings)
 
-        firestore.runTransaction(transaction -> {
-            DocumentSnapshot bookSnapshot = transaction.get(bookRef).get();
-            Book book = bookSnapshot.toObject(Book.class);
+        if (averageRating == null) averageRating = 0.0;
+        if (ratingsCount == null) ratingsCount = 0;
 
-            double currentAvg = book.getAverageRating();
-            int currentCount = book.getRatingsCount();
-
-            // Calcular nova média e contador
-            int newCount;
-            double newAvg;
-
-            if (isNew) {
-                // Nova review
-                newCount = currentCount + 1;
-                newAvg = ((currentAvg * currentCount) + newRating) / newCount;
-            } else if (oldRating != newRating) {
-                // Atualização de review
-                newCount = currentCount;
-                newAvg = ((currentAvg * currentCount) - oldRating + newRating) / newCount;
-            } else {
-                // Nenhuma mudança necessária
-                return null;
-            }
-
-            // Arredondar para uma casa decimal
-            newAvg = Math.round(newAvg * 10.0) / 10.0;
-
-            // Atualizar o livro
-            transaction.update(bookRef, "averageRating", newAvg);
-            transaction.update(bookRef, "ratingsCount", newCount);
-
-            return null;
-        });
+        // Fórmula Bayesiana
+        return (W * R + ratingsCount * averageRating) / (W + ratingsCount);
     }
-
 
     public List<ReviewDTO> getAllReviews() throws ExecutionException, InterruptedException, IOException {
         return getAllReviewsWithDetails();

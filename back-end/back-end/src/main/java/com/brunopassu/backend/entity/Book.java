@@ -44,6 +44,9 @@ public class Book {
     @Schema(description = "Quantidade total de avaliações", example = "150")
     private Integer ratingsCount;
 
+    @Schema(description = "Cálculo com base na Fórmula de Bayes para 'filtrar' as maiores notas")
+    private Double relevanceScore;
+
     @Schema(description = "Número de páginas do livro", minimum = "1", example = "256")
     @Min(value = 1, message = "Número de páginas deve ser maior que zero")
     private Integer pagesCount;
@@ -65,7 +68,20 @@ public class Book {
         this.genre = genre;
         this.averageRating = 0.0; //MEDIA DAS NOTAS!
         this.ratingsCount = 0; //QUANTIDADE DE NOTAS
+        this.relevanceScore = 0.0;
         this.pagesCount = pagesCount;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
+
+    public Double getRelevanceScore() {
+        return relevanceScore;
+    }
+
+    public void setRelevanceScore(Double relevanceScore) {
+        this.relevanceScore = relevanceScore;
     }
 
     public String getUniqueKey() {

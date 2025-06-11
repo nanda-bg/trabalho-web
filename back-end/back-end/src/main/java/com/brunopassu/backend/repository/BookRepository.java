@@ -15,6 +15,7 @@ import java.util.concurrent.ExecutionException;
 public class BookRepository {
 
     private static final String COLLECTION_NAME = "books";
+    private static final int DEFAULT_PAGE_SIZE = 20;
 
     public String saveBook(Book book) throws ExecutionException, InterruptedException {
         Firestore firestore = FirestoreClient.getFirestore();
@@ -45,6 +46,35 @@ public class BookRepository {
         for (QueryDocumentSnapshot document : documents) {
             books.add(document.toObject(Book.class));
         }
+        return books;
+    }
+
+    public List<Book> getBooksWithPagination(String lastBookId, int pageSize)
+            throws ExecutionException, InterruptedException {
+        Firestore firestore = FirestoreClient.getFirestore();
+
+        // MUDANÇA: Usar apenas relevanceScore para ordenação
+        Query query = firestore.collection(COLLECTION_NAME)
+                .orderBy("relevanceScore", Query.Direction.DESCENDING)
+                .limit(pageSize);
+
+        // Se não é a primeira página, use cursor
+        if (lastBookId != null && !lastBookId.isEmpty()) {
+            DocumentSnapshot lastDoc = firestore.collection(COLLECTION_NAME)
+                    .document(lastBookId)
+                    .get()
+                    .get();
+            query = query.startAfter(lastDoc);
+        }
+
+        ApiFuture<QuerySnapshot> future = query.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        List<Book> books = new ArrayList<>();
+        for (QueryDocumentSnapshot document : documents) {
+            books.add(document.toObject(Book.class));
+        }
+
         return books;
     }
 

@@ -3,6 +3,8 @@ package com.brunopassu.backend.controller;
 import com.brunopassu.backend.entity.Book;
 import com.brunopassu.backend.exception.BookTitleImmutableFieldException;
 import com.brunopassu.backend.service.BookService;
+import com.brunopassu.backend.service.MigrationStatus;
+import com.brunopassu.backend.service.UnifiedMigrationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -211,6 +213,24 @@ public class BookController {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
+    @GetMapping("/paginated")
+    @Operation(
+            summary = "Listar livros com paginação",
+            description = "Retorna livros ordenados por relevância com paginação"
+    )
+    public ResponseEntity<List<Book>> getBooksWithPagination(
+            @RequestParam(required = false) String lastBookId,
+            @RequestParam(defaultValue = "20") Integer pageSize) {
+        try {
+            List<Book> books = bookService.getBooksWithPagination(lastBookId, pageSize);
+            return new ResponseEntity<>(books, HttpStatus.OK);
+        } catch (ExecutionException | InterruptedException e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
     @GetMapping("/id/{bookId}")
     @Operation(
@@ -472,4 +492,37 @@ public class BookController {
             return new ResponseEntity<>("Erro ao deletar livro: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
+    @PostMapping("/migrate")
+    @Operation(
+            summary = "Executar migração de dados, não serve pra nada em produção",
+            description = "Migra campos genres-> genre e calcula relevanceScore para todos os livros"
+    )
+    public ResponseEntity<String> executeMigration() {
+        try {
+            UnifiedMigrationService migrationService = new UnifiedMigrationService();
+            migrationService.migrateAllBooksData();
+            return new ResponseEntity<>("Migração executada com sucesso!", HttpStatus.OK);
+        } catch (ExecutionException | InterruptedException e) {
+            return new ResponseEntity<>("Erro na migração: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/migration-status")
+    @Operation(
+            summary = "Verificar status da migração, não serve para nada em produção",
+            description = "Retorna informações sobre o progresso da migração"
+    )
+    public ResponseEntity<MigrationStatus> getMigrationStatus() {
+        try {
+            UnifiedMigrationService migrationService = new UnifiedMigrationService();
+            MigrationStatus status = migrationService.checkMigrationStatus();
+            return new ResponseEntity<>(status, HttpStatus.OK);
+        } catch (ExecutionException | InterruptedException e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

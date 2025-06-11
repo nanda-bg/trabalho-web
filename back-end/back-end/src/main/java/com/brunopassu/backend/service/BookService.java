@@ -12,15 +12,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @Service
 public class BookService {
 
-    private BookRepository bookRepository;
+    private final BookRepository bookRepository;
     private final FirestoreConfig firestore;
-    private UserService userService;
+    private final UserService userService;
 
     @Autowired
     public BookService(BookRepository bookRepository, FirestoreConfig firestore, UserService userService) {
@@ -45,6 +47,12 @@ public class BookService {
 
     public List<Book> getAllBooks() throws ExecutionException, InterruptedException {
         return bookRepository.getAllBooks();
+    }
+
+    public List<Book> getBooksWithPagination(String lastBookId, Integer pageSize)
+            throws ExecutionException, InterruptedException {
+        int actualPageSize = (pageSize != null && pageSize > 0) ? pageSize : 20;
+        return bookRepository.getBooksWithPagination(lastBookId, actualPageSize);
     }
 
     public Book getBookById(String bookId) throws ExecutionException, InterruptedException {
@@ -88,9 +96,34 @@ public class BookService {
 
         if (user.getUserType() == UserType.CONTRIBUIDOR) {
             return true; // USUARIO CONTRIBUIDOR PODE ADICIONAR LIVROS
-        }
-        else {
+        } else {
             return false;
         }
     }
+
+    // Adicionar no BookService
+    public void updateRelevanceScore(String bookId) throws ExecutionException, InterruptedException {
+        Book book = getBookById(bookId);
+        if (book != null) {
+            double relevanceScore = calculateRelevanceScore(
+                    book.getAverageRating(),
+                    book.getRatingsCount()
+            );
+
+            Map<String, Object> updates = new HashMap<>();
+            updates.put("relevanceScore", relevanceScore);
+            bookRepository.updateBookFields(bookId, updates);
+        }
+    }
+
+    private double calculateRelevanceScore(Double averageRating, Integer ratingsCount) {
+        double R = 3.0; // Rating médio assumido
+        double W = 10.0; // Peso do prior
+
+        if (averageRating == null) averageRating = 0.0;
+        if (ratingsCount == null) ratingsCount = 0;
+
+        return (W * R + ratingsCount * averageRating) / (W + ratingsCount);
+    }
+
 }
