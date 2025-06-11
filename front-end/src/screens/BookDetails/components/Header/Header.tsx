@@ -20,9 +20,7 @@ const Header: FC<HeaderProps> = ({ bookDetails }) => {
         </S.Description>
 
         <S.GenreContainer>
-          {bookDetails.genres.map((genre) => (
-            <S.GenreTag key={genre}>{genre}</S.GenreTag>
-          ))}
+            <S.GenreTag key={bookDetails.genre}>{bookDetails.genre}</S.GenreTag>
         </S.GenreContainer>
       </S.BookInfo>
     </S.Header>

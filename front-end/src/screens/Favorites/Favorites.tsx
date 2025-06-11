@@ -24,10 +24,10 @@ const FavoriteBooks: FC = () => {
   const [activeGenre, setActiveGenre] = useState<string | null>(null);
 
   const filteredBooks = activeGenre
-    ? books?.filter((book) => book.genres.some((genre) => genre === activeGenre))
+    ? books?.filter((book) => book.genre === activeGenre)
     : books;
 
-  const genres = Array.from(new Set(books.flatMap((book) => book.genres)));
+  const genres = Array.from(new Set(books.flatMap((book) => book.genre)));
 
   const handleGoBack = () => {
     navigation(-1);

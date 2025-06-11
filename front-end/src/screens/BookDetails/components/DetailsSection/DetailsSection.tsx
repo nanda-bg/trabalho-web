@@ -19,7 +19,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ selectedBook }) => {
         <strong>Páginas:</strong> {selectedBook.pagesCount}
       </p>
       <p>
-        <strong>Gênero:</strong> {selectedBook.genres.join(", ")}
+        <strong>Gênero:</strong> {selectedBook.genre}
       </p>
     </S.DetailsSection>
   );

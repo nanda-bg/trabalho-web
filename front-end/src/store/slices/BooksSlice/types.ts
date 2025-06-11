@@ -18,7 +18,7 @@ export interface Book {
   authors: string[];
   coverUrl: string;
   publicationYear: number;
-  genres: string[];
+  genre: string;
   averageRating: number;
   ratingsCount: number;
   pagesCount: number;
