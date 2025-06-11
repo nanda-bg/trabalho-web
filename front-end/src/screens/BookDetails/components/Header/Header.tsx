@@ -1,4 +1,4 @@
-import type { Book } from "@app/store/slices/BooksSlice/types";
+import { Book } from "@app/types/Book";
 import * as S from "./styles";
 import { type FC} from "react";
 

@@ -1,7 +1,6 @@
 "use client";
 
 import { useAppSelector } from "@app/store/rootReducer";
-import { getBook } from "@app/store/slices/BooksSlice";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -13,6 +12,7 @@ import { createReview, setReviewSlice } from "@app/store/slices/ReviewsSlice";
 import ErrorAlert from "../Authentication/commonComponents/ErrorAlert/ErrorAlert";
 import * as S from "./styles";
 import { ArrowLeft } from "lucide-react";
+import { getBookDetails } from "@app/store/slices/BookDetailsSlice";
 
 const CreateReviewScreen = () => {
   const dispatch = useDispatch();
@@ -20,7 +20,7 @@ const CreateReviewScreen = () => {
 
   const { bookId } = useParams();
 
-  const { selectedBook: book } = useAppSelector((state) => state.bookSlice);
+  const { selectedBook: book } = useAppSelector((state) => state.bookDetailsSlice);
   const { createReviewSuccess, createReviewError } = useAppSelector(
     (state) => state.reviewSlice
   );
@@ -28,7 +28,7 @@ const CreateReviewScreen = () => {
   const [noCommentError, setNoCommentError] = useState<string | null>(null);
 
   useEffect(() => {
-    dispatch(getBook({ uid: bookId }));
+    dispatch(getBookDetails({ uid: bookId }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookId]);
 

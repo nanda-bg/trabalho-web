@@ -10,8 +10,8 @@ import RatingsBars from "./components/RatingBars/RatingsBar";
 import DetailsSection from "./components/DetailsSection/DetailsSection";
 import ReviewsSection from "./components/ReviewsSection/ReviewsSection";
 import { useDispatch } from "react-redux";
-import { getBook } from "@app/store/slices/BooksSlice";
 import { listReviewsByBook } from "@app/store/slices/ReviewsSlice";
+import { getBookDetails } from "@app/store/slices/BookDetailsSlice";
 
 const BookDetails: FC = () => {
   const navigation = useNavigate();
@@ -19,7 +19,10 @@ const BookDetails: FC = () => {
 
   const { id } = useParams();
 
-  const { selectedBook, books } = useAppSelector((state) => state.bookSlice);
+  const { selectedBook, isLoading } = useAppSelector(
+    (state) => state.bookDetailsSlice
+  );
+  const { books } = useAppSelector((state) => state.bookSlice);
   const { reviews } = useAppSelector((state) => state.reviewSlice);
 
   const [activeTab, setActiveTab] = useState<"summary" | "details" | "reviews">(
@@ -31,7 +34,7 @@ const BookDetails: FC = () => {
   };
 
   useEffect(() => {
-    dispatch(getBook({ uid: id }));
+    dispatch(getBookDetails({ uid: id }));
     dispatch(listReviewsByBook({ bookId: id }));
 
     window.scrollTo({
@@ -42,8 +45,12 @@ const BookDetails: FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  if (!selectedBook) {
+  if (isLoading) {
     return <div>Loading...</div>;
+  }
+
+  if (!selectedBook) {
+    return <div>Não rolou</div>;
   }
 
   return (

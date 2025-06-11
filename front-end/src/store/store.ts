@@ -14,8 +14,19 @@ import { combineReducers } from "redux";
 import { watchBooksSagas } from "./sagas/BooksSaga";
 import { watchReviewsSagas } from "./sagas/ReviewsSaga";
 import reviewSlice from "./slices/ReviewsSlice";
-import { FLUSH, PAUSE, PERSIST, persistReducer, persistStore, PURGE, REGISTER, REHYDRATE } from "redux-persist";
+import {
+  FLUSH,
+  PAUSE,
+  PERSIST,
+  persistReducer,
+  persistStore,
+  PURGE,
+  REGISTER,
+  REHYDRATE,
+} from "redux-persist";
 import storage from "redux-persist/lib/storage"; // defaults to localStorage
+import bookDetailsSlice from "./slices/BookDetailsSlice";
+import { watchBookDetailsSagas } from "./sagas/BookDetailsSaga";
 
 function* rootSaga() {
   yield all([
@@ -25,6 +36,7 @@ function* rootSaga() {
     watchAuthSagas(),
     watchBooksSagas(),
     watchReviewsSagas(),
+    watchBookDetailsSagas(),
   ]);
 }
 
@@ -42,6 +54,7 @@ const rootReducer = combineReducers({
   authSlice: authSlice.reducer,
   bookSlice: bookSlice.reducer,
   reviewSlice: reviewSlice.reducer,
+  bookDetailsSlice: bookDetailsSlice.reducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

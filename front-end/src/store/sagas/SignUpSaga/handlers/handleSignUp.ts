@@ -91,9 +91,6 @@ export function* handleSignUp({ payload }: SignUpPayloadAction) {
 
     yield put(setSignUpSliceField({ key: "isSuccessfull", value: true }));
   } catch (error) {
-    console.error("Erro ao cadastrar usuário:", error);
-    console.log(error.response?.data);
-
     if (error.response.data === "Usuário já cadastrado com esse email!") {
       yield put(
         setSignUpSliceField({

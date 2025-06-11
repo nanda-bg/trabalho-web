@@ -1,12 +1,11 @@
 import { call, put } from "redux-saga/effects";
 import axios from "axios";
-import { GetBookPayloadAction } from "@app/store/slices/BooksSlice/types";
-import { setBookSliceField } from "@app/store/slices/BooksSlice";
+import { setBookDetailsSlice, setBookDetailsSliceField } from "@app/store/slices/BookDetailsSlice";
+import { GetBookDetailsPayloadAction } from "@app/store/slices/BookDetailsSlice/types";
 
-export function* getBookHandler({ payload }: GetBookPayloadAction) {
+export function* getBookDetailsHandler({ payload }: GetBookDetailsPayloadAction) {
   try {
-    yield put(setBookSliceField({ key: "isLoading", value: true }));
-    yield put(setBookSliceField({ key: "error", value: null }));
+    yield put(setBookDetailsSlice({ isLoading: true, error: null }));
 
     const token = localStorage.getItem("token");
 
@@ -17,19 +16,19 @@ export function* getBookHandler({ payload }: GetBookPayloadAction) {
     });
 
     yield put(
-      setBookSliceField({
+      setBookDetailsSliceField({
         key: "selectedBook",
         value: data,
       })
     );
   } catch (error) {
     yield put(
-      setBookSliceField({
+      setBookDetailsSliceField({
         key: "error",
         value: "Erro ao resgatar informações do livro, tente novamente.",
       })
     );
   } finally {
-    yield put(setBookSliceField({ key: "isLoading", value: false }));
+    yield put(setBookDetailsSliceField({ key: "isLoading", value: false }));
   }
 }
