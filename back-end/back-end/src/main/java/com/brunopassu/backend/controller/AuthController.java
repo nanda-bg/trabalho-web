@@ -2,7 +2,6 @@ package com.brunopassu.backend.controller;
 
 import com.brunopassu.backend.dto.VerifyTokenRequestDTO;
 import com.brunopassu.backend.entity.AuthRequest;
-import com.brunopassu.backend.entity.User;
 import com.brunopassu.backend.exception.UserAlreadyExistsException;
 import com.brunopassu.backend.service.AuthService;
 import com.brunopassu.backend.service.UserService;
@@ -159,21 +158,8 @@ public class AuthController {
 
             UserRecord userRecord = authService.createUser(request.getEmail(), request.getPassword());
 
-            // Cria o usuário no Firestore com o mesmo UID
-            User user = new User();
-            user.setUid(userRecord.getUid());
-            user.setEmail(request.getEmail());
-            if (request.getName() == null || request.getName().trim().isEmpty()) {
-                user.setName(null);
-            } else {
-                user.setName(request.getName());
-            }
-            user.setUsername(request.getUsername());
-            user.setFollowers(0);
-            user.setFollowing(0);
-            user.setUserType(request.getUserType());
-
-            userService.AddUser(user);
+            //Adiciona o Usuário no Banco de dados
+            userService.AddUser(userRecord, request);
 
             Map<String, String> response = new HashMap<>();
             response.put("uid", userRecord.getUid());
