@@ -175,6 +175,22 @@ public class ReviewController {
         }
     }
 
+    @GetMapping("/paginated")
+    @Operation(
+            summary = "Listar reviews com paginação",
+            description = "Retorna reviews ordenadas por data com paginação e cache Redis"
+    )
+    public ResponseEntity<List<ReviewDTO>> getReviewsWithPagination(
+            @RequestParam(required = false) String lastReviewId,
+            @RequestParam(defaultValue = "20") Integer pageSize) {
+        try {
+            List<ReviewDTO> reviews = reviewService.getReviewsWithPagination(lastReviewId, pageSize);
+            return new ResponseEntity<>(reviews, HttpStatus.OK);
+        } catch (ExecutionException | InterruptedException | IOException e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/{reviewId}")
     @Operation(
             summary = "Buscar review por ID",

@@ -7,6 +7,8 @@ import com.brunopassu.backend.entity.enums.UserType;
 import com.brunopassu.backend.exception.BookTitleImmutableFieldException;
 import com.brunopassu.backend.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -49,27 +51,49 @@ public class BookService {
         return bookRepository.getAllBooks();
     }
 
-    public List<Book> getBooksWithPagination(String lastBookId, Integer pageSize)
-            throws ExecutionException, InterruptedException {
+    //Cache para paginação - chave baseada em cursor e pageSize
+    @Cacheable(value = "books-paginated", key = "#lastBookId + '_' + #pageSize")
+    public List<Book> getBooksWithPagination(String lastBookId, Integer pageSize) throws ExecutionException, InterruptedException {
+        // SÓ EXECUTA se não estiver no cache
         int actualPageSize = (pageSize != null && pageSize > 0) ? pageSize : 20;
         return bookRepository.getBooksWithPagination(lastBookId, actualPageSize);
     }
 
+    //Cache para livro individual
+    @Cacheable(value = "book-details", key = "#bookId")
     public Book getBookById(String bookId) throws ExecutionException, InterruptedException {
+        // SÓ EXECUTA se não estiver no cache
         return bookRepository.getBookById(bookId);
     }
 
+    // Cache para busca por gênero
+    @Cacheable(value = "books-by-genre", key = "#genre")
     public List<Book> getBooksByGenre(String genre) throws ExecutionException, InterruptedException {
 
         return bookRepository.getBooksByGenre(genre);
     }
 
+    // Invalidar cache quando livro é atualizado
+    @CacheEvict(value = {"book-details", "books-paginated", "books-by-genre"}, key = "#book.bookId", allEntries = false)
     public boolean updateBook(Book book) throws ExecutionException, InterruptedException {
-        return bookRepository.updateBook(book);
+
+        boolean updated = bookRepository.updateBook(book);
+
+        if (updated) {
+            evictGenreCache(book.getGenre());
+        }
+        return updated;
     }
 
+    // Invalidar cache quando livro é deletado
+    @CacheEvict(value = {"book-details", "books-paginated", "books-by-genre"}, key = "#bookId")
     public boolean deleteBook(String bookId) throws ExecutionException, InterruptedException {
-        return bookRepository.deleteBook(bookId);
+        Book book = getBookById(bookId); // Buscar antes de deletar para invalidar gênero
+        boolean deleted = bookRepository.deleteBook(bookId);
+        if (deleted && book != null) {
+            evictGenreCache(book.getGenre());
+        }
+        return deleted;
     }
 
     public boolean checkTitleExists(String title) throws ExecutionException, InterruptedException, IOException {
@@ -101,7 +125,8 @@ public class BookService {
         }
     }
 
-    // Adicionar no BookService
+    // Invalidar cache quando relevanceScore é atualizado
+    @CacheEvict(value = {"book-details", "books-paginated"}, key = "#bookId")
     public void updateRelevanceScore(String bookId) throws ExecutionException, InterruptedException {
         Book book = getBookById(bookId);
         if (book != null) {
@@ -126,4 +151,12 @@ public class BookService {
         return (W * R + ratingsCount * averageRating) / (W + ratingsCount);
     }
 
+    @CacheEvict(value = {"book-details", "books-paginated"}, key = "#bookId")
+    public void evictGenreCache(String genre) {
+        // INVALIDAR CACHE
+    }
+    @CacheEvict(value = {"book-details", "books-paginated"}, key = "#bookId")
+    public void invalidateBookCache(String bookId) {
+        // Já invalida "book-details" E "books-paginated"
+    }
 }

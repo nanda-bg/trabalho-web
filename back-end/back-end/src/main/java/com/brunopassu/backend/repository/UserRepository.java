@@ -35,43 +35,126 @@ public class UserRepository {
     }
 
     public User getUserByUsername(String username) throws ExecutionException, InterruptedException {
+        long startTime = System.currentTimeMillis();
+        System.out.println("🔍 [FIRESTORE READ] Starting getUserByUsername");
+        System.out.println("   Parameters: username=" + username);
+
         Firestore firestore = FirestoreClient.getFirestore();
         CollectionReference usersRef = firestore.collection(COLLECTION_NAME);
         Query query = usersRef.whereEqualTo("username", username);
         ApiFuture<QuerySnapshot> future = query.get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+        int totalReads = 1;
 
+        User user = null;
         if (!documents.isEmpty()) {
-            return documents.get(0).toObject(User.class);
+            user = documents.get(0).toObject(User.class);
+            System.out.println("   ✅ Document found");
         } else {
-            return null;
+            System.out.println("   ❌ Document not found");
         }
+
+        long endTime = System.currentTimeMillis();
+        System.out.println("   🎯 TOTAL FIRESTORE READS: " + totalReads);
+        System.out.println("   ⏱️ Execution time: " + (endTime - startTime) + "ms");
+        System.out.println("🔚 [FIRESTORE READ] Completed getUserById\n");
+
+        return user;
     }
 
 
     public User getUserById(String userId) throws ExecutionException, InterruptedException {
+        long startTime = System.currentTimeMillis();
+        System.out.println("🔍 [FIRESTORE READ] Starting getUserById");
+        System.out.println("   Parameters: userId=" + userId);
+
         Firestore firestore = FirestoreClient.getFirestore();
         DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(userId);
         ApiFuture<DocumentSnapshot> future = docRef.get();
         DocumentSnapshot document = future.get();
+        int totalReads = 1; // Sempre 1 read para buscar por ID
 
+        User user = null;
         if (document.exists()) {
-            return document.toObject(User.class);
+            user = document.toObject(User.class);
+            System.out.println("   ✅ Document found");
         } else {
-            return null; // Ou lance uma exceção, dependendo do seu caso de uso
+            System.out.println("   ❌ Document not found");
         }
+
+        long endTime = System.currentTimeMillis();
+        System.out.println("   🎯 TOTAL FIRESTORE READS: " + totalReads);
+        System.out.println("   ⏱️ Execution time: " + (endTime - startTime) + "ms");
+        System.out.println("🔚 [FIRESTORE READ] Completed getUserById\n");
+
+        return user;
     }
 
     public List<User> getAllUsers() throws ExecutionException, InterruptedException {
+        long startTime = System.currentTimeMillis();
+        System.out.println("🔍 [FIRESTORE READ] Starting getAllUsers");
+        System.out.println("   ⚠️ WARNING: This method reads ALL documents in collection!");
+
         Firestore firestore = FirestoreClient.getFirestore();
         ApiFuture<QuerySnapshot> query = firestore.collection(COLLECTION_NAME).get();
         List<QueryDocumentSnapshot> documents = query.get().getDocuments();
-        List<User> users = new ArrayList<>();
+        int totalReads = documents.size();
 
+        List<User> users = new ArrayList<>();
         for (QueryDocumentSnapshot document : documents) {
             User user = document.toObject(User.class);
             users.add(user);
         }
+
+        long endTime = System.currentTimeMillis();
+        System.out.println("   🎯 TOTAL FIRESTORE READS: " + totalReads);
+        System.out.println("   ⏱️ Execution time: " + (endTime - startTime) + "ms");
+        System.out.println("   📤 Returning " + users.size() + " users");
+        System.out.println("🔚 [FIRESTORE READ] Completed getAllUsers\n");
+
+        return users;
+    }
+
+    public List<User> getUsersWithPagination(String lastUserId, int pageSize)
+            throws ExecutionException, InterruptedException {
+        long startTime = System.currentTimeMillis();
+        int totalReads = 0;
+        System.out.println("🔍 [FIRESTORE READ] Starting getUsersWithPagination");
+        System.out.println("   Parameters: lastUserId=" + lastUserId + ", pageSize=" + pageSize);
+
+        Firestore firestore = FirestoreClient.getFirestore();
+        Query query = firestore.collection(COLLECTION_NAME)
+                .orderBy("username", Query.Direction.ASCENDING)
+                .limit(pageSize);
+
+        // Se não é a primeira página, use cursor
+        if (lastUserId != null && !lastUserId.isEmpty()) {
+            System.out.println("   📖 Reading cursor document: " + lastUserId);
+            DocumentSnapshot lastDoc = firestore.collection(COLLECTION_NAME)
+                    .document(lastUserId)
+                    .get()
+                    .get();
+            totalReads++; // Contabilizar leitura do cursor
+            query = query.startAfter(lastDoc);
+            System.out.println("   ✅ Cursor document read successfully");
+        }
+
+        System.out.println("   📚 Executing pagination query...");
+        ApiFuture<QuerySnapshot> future = query.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+        totalReads += documents.size(); // Contabilizar documentos da paginação
+        System.out.println("   📊 Query results: " + documents.size() + " documents");
+
+        List<User> users = new ArrayList<>();
+        for (QueryDocumentSnapshot document : documents) {
+            users.add(document.toObject(User.class));
+        }
+
+        long endTime = System.currentTimeMillis();
+        System.out.println("   🎯 TOTAL FIRESTORE READS: " + totalReads);
+        System.out.println("   ⏱️ Execution time: " + (endTime - startTime) + "ms");
+        System.out.println("   📤 Returning " + users.size() + " users");
+        System.out.println("🔚 [FIRESTORE READ] Completed getUsersWithPagination\n");
 
         return users;
     }

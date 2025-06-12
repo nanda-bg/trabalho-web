@@ -12,6 +12,8 @@ import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -52,11 +54,12 @@ public class UserService {
         return userRepository.saveUser(user);
     }
 
-
+    @Cacheable(value = "user-by-username", key = "#username")
     public User getUserByUsername(String username) throws ExecutionException, InterruptedException {
         return userRepository.getUserByUsername(username);
     }
 
+    @Cacheable(value = "user-details", key = "#userId")
     public User getUserById(String userId) throws ExecutionException, InterruptedException {
         return userRepository.getUserById(userId);
     }
@@ -65,6 +68,15 @@ public class UserService {
         return userRepository.getAllUsers();
     }
 
+    @Cacheable(value = "users-paginated", key = "#lastUserId + '_' + #pageSize")
+    public List<User> getUsersWithPagination(String lastUserId, Integer pageSize)
+            throws ExecutionException, InterruptedException {
+        // SÓ EXECUTA se não estiver no cache
+        int actualPageSize = (pageSize != null && pageSize > 0) ? pageSize : 20;
+        return userRepository.getUsersWithPagination(lastUserId, actualPageSize);
+    }
+
+    @CacheEvict(value = {"user-details", "user-by-username", "users-paginated"}, key = "#user.uid")
     public boolean updateUser(User user) throws ExecutionException, InterruptedException, IOException,
             UserAlreadyExistsException, UserUsernameImmutableFieldException, UserEmailmmutableFieldException, FirebaseAuthException {
 
@@ -108,6 +120,7 @@ public class UserService {
         return userRepository.updateUser(user);
     }
 
+    @CacheEvict(value = {"user-details", "user-by-username", "users-paginated"}, key = "#userId")
     public boolean deleteUser(String userId) throws ExecutionException, InterruptedException, FirebaseAuthException {
         if (userId == null || userId.isEmpty()) {
             return false;
@@ -175,5 +188,18 @@ public class UserService {
             return token.substring(7);
         }
         return token; // Retorna o token original se não tiver o prefixo
+    }
+
+    @CacheEvict(value = {"user-by-username", "users-paginated"}, allEntries = true)
+    public void evictUserCaches(String oldUsername, String newUsername) {
+        // Invalida caches relacionados ao username
+        if (newUsername != null && !oldUsername.equals(newUsername)) {
+            // Se o username mudou, invalida ambos
+        }
+    }
+
+    @CacheEvict(value = {"user-details", "user-by-username", "users-paginated"}, allEntries = true)
+    public void invalidateAllUserCaches() {
+        // Invalida todos os caches de usuários
     }
 }

@@ -11,6 +11,8 @@ import com.brunopassu.backend.repository.ReviewRepository;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.*;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -26,13 +28,17 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final FirestoreConfig firestore;
     private final LikeRepository likeRepository;
+    private final BookService bookService;
 
-    public ReviewService(ReviewRepository reviewRepository, FirestoreConfig firestore, LikeRepository likeRepository, LikeRepository likeRepository1) {
+    public ReviewService(ReviewRepository reviewRepository, FirestoreConfig firestore, LikeRepository likeRepository1, BookService bookService) {
         this.reviewRepository = reviewRepository;
         this.firestore = firestore;
         this.likeRepository = likeRepository1;
+        this.bookService = bookService;
+
     }
 
+    @CacheEvict(value = {"review-details", "reviews-paginated", "reviews-by-book", "reviews-by-user"}, allEntries = true)
     public String addReview(ReviewDTO reviewDTO) throws ExecutionException, InterruptedException, IOException {
         // Converter DTO para entidade
         Review review = convertToEntity(reviewDTO);
@@ -83,6 +89,7 @@ public class ReviewService {
         batch.update(bookRef, "relevanceScore", relevanceScore); // NOVA LINHA
         batch.commit().get();
 
+        bookService.invalidateBookCache(bookId);
     }
 
     private double calculateRelevanceScore(Double averageRating, Integer ratingsCount) {
@@ -100,11 +107,23 @@ public class ReviewService {
         return getAllReviewsWithDetails();
     }
 
+    @Cacheable(value = "reviews-paginated", key = "#lastReviewId + '_' + #pageSize")
+    public List<ReviewDTO> getReviewsWithPagination(String lastReviewId, Integer pageSize)
+            throws ExecutionException, InterruptedException, IOException {
+        // SÓ EXECUTA se não estiver no cache
+        int actualPageSize = (pageSize != null && pageSize > 0) ? pageSize : 20;
+        List<Review> reviews = reviewRepository.getReviewsWithPagination(lastReviewId, actualPageSize);
+
+        return convertReviewsToDTOs(reviews);
+    }
+
+    @Cacheable(value = "review-details", key = "#reviewId")
     public ReviewDTO getReviewById(String reviewId) throws ExecutionException, InterruptedException, IOException {
         Review review = reviewRepository.getReviewById(reviewId);
         return review != null ? convertToDTOAsync(review) : null;
     }
 
+    @Cacheable(value = "reviews-by-book", key = "#bookId")
     public List<ReviewDTO> getReviewsByBookId(String bookId) throws ExecutionException, InterruptedException, IOException {
         List<Review> reviews = reviewRepository.getReviewsByBookId(bookId);
 
@@ -148,6 +167,7 @@ public class ReviewService {
                 .toList();
     }
 
+    @Cacheable(value = "reviews-by-user", key = "#userId")
     public List<ReviewDTO> getReviewsByUserId(String userId) throws ExecutionException, InterruptedException, IOException {
         List<Review> reviews = reviewRepository.getReviewsByUserId(userId);
 
@@ -191,6 +211,7 @@ public class ReviewService {
                 .toList();
     }
 
+    @CacheEvict(value = {"review-details", "reviews-paginated", "reviews-by-book", "reviews-by-user"}, key = "#reviewDTO.reviewId")
     public boolean updateReview(ReviewDTO reviewDTO) throws ExecutionException, InterruptedException, IOException {
         //GAMBIARRA DO BRUNÃO:
         ReviewDTO existingReview = getReviewById(reviewDTO.getReviewId());
@@ -211,6 +232,7 @@ public class ReviewService {
         return updated;
     }
 
+    @CacheEvict(value = {"review-details", "reviews-paginated", "reviews-by-book", "reviews-by-user"}, key = "#reviewId")
     public boolean deleteReview(String reviewId) throws ExecutionException, InterruptedException, IOException {
         // Obter a review antes de excluí-la para saber qual livro atualizar
         Review review = reviewRepository.getReviewById(reviewId);
@@ -280,24 +302,56 @@ public class ReviewService {
         return entity;
     }
 
-    private ReviewDTO convertToDTO(Review entity) throws ExecutionException, InterruptedException {
-        ReviewDTO dto = new ReviewDTO();
-        dto.setReviewId(entity.getReviewId());
-        dto.setUserUid(entity.getUserRef().getId());
-        dto.setBookId(entity.getBookRef().getId());
-        dto.setRating(entity.getRating());
-        dto.setReviewText(entity.getReviewText());
-        dto.setDate(entity.getDate());
-        dto.setLikeCount(entity.getLikeCount());
-        dto.setSpoiler(entity.isSpoiler());
+    private List<ReviewDTO> convertReviewsToDTOs(List<Review> reviews)
+            throws ExecutionException, InterruptedException, IOException {
+        // Otimização para buscar usuários e livros em lote
+        Map<String, ApiFuture<DocumentSnapshot>> userFutures = new HashMap<>();
+        Map<String, ApiFuture<DocumentSnapshot>> bookFutures = new HashMap<>();
+        Firestore firestore = this.firestore.firestore();
 
-        User user = getUserFromReview(entity);
-        Book book = getBookFromReview(entity);
+        for (Review review : reviews) {
+            String userId = review.getUserRef().getId();
+            String bookId = review.getBookRef().getId();
 
-        dto.setUser(user);
-        dto.setBook(book);
+            if (!userFutures.containsKey(userId)) {
+                userFutures.put(userId, firestore.collection("users").document(userId).get());
+            }
 
-        return dto;
+            if (!bookFutures.containsKey(bookId)) {
+                bookFutures.put(bookId, firestore.collection("books").document(bookId).get());
+            }
+        }
+
+        // Cache dos usuários e livros
+        Map<String, User> userCache = new HashMap<>();
+        Map<String, Book> bookCache = new HashMap<>();
+
+        for (Map.Entry<String, ApiFuture<DocumentSnapshot>> entry : userFutures.entrySet()) {
+            User user = entry.getValue().get().toObject(User.class);
+            userCache.put(entry.getKey(), user);
+        }
+
+        for (Map.Entry<String, ApiFuture<DocumentSnapshot>> entry : bookFutures.entrySet()) {
+            Book book = entry.getValue().get().toObject(Book.class);
+            bookCache.put(entry.getKey(), book);
+        }
+
+        return reviews.stream()
+                .map(review -> {
+                    ReviewDTO dto = new ReviewDTO();
+                    dto.setReviewId(review.getReviewId());
+                    dto.setUserUid(review.getUserRef().getId());
+                    dto.setBookId(review.getBookRef().getId());
+                    dto.setRating(review.getRating());
+                    dto.setReviewText(review.getReviewText());
+                    dto.setDate(review.getDate());
+                    dto.setLikeCount(review.getLikeCount());
+                    dto.setSpoiler(review.isSpoiler());
+                    dto.setUser(userCache.get(review.getUserRef().getId()));
+                    dto.setBook(bookCache.get(review.getBookRef().getId()));
+                    return dto;
+                })
+                .toList();
     }
 
     private ReviewDTO convertToDTOAsync(Review entity) throws ExecutionException, InterruptedException {
@@ -391,4 +445,13 @@ public class ReviewService {
         return bookSnapshot.toObject(Book.class);
     }
 
+    @CacheEvict(value = {"reviews-by-book", "reviews-by-user", "reviews-paginated"}, allEntries = true)
+    public void evictReviewCaches(String bookId, String userId) {
+        // Invalida caches relacionados
+    }
+
+    @CacheEvict(value = {"review-details", "reviews-paginated", "reviews-by-book", "reviews-by-user"}, allEntries = true)
+    public void invalidateAllReviewCaches() {
+        // Invalida todos os caches de reviews
+    }
 }

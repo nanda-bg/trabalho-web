@@ -5,10 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8e9f613b-8c25-4c30-8cdb-8a962897647d" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/controller/AuthController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/back-end/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/back-end/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/BackEndApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/BackEndApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/controller/BookController.java" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/controller/BookController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/controller/ReviewController.java" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/controller/ReviewController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/controller/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/entity/Book.java" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/entity/Book.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/repository/BookRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/repository/BookRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/repository/ReviewRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/repository/ReviewRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/repository/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/service/BookService.java" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/service/BookService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/service/ReviewService.java" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/service/ReviewService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/service/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/front-end/yarn.lock" beforeDir="false" afterPath="$PROJECT_DIR$/front-end/yarn.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/back-end/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/back-end/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -74,7 +85,7 @@
     &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;Spring Boot.BackEndApplication.executor&quot;: &quot;Debug&quot;,
+    &quot;Spring Boot.BackEndApplication.executor&quot;: &quot;Run&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
@@ -154,6 +165,8 @@
       <workItem from="1749562991568" duration="5814000" />
       <workItem from="1749578252806" duration="11157000" />
       <workItem from="1749657750074" duration="358000" />
+      <workItem from="1749660695516" duration="3079000" />
+      <workItem from="1749726404038" duration="13366000" />
     </task>
     <servers />
   </component>

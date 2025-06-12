@@ -94,6 +94,22 @@ public class UserController {
         }
     }
 
+    @GetMapping("/paginated")
+    @Operation(
+            summary = "Listar usuários com paginação",
+            description = "Retorna usuários ordenados por username com paginação e cache Redis"
+    )
+    public ResponseEntity<List<User>> getUsersWithPagination(
+            @RequestParam(required = false) String lastUserId,
+            @RequestParam(defaultValue = "20") Integer pageSize) {
+        try {
+            List<User> users = userService.getUsersWithPagination(lastUserId, pageSize);
+            return new ResponseEntity<>(users, HttpStatus.OK);
+        } catch (ExecutionException | InterruptedException e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/{username}")
     @Operation(
             summary = "Buscar usuário por username",

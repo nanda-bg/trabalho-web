@@ -5,11 +5,14 @@ import com.google.cloud.firestore.annotation.Exclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Schema(description = "Entidade de livro do sistema")
-public class Book {
+public class Book implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Schema(description = "ID único do livro", example = "book123def456")
     private String bookId;
