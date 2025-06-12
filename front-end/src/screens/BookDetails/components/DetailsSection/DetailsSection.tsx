@@ -1,4 +1,4 @@
-import type { Book } from "@app/store/slices/BooksSlice/types";
+import { Book } from "@app/types/Book";
 import * as S from "./styles";
 import { type FC } from "react";
 
@@ -19,7 +19,7 @@ const DetailsSection: FC<DetailsSectionProps> = ({ selectedBook }) => {
         <strong>Páginas:</strong> {selectedBook.pagesCount}
       </p>
       <p>
-        <strong>Gênero:</strong> {selectedBook.genres.join(", ")}
+        <strong>Gênero:</strong> {selectedBook.genre}
       </p>
     </S.DetailsSection>
   );

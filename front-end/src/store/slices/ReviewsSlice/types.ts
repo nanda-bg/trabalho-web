@@ -1,6 +1,6 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { User } from "../UserSlice/types";
-import { Book } from "../BooksSlice/types";
+import { Book } from "@app/types/Book";
 
 export interface ReviewsState {
   reviews: Review[];

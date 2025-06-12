@@ -4,13 +4,13 @@ import {
   SetStateSliceFieldReducerPayload,
 } from "../../utils/setStateSliceFieldReducer";
 import { setStateSliceReducer } from "../../utils/setStateSliceReducer";
-import { BooksState, GetBookPayloadAction } from "./types";
+import { BooksState } from "./types";
 
 export const initialState: BooksState = {
   books: [],
   isLoading: false,
   error: null,
-  selectedBook: null,
+  lastBookId: null,
 };
 
 const bookSlice = createSlice({
@@ -23,11 +23,11 @@ const bookSlice = createSlice({
     ) => setStateSliceFieldReducer<BooksState>(state, action),
     setBookSlice: (state, action: PayloadAction<Partial<BooksState>>) =>
       setStateSliceReducer<BooksState>(state, action),
-    getBook: (_state, _action: GetBookPayloadAction) => {},
     listBooks: () => {},
+    resetBookSlice: () => initialState,
   },
 });
 
-export const { setBookSliceField, setBookSlice, getBook, listBooks} =
+export const { setBookSliceField, setBookSlice, listBooks, resetBookSlice } =
   bookSlice.actions;
 export default bookSlice;

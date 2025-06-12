@@ -33,6 +33,7 @@ const reviewSlice = createSlice({
     getReview: (_state, _action: GetReviewPayloadAction) => {},
     listReviewsByBook: (_state, _action: ListReviewsByBookPayloadAction) => {},
     createReview: (_state, _action: CreateReviewPayloadAction) => {},
+    resetReviewSlice: () => initialState,
   },
 });
 
@@ -42,5 +43,6 @@ export const {
   getReview,
   listReviewsByBook,
   createReview,
+  resetReviewSlice,
 } = reviewSlice.actions;
 export default reviewSlice;

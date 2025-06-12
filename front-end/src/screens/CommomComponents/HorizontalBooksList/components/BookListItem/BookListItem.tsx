@@ -1,8 +1,9 @@
+import { Book } from "@app/types/Book";
 import * as S from "./styles";
 import { Star } from "lucide-react";
 import { FC } from "react";
 import { useNavigate } from "react-router-dom";
-import { Book } from "@app/store/slices/BooksSlice/types";
+
 
 interface BookListItemProps {
   book: Book;

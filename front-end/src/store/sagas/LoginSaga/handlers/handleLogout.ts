@@ -1,7 +1,14 @@
-import { setAuthSlice } from "@app/store/slices/Auth";
-import { setLoginSliceField } from "@app/store/slices/LoginSlice";
+import { resetAuthSlice } from "@app/store/slices/Auth";
+import { resetBookSlice } from "@app/store/slices/BooksSlice";
+import {
+  resetLoginSlice,
+  setLoginSliceField,
+} from "@app/store/slices/LoginSlice";
+import { resetReviewSlice } from "@app/store/slices/ReviewsSlice";
+import { resetSignUpSlice } from "@app/store/slices/SignUpSlice";
+import { resetUserSlice } from "@app/store/slices/UserSlice";
 import { persistor } from "@app/store/store";
-import { put } from "redux-saga/effects";
+import { all, call, put } from "redux-saga/effects";
 
 export function* handleLogout() {
   try {
@@ -10,13 +17,16 @@ export function* handleLogout() {
 
     localStorage.removeItem("token");
 
-    yield put(
-      setAuthSlice({
-        isAuthenticated: false,
-      })
-    );
+    yield all([
+      put(resetAuthSlice()),
+      put(resetBookSlice()),
+      put(resetLoginSlice()),
+      put(resetReviewSlice()),
+      put(resetSignUpSlice()),
+      put(resetUserSlice()),
+    ]);
 
-    yield persistor.purge();
+    yield call(persistor.purge);
   } catch (error) {
     yield put(
       setLoginSliceField({

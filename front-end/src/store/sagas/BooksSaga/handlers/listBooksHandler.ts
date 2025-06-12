@@ -1,6 +1,8 @@
-import { setBookSliceField } from "@app/store/slices/BooksSlice";
-import axios from "axios";
-import { call, put } from "redux-saga/effects";
+import { setBookSlice, setBookSliceField } from "@app/store/slices/BooksSlice";
+import axios, { AxiosResponse } from "axios";
+import { call, put, select } from "redux-saga/effects";
+import _ from "lodash";
+import { Book } from "@app/types/Book";
 
 export function* listBooksHandler() {
   try {
@@ -8,17 +10,25 @@ export function* listBooksHandler() {
     yield put(setBookSliceField({ key: "error", value: null }));
 
     const token = localStorage.getItem("token");
+    const { lastBookId, books } = yield select((state) => state.bookSlice);
 
-    const { data } = yield call(axios.get, `/books`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const { data }: AxiosResponse<Book[]> = yield call(
+      axios.get,
+      `/books/paginated`,
+      {
+        params: {
+          lastBookId,
+        },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     yield put(
-      setBookSliceField({
-        key: "books",
-        value: data,
+      setBookSlice({
+        lastBookId: _.last(data)?.bookId,
+        books: [...books, ...data],
       })
     );
   } catch (error) {

@@ -18,6 +18,9 @@ export const initialState: UserState = {
   isLoading: false,
   followers: 0,
   following: 0,
+  error: null,
+  profilePicture: null,
+  bio: null,
 };
 
 const userSlice = createSlice({
@@ -32,9 +35,15 @@ const userSlice = createSlice({
       setStateSliceReducer<UserState>(state, action),
     fetchUserInfo: (_state, _action: FetchUserInfoPayloadAction) => {},
     updateProfile: (_state, _action: UpdateProfilePayloadAction) => {},
+    resetUserSlice: () => initialState,
   },
 });
 
-export const { setUserSliceField, setUserSlice, fetchUserInfo, updateProfile } =
-  userSlice.actions;
+export const {
+  setUserSliceField,
+  setUserSlice,
+  fetchUserInfo,
+  updateProfile,
+  resetUserSlice,
+} = userSlice.actions;
 export default userSlice;

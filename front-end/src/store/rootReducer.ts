@@ -6,6 +6,7 @@ import signUpSlice from "./slices/SignUpSlice";
 import authSlice from "./slices/Auth";
 import bookSlice from "./slices/BooksSlice";
 import reviewSlice from "./slices/ReviewsSlice";
+import bookDetailsSlice from "./slices/BookDetailsSlice";
 
 const appReducer = combineReducers({
   userSlice: userSlice.reducer,
@@ -13,6 +14,7 @@ const appReducer = combineReducers({
   signUpSlice: signUpSlice.reducer,
   authSlice: authSlice.reducer,
   bookSlice: bookSlice.reducer,
+  bookDetailsSlice: bookDetailsSlice.reducer,
   reviewSlice: reviewSlice.reducer,
 });
 

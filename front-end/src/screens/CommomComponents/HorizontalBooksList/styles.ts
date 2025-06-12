@@ -8,6 +8,7 @@ export const HorizontalScroll = styled.div`
   padding-bottom: 16px;
   margin-bottom: 24px;
   padding-top: 10px;
+  scroll-behavior: smooth;
 
   &::-webkit-scrollbar {
     height: 8px;
