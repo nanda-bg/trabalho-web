@@ -16,10 +16,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -38,7 +35,7 @@ public class ReviewService {
 
     }
 
-    @CacheEvict(value = {"review-details", "reviews-paginated", "reviews-by-book", "reviews-by-user"}, allEntries = true)
+    @CacheEvict(value = {"review-details", "reviews-paginated", "reviews-by-book", "reviews-by-user", "reviews-feed"}, allEntries = true)
     public String addReview(ReviewDTO reviewDTO) throws ExecutionException, InterruptedException, IOException {
         // Converter DTO para entidade
         Review review = convertToEntity(reviewDTO);
@@ -115,6 +112,105 @@ public class ReviewService {
         List<Review> reviews = reviewRepository.getReviewsWithPagination(lastReviewId, actualPageSize);
 
         return convertReviewsToDTOs(reviews);
+    }
+
+    @Cacheable(value = "reviews-feed", key = "#userId + '_' + #lastReviewId + '_' + #pageSize")
+    public List<ReviewDTO> getFollowingFeed(String userId, String lastReviewId, Integer pageSize)
+            throws ExecutionException, InterruptedException, IOException {
+
+        long startTime = System.currentTimeMillis();
+        System.out.println("🔍 [FEED] Starting optimized feed for userId: " + userId);
+
+        // Get following relationships - OTIMIZADO
+        List<String> followingUserIds = getFollowingUserIds(userId);
+        System.out.println("🔍 [FEED] Found " + followingUserIds.size() + " followed users");
+
+        if (followingUserIds.isEmpty()) {
+            System.out.println("❌ [FEED] No followed users");
+            return new ArrayList<>();
+        }
+
+        // Firestore 'in' constraint: máximo 30 valores
+        if (followingUserIds.size() > 30) {
+            followingUserIds = followingUserIds.subList(0, 30);
+            System.out.println("⚠️ [FEED] Limited to 30 users due to Firestore constraints");
+        }
+
+        Firestore firestore = this.firestore.firestore();
+        int actualPageSize = (pageSize != null && pageSize > 0) ? pageSize : 20;
+
+        // Create user references
+        List<DocumentReference> followingRefs = followingUserIds.stream()
+                .map(id -> firestore.collection("users").document(id))
+                .toList();
+
+        // Build optimized query with index
+        Query query = firestore.collection("reviews")
+                .whereIn("userRef", followingRefs)
+                .orderBy("date", Query.Direction.DESCENDING)
+                .limit(actualPageSize);
+
+        int totalReads = 0;
+
+        // Handle pagination cursor
+        if (lastReviewId != null && !lastReviewId.isEmpty()) {
+            System.out.println("📖 [FEED] Using pagination cursor: " + lastReviewId);
+            DocumentSnapshot lastDoc = firestore.collection("reviews")
+                    .document(lastReviewId)
+                    .get()
+                    .get();
+            totalReads++; // Count cursor read
+            query = query.startAfter(lastDoc);
+        }
+
+        // Execute query with index
+        System.out.println("📚 [FEED] Executing indexed query...");
+        try {
+            ApiFuture<QuerySnapshot> future = query.get();
+            List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+            totalReads += documents.size();
+
+            System.out.println("✅ [FEED] Query successful: " + documents.size() + " reviews");
+
+            List<Review> reviews = documents.stream()
+                    .map(doc -> doc.toObject(Review.class))
+                    .toList();
+
+            List<ReviewDTO> result = convertReviewsToDTOs(reviews);
+
+            long endTime = System.currentTimeMillis();
+            System.out.println("🎯 [FEED] TOTAL FIRESTORE READS: " + totalReads);
+            System.out.println("⏱️ [FEED] Execution time: " + (endTime - startTime) + "ms");
+            System.out.println("📤 [FEED] Returning " + result.size() + " reviews");
+
+            return result;
+
+        } catch (Exception e) {
+            System.out.println("❌ [FEED] Query failed: " + e.getMessage());
+
+            // Check for specific index errors
+            if (e.getMessage().contains("index") || e.getMessage().contains("FAILED_PRECONDITION")) {
+                System.out.println("🚨 [FEED] Index still propagating or incorrect structure");
+                System.out.println("   Expected: userRef (ASC) + date (DESC)");
+            }
+
+            throw e;
+        }
+    }
+
+    private List<String> getFollowingUserIds(String userId) throws ExecutionException, InterruptedException, IOException {
+        Firestore firestore = this.firestore.firestore();
+
+        Query query = firestore.collection("user_relationships") // CORRECT collection
+                .whereEqualTo("followerId", userId)
+                .select("followingId");
+
+        ApiFuture<QuerySnapshot> future = query.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+
+        return documents.stream()
+                .map(doc -> doc.getString("followingId"))
+                .toList();
     }
 
     @Cacheable(value = "review-details", key = "#reviewId")
@@ -211,7 +307,7 @@ public class ReviewService {
                 .toList();
     }
 
-    @CacheEvict(value = {"review-details", "reviews-paginated", "reviews-by-book", "reviews-by-user"}, key = "#reviewDTO.reviewId")
+    @CacheEvict(value = {"review-details", "reviews-paginated", "reviews-by-book", "reviews-by-user", "reviews-feed"}, key = "#reviewDTO.reviewId")
     public boolean updateReview(ReviewDTO reviewDTO) throws ExecutionException, InterruptedException, IOException {
         //GAMBIARRA DO BRUNÃO:
         ReviewDTO existingReview = getReviewById(reviewDTO.getReviewId());
@@ -232,7 +328,7 @@ public class ReviewService {
         return updated;
     }
 
-    @CacheEvict(value = {"review-details", "reviews-paginated", "reviews-by-book", "reviews-by-user"}, key = "#reviewId")
+    @CacheEvict(value = {"review-details", "reviews-paginated", "reviews-by-book", "reviews-by-user", "reviews-feed"}, key = "#reviewId")
     public boolean deleteReview(String reviewId) throws ExecutionException, InterruptedException, IOException {
         // Obter a review antes de excluí-la para saber qual livro atualizar
         Review review = reviewRepository.getReviewById(reviewId);

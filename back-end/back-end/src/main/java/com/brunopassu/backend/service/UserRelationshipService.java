@@ -1,5 +1,6 @@
 package com.brunopassu.backend.service;
 
+import com.brunopassu.backend.cacheManager.RedisFeedCacheManager;
 import com.brunopassu.backend.entity.User;
 import com.brunopassu.backend.entity.UserRelationship;
 import com.brunopassu.backend.repository.UserRelationshipRepository;
@@ -17,6 +18,9 @@ public class UserRelationshipService {
 
     private final UserRelationshipRepository relationshipRepository;
     private final UserRepository userRepository;
+
+    @Autowired
+    private RedisFeedCacheManager feedCacheManager;
 
     @Autowired
     private AuthService authService;
@@ -42,7 +46,17 @@ public class UserRelationshipService {
             return false;
         }
 
-        return relationshipRepository.toggleFollow(followerId, followingId);
+        boolean sucess = relationshipRepository.toggleFollow(followerId, followingId);
+
+        if (sucess) {
+            feedCacheManager.invalidateUserFeedCache(followerId);
+            System.out.println("✅ [FOLLOW] Successfully followed and invalidated cache");
+        }
+        else {
+            feedCacheManager.invalidateUserFeedCache(followerId);
+            System.out.println("✅ [UNFOLLOW] Successfully unfollowed and invalidated cache");
+        }
+        return sucess;
     }
 
     public List<User> getUserFollowers(String userId) throws ExecutionException, InterruptedException {

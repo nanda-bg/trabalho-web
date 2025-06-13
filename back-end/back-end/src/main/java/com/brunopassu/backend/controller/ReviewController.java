@@ -191,6 +191,95 @@ public class ReviewController {
         }
     }
 
+    @GetMapping("/feed")
+    @Operation(
+            summary = "Buscar feed de reviews dos usuários seguidos",
+            description = "Retorna reviews dos usuários seguidos ordenadas por data com paginação"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Feed de reviews retornado com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Feed de reviews",
+                                    value = """
+                [
+                    {
+                        "reviewId": "review1",
+                        "userUid": "user123",
+                        "bookId": "book456",
+                        "rating": 5,
+                        "reviewText": "Excelente livro!",
+                        "date": "2025-06-13T10:00:00Z",
+                        "likeCount": 15,
+                        "spoiler": false,
+                        "user": {
+                            "uid": "user123",
+                            "displayName": "João Silva",
+                            "email": "joao@email.com"
+                        },
+                        "book": {
+                            "id": "book456",
+                            "title": "Dom Casmurro",
+                            "author": "Machado de Assis",
+                            "averageRating": 4.2
+                        }
+                    },
+                    {
+                        "reviewId": "review2",
+                        "userUid": "user456",
+                        "bookId": "book789",
+                        "rating": 4,
+                        "reviewText": "Muito bom, recomendo a leitura.",
+                        "date": "2025-06-13T09:30:00Z",
+                        "likeCount": 8,
+                        "spoiler": false,
+                        "user": {
+                            "uid": "user456",
+                            "displayName": "Maria Santos",
+                            "email": "maria@email.com"
+                        },
+                        "book": {
+                            "id": "book789",
+                            "title": "O Cortiço",
+                            "author": "Aluísio Azevedo",
+                            "averageRating": 3.8
+                        }
+                    }
+                ]
+                """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Erro interno do servidor",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Erro interno",
+                                    value = "null"
+                            )
+                    )
+            )
+    })
+    public ResponseEntity<List<ReviewDTO>> getFollowingFeed(
+            @RequestParam(required = false) String lastReviewId,
+            @RequestParam(defaultValue = "20") Integer pageSize,
+            @Parameter(hidden = true) @RequestHeader("Authorization") String token) {
+
+        try {
+            String userId = authService.getUserIdFromToken(token);
+            List<ReviewDTO> feedReviews = reviewService.getFollowingFeed(userId, lastReviewId, pageSize);
+            return new ResponseEntity<>(feedReviews, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
     @GetMapping("/{reviewId}")
     @Operation(
             summary = "Buscar review por ID",

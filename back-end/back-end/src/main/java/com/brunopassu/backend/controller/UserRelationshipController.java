@@ -90,10 +90,10 @@ public class UserRelationshipController {
             name = "Authorization",
             description = "Token Bearer do usuário autenticado",
             example = "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IjE2NzAyN...",
-            required = true,
+            required = false,
             in = ParameterIn.HEADER
     )
-    public ResponseEntity<Map<String, Object>> toggleFollowWithAuth(@PathVariable String followingId, @RequestHeader ("Authorization") String token) {
+    public ResponseEntity<Map<String, Object>> toggleFollowWithAuth(@PathVariable String followingId, @RequestHeader(value = "Authorization", required = false) String token) {
         try {
             boolean result = relationshipService.toggleFollowWithAuth(followingId, token);
             return ResponseEntity.ok(Map.of(

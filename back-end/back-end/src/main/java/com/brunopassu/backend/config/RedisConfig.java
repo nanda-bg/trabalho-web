@@ -25,7 +25,7 @@ public class RedisConfig {
 
     @Bean
     public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
-        // ObjectMapper SEM default typing problemático
+        // Serialização
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         objectMapper.registerModule(new JavaTimeModule());
@@ -45,11 +45,11 @@ public class RedisConfig {
 
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(config)
-                .withCacheConfiguration("books-paginated",
+                .withCacheConfiguration("books-paginated", //NAMESPACE do cache
                         RedisCacheConfiguration.defaultCacheConfig()
-                                .entryTtl(Duration.ofMinutes(15))
-                                .serializeValuesWith(RedisSerializationContext.SerializationPair
-                                        .fromSerializer(jsonSerializer)))
+                                .entryTtl(Duration.ofMinutes(15)) //Duração do tempo de vida do cache
+                                .serializeValuesWith(RedisSerializationContext.SerializationPair //como serializar as chaves
+                                        .fromSerializer(jsonSerializer))) //como serializar os valores
                 .withCacheConfiguration("book-details",
                         RedisCacheConfiguration.defaultCacheConfig()
                                 .entryTtl(Duration.ofMinutes(60))
@@ -95,30 +95,43 @@ public class RedisConfig {
                                 .entryTtl(Duration.ofHours(1))
                                 .serializeValuesWith(RedisSerializationContext.SerializationPair
                                         .fromSerializer(jsonSerializer)))
+                .withCacheConfiguration("reviews-feed",
+                        RedisCacheConfiguration.defaultCacheConfig()
+                                .entryTtl(Duration.ofHours(1))
+                                .serializeValuesWith(RedisSerializationContext.SerializationPair
+                                        .fromSerializer(jsonSerializer)))
                 .build();
     }
 
     // ADICIONAR este bean que está faltando
     @Bean
     @Primary
-    public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
-        RedisTemplate<Object, Object> template = new RedisTemplate<>();
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
 
-        // ObjectMapper simplificado para RedisTemplate
+        // ObjectMapper configuration
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        objectMapper.registerModule(new JavaTimeModule());
 
         GenericJackson2JsonRedisSerializer jsonSerializer =
                 new GenericJackson2JsonRedisSerializer(objectMapper);
 
+        // Set serializers with proper types
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(jsonSerializer);
         template.setHashKeySerializer(new StringRedisSerializer());
         template.setHashValueSerializer(jsonSerializer);
+
+        // Enable transaction support for batch operations
+        template.setEnableTransactionSupport(true);
         template.afterPropertiesSet();
+
         return template;
     }
+
 }
 
 
