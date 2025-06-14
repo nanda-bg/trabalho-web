@@ -24,7 +24,7 @@ import {
   REGISTER,
   REHYDRATE,
 } from "redux-persist";
-import storage from "redux-persist/lib/storage"; // defaults to localStorage
+import storageSession from "redux-persist/lib/storage/session";
 import bookDetailsSlice from "./slices/BookDetailsSlice";
 import { watchBookDetailsSagas } from "./sagas/BookDetailsSaga";
 import bookByGenreSlice from "./slices/BookByGenreSlice";
@@ -45,7 +45,7 @@ function* rootSaga() {
 
 const persistConfig = {
   key: "root",
-  storage,
+  storage: storageSession,
 };
 
 const sagaMiddleware = createSagaMiddleware();

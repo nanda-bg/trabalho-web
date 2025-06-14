@@ -16,6 +16,7 @@
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
     "firebase": "^11.4.0",
+    "js-cookie": "^3.0.5",
     "lucide-react": "^0.483.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -53,6 +54,7 @@
   },
   "devDependencies": {
     "@craco/craco": "^7.1.0",
+    "@types/js-cookie": "^3.0.6",
     "@types/node": "^22.13.10",
     "craco-alias": "^3.0.1",
     "crypto-browserify": "^3.12.1",

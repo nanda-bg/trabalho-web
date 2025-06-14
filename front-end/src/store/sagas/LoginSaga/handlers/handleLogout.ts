@@ -1,4 +1,6 @@
 import { resetAuthSlice } from "@app/store/slices/Auth";
+import { resetBookByGenreSlice } from "@app/store/slices/BookByGenreSlice";
+import { resetBookDetailsSlice } from "@app/store/slices/BookDetailsSlice";
 import { resetBookSlice } from "@app/store/slices/BooksSlice";
 import {
   resetLoginSlice,
@@ -8,6 +10,7 @@ import { resetReviewSlice } from "@app/store/slices/ReviewsSlice";
 import { resetSignUpSlice } from "@app/store/slices/SignUpSlice";
 import { resetUserSlice } from "@app/store/slices/UserSlice";
 import { persistor } from "@app/store/store";
+import Cookies from "js-cookie";
 import { all, call, put } from "redux-saga/effects";
 
 export function* handleLogout() {
@@ -15,7 +18,7 @@ export function* handleLogout() {
     yield put(setLoginSliceField({ key: "isLoading", value: true }));
     yield put(setLoginSliceField({ key: "logoutError", value: null }));
 
-    localStorage.removeItem("token");
+    Cookies.remove("token", { secure: true, sameSite: "strict" });
 
     yield all([
       put(resetAuthSlice()),
@@ -24,6 +27,8 @@ export function* handleLogout() {
       put(resetReviewSlice()),
       put(resetSignUpSlice()),
       put(resetUserSlice()),
+      put(resetBookByGenreSlice()),
+      put(resetBookDetailsSlice()),
     ]);
 
     yield call(persistor.purge);

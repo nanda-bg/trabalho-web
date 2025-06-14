@@ -1,5 +1,6 @@
 import { setAuthSlice } from "@app/store/slices/Auth";
 import axios from "axios";
+import Cookies from "js-cookie";
 import { call, put } from "redux-saga/effects";
 
 export function* getToken(email: string, password: string) {
@@ -19,11 +20,12 @@ export function* getToken(email: string, password: string) {
       }
     );
 
-    localStorage.setItem("token", response.data.idToken);
+    Cookies.set("token", response.data.idToken, {
+      secure: true,
+      sameSite: "strict"
+    });
 
-    yield put(
-      setAuthSlice({ isAuthenticated: true })
-    );
+    yield put(setAuthSlice({ isAuthenticated: true }));
     return response.data.idToken;
   } catch (error) {
     yield put(

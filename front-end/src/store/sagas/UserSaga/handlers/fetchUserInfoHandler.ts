@@ -1,13 +1,14 @@
 import { setUserSlice, setUserSliceField } from "@app/store/slices/UserSlice";
 import { FetchUserInfoPayloadAction } from "@app/store/slices/UserSlice/types";
 import axios from "axios";
+import Cookies from "js-cookie";
 import { call, put } from "redux-saga/effects";
 
 export function* fetchUserInfoHandler({ payload }: FetchUserInfoPayloadAction) {
   try {
     yield put(setUserSliceField({ key: "isLoading", value: true }));
 
-    const token = localStorage.getItem("token");
+    const token = Cookies.get("token");
 
     const { data } = yield call(axios.get, `/users/id/${payload.uid}`, {
       headers: {

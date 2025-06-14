@@ -10,14 +10,14 @@ import BookDetails from "./screens/BookDetails/BookDetails";
 import FavoriteBooks from "./screens/Favorites/Favorites";
 import ReviewsScreen from "./screens/Reviews/ReviewsScreen";
 import CreateReviewScreen from "./screens/CreateReviewScreen/CreateReviewScreen";
-import BookScreen from "./screens/Books/Books";
+import BooksScreen from "./screens/Books/BooksScreen";
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
   const { isAuthenticated } = useAppSelector((state) => state.authSlice);
   const location = useLocation();
 
   if (!isAuthenticated) {
-    localStorage.setItem("redirectAfterLogin", location.pathname);
+    sessionStorage.setItem("redirectAfterLogin", location.pathname);
     return <Navigate to="/" replace />;
   }
 
@@ -85,12 +85,10 @@ const router = createBrowserRouter([
     path: "/books",
     element: (
       <ProtectedRoute>
-        <BookScreen />
+        <BooksScreen />
       </ProtectedRoute>
     ),
   },
 ]);
-
-
 
 export default router;

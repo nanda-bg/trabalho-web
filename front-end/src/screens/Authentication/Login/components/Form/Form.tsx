@@ -26,9 +26,9 @@ const LoginForm = () => {
 
   useEffect(() => {
     if (isAuthenticated && !isLoading) {
-      const redirectPath = localStorage.getItem('redirectAfterLogin');
+      const redirectPath = sessionStorage.getItem("redirectAfterLogin");
       if (redirectPath) {
-        localStorage.removeItem('redirectAfterLogin');
+        sessionStorage.removeItem("redirectAfterLogin");
         navigate(redirectPath);
       } else {
         navigate("/home");

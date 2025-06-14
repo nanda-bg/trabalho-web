@@ -4,6 +4,7 @@ import { LoginPayloadAction } from "@app/store/slices/LoginSlice/types";
 import { fetchUserInfo } from "@app/store/slices/UserSlice";
 import { getToken } from "../../AuthSaga/handlers/getToken";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 export function* handleLogin({ payload }: LoginPayloadAction) {
   try {
@@ -12,7 +13,7 @@ export function* handleLogin({ payload }: LoginPayloadAction) {
 
     yield call(getToken, payload.email, payload.password);
 
-    const token = localStorage.getItem('token');
+    const token = Cookies.get("token");
 
     const response = yield call(axios.post, "/auth/verify-token", {
       token: token,

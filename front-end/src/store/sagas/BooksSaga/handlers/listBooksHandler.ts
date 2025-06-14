@@ -3,13 +3,14 @@ import axios, { AxiosResponse } from "axios";
 import { call, put, select } from "redux-saga/effects";
 import _ from "lodash";
 import { Book } from "@app/types/Book";
+import Cookies from "js-cookie";
 
 export function* listBooksHandler() {
   try {
     yield put(setBookSliceField({ key: "isLoading", value: true }));
     yield put(setBookSliceField({ key: "error", value: null }));
 
-    const token = localStorage.getItem("token");
+    const token = Cookies.get("token");
     const { lastBookId, books } = yield select((state) => state.bookSlice);
 
     const { data }: AxiosResponse<Book[]> = yield call(

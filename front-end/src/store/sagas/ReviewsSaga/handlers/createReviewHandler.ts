@@ -1,7 +1,11 @@
 import { call, put, select } from "redux-saga/effects";
 import axios from "axios";
 import { CreateReviewPayloadAction } from "@app/store/slices/ReviewsSlice/types";
-import { setReviewSlice, setReviewSliceField } from "@app/store/slices/ReviewsSlice";
+import {
+  setReviewSlice,
+  setReviewSliceField,
+} from "@app/store/slices/ReviewsSlice";
+import Cookies from "js-cookie";
 
 export function* createReviewHandler({ payload }: CreateReviewPayloadAction) {
   try {
@@ -14,10 +18,10 @@ export function* createReviewHandler({ payload }: CreateReviewPayloadAction) {
     );
     yield put(setReviewSliceField({ key: "createReviewError", value: null }));
 
-    const token = localStorage.getItem("token");
+    const token = Cookies.get("token");
     const userId = yield select((state) => state.userSlice.userId);
 
-   yield call(
+    yield call(
       axios.post,
       `/reviews`,
       {

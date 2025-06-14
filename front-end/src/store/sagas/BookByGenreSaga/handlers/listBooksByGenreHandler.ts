@@ -1,18 +1,27 @@
-import { setBookSlice, setBookSliceField } from "@app/store/slices/BooksSlice";
 import axios, { AxiosResponse } from "axios";
 import { call, put, select } from "redux-saga/effects";
-import _ from "lodash";
 import { Book } from "@app/types/Book";
-import { setBookByGenreSlice, setBookByGenreSliceField } from "@app/store/slices/BookByGenreSlice";
+import {
+  setBookByGenreSlice,
+  setBookByGenreSliceField,
+} from "@app/store/slices/BookByGenreSlice";
 import { ListBookByGenrePayloadAction } from "@app/store/slices/BookByGenreSlice/types";
+import Cookies from "js-cookie";
 
-export function* listBooksByGenreHandler({payload}:ListBookByGenrePayloadAction) {
-  const { booksByGenre, isLoading } = yield select((state) => state.bookByGenreSlice);
+export function* listBooksByGenreHandler({
+  payload,
+}: ListBookByGenrePayloadAction) {
   try {
-    yield put(setBookByGenreSliceField({ key: "isLoading", value: {...isLoading, [payload.genre]: true } }));
+    const { isLoading } = yield select((state) => state.bookByGenreSlice);
+    yield put(
+      setBookByGenreSliceField({
+        key: "isLoading",
+        value: { ...isLoading, [payload.genre]: true },
+      })
+    );
     yield put(setBookByGenreSliceField({ key: "error", value: null }));
 
-    const token = localStorage.getItem("token");
+    const token = Cookies.get("token");
 
     const { data }: AxiosResponse<Book[]> = yield call(
       axios.get,
@@ -27,9 +36,11 @@ export function* listBooksByGenreHandler({payload}:ListBookByGenrePayloadAction)
       }
     );
 
+    const { booksByGenre } = yield select((state) => state.bookByGenreSlice);
+
     yield put(
       setBookByGenreSlice({
-        booksByGenre: {...booksByGenre, [payload.genre]: data },
+        booksByGenre: { ...booksByGenre, [payload.genre]: data },
       })
     );
   } catch (error) {
@@ -40,6 +51,12 @@ export function* listBooksByGenreHandler({payload}:ListBookByGenrePayloadAction)
       })
     );
   } finally {
-    yield put(setBookByGenreSliceField({ key: "isLoading", value: {...isLoading, [payload.genre]: false } }));
+    const { isLoading } = yield select((state) => state.bookByGenreSlice);
+    yield put(
+      setBookByGenreSliceField({
+        key: "isLoading",
+        value: { ...isLoading, [payload.genre]: false },
+      })
+    );
   }
 }

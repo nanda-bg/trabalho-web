@@ -2,6 +2,7 @@ import { call, put, select } from "redux-saga/effects";
 import { UpdateProfilePayloadAction } from "@app/store/slices/UserSlice/types";
 import { fetchUserInfo, setUserSliceField } from "@app/store/slices/UserSlice";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 export function* updateProfileHandler({ payload }: UpdateProfilePayloadAction) {
   try {
@@ -9,7 +10,7 @@ export function* updateProfileHandler({ payload }: UpdateProfilePayloadAction) {
 
     const { email, name, username, profileImage, bio } = payload;
     const userId = yield select((state) => state.userSlice.userId);
-    const token = localStorage.getItem("token");
+    const token = Cookies.get("token");
 
     yield call(
       axios.put,
