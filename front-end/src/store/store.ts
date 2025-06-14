@@ -27,6 +27,8 @@ import {
 import storage from "redux-persist/lib/storage"; // defaults to localStorage
 import bookDetailsSlice from "./slices/BookDetailsSlice";
 import { watchBookDetailsSagas } from "./sagas/BookDetailsSaga";
+import bookByGenreSlice from "./slices/BookByGenreSlice";
+import { watchBooksByGenreSagas } from "./sagas/BookByGenreSaga";
 
 function* rootSaga() {
   yield all([
@@ -37,6 +39,7 @@ function* rootSaga() {
     watchBooksSagas(),
     watchReviewsSagas(),
     watchBookDetailsSagas(),
+    watchBooksByGenreSagas(),
   ]);
 }
 
@@ -55,6 +58,7 @@ const rootReducer = combineReducers({
   bookSlice: bookSlice.reducer,
   reviewSlice: reviewSlice.reducer,
   bookDetailsSlice: bookDetailsSlice.reducer,
+  bookByGenreSlice: bookByGenreSlice.reducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

@@ -37,7 +37,7 @@ const HorizontalBooksList: FC<HorizontalBooksListProps> = ({
 
   return (
     <S.HorizontalScroll ref={scrollRef}>
-      {books.map((book) => (
+      {books && books.map((book) => (
         <BookListItem key={book.bookId} book={book} />
       ))}
       {isLoading && <LoadingAnimation />}

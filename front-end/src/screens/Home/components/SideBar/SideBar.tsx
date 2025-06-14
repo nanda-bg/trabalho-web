@@ -36,6 +36,10 @@ const Sidebar = () => {
     navigate("/books/favorites");
   };
 
+  const goToBooks = () => {
+    navigate("/books");
+  };
+
   const goToHome = () => {
     navigate("/home");
   };
@@ -62,7 +66,11 @@ const Sidebar = () => {
             onClick={goToHome}
             isActive={true}
           />
-          <NavItem icon={<Book size={20} />} label="Livros" />
+          <NavItem 
+            icon={<Book size={20} />} 
+            label="Livros" 
+            onClick={goToBooks}
+          />
           <NavItem icon={<Star size={20} />} label="Avaliações" />
           <NavItem icon={<BookOpen size={20} />} label="Lista de leitura" />
           <NavItem

@@ -7,6 +7,8 @@ import authSlice from "./slices/Auth";
 import bookSlice from "./slices/BooksSlice";
 import reviewSlice from "./slices/ReviewsSlice";
 import bookDetailsSlice from "./slices/BookDetailsSlice";
+import bookByGenreSlice from "./slices/BookByGenreSlice";
+
 
 const appReducer = combineReducers({
   userSlice: userSlice.reducer,
@@ -16,6 +18,7 @@ const appReducer = combineReducers({
   bookSlice: bookSlice.reducer,
   bookDetailsSlice: bookDetailsSlice.reducer,
   reviewSlice: reviewSlice.reducer,
+  bookByGenreSlice: bookByGenreSlice.reducer,
 });
 
 const rootReducer: Reducer<ReturnType<typeof appReducer>, AnyAction> = (

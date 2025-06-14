@@ -13,7 +13,7 @@ export const initialState: BookDetailsState = {
 };
 
 const bookDetailsSlice = createSlice({
-  name: "book",
+  name: "bookDetails",
   initialState,
   reducers: {
     setBookDetailsSliceField: (
