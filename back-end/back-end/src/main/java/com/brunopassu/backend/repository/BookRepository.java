@@ -193,6 +193,53 @@ public class BookRepository {
         return books;
     }
 
+    public List<Book> getBooksByGenreWithPagination(String genre, String lastBookId, int pageSize)
+            throws ExecutionException, InterruptedException {
+        long startTime = System.currentTimeMillis();
+        int totalReads = 0;
+        System.out.println("[FIRESTORE READ] Starting getBooksByGenreWithPagination");
+        System.out.println("Parameters: genre=" + genre + ", lastBookId=" + lastBookId + ", pageSize=" + pageSize);
+
+        Firestore firestore = FirestoreClient.getFirestore();
+
+        Query query = firestore.collection(COLLECTION_NAME)
+                .whereEqualTo("genre", genre)
+                .orderBy("relevanceScore", Query.Direction.DESCENDING)
+                .limit(pageSize);
+
+        // Se não é a primeira página, use cursor
+        if (lastBookId != null && !lastBookId.isEmpty()) {
+            System.out.println("Reading cursor document: " + lastBookId);
+            DocumentSnapshot lastDoc = firestore.collection(COLLECTION_NAME)
+                    .document(lastBookId)
+                    .get()
+                    .get();
+            totalReads++; // Contabilizar leitura do cursor
+            query = query.startAfter(lastDoc);
+            System.out.println("Cursor document read successfully");
+        }
+
+        System.out.println("Executing genre pagination query...");
+        ApiFuture<QuerySnapshot> future = query.get();
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+        totalReads += documents.size(); // Contabilizar documentos da paginação
+        System.out.println("Query results: " + documents.size() + " documents");
+
+        List<Book> books = new ArrayList<>();
+        for (QueryDocumentSnapshot document : documents) {
+            books.add(document.toObject(Book.class));
+        }
+
+        long endTime = System.currentTimeMillis();
+        System.out.println("TOTAL FIRESTORE READS: " + totalReads);
+        System.out.println("Execution time: " + (endTime - startTime) + "ms");
+        System.out.println("Returning " + books.size() + " books for genre: " + genre);
+        System.out.println("[FIRESTORE READ] Completed getBooksByGenreWithPagination\n");
+
+        return books;
+    }
+
+
     public boolean updateBook(Book book) throws ExecutionException, InterruptedException {
         if (book.getBookId() == null || book.getBookId().isEmpty()) {
             return false; // Não podemos atualizar sem um ID

@@ -148,6 +148,13 @@ public class RedisConfig {
                                         .fromSerializer(new StringRedisSerializer()))
                                 .serializeValuesWith(RedisSerializationContext.SerializationPair
                                         .fromSerializer(jsonSerializer)))
+                .withCacheConfiguration("books-genre-paginated",
+                        RedisCacheConfiguration.defaultCacheConfig()
+                                .entryTtl(Duration.ofHours(1))
+                                .serializeKeysWith(RedisSerializationContext.SerializationPair
+                                        .fromSerializer(new StringRedisSerializer()))
+                                .serializeValuesWith(RedisSerializationContext.SerializationPair
+                                        .fromSerializer(jsonSerializer)))
                 .build();
     }
 

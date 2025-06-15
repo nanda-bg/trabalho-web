@@ -14,9 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -73,8 +71,18 @@ public class BookService {
         return bookRepository.getBooksByGenre(genre);
     }
 
+    // Cache para paginação por gênero
+    @Cacheable(value = "books-genre-paginated", key = "#genre + '_' + #lastBookId + '_' + #pageSize")
+    public List<Book> getBooksByGenreWithPagination(String genre, String lastBookId, Integer pageSize)
+            throws ExecutionException, InterruptedException {
+        // SÓ EXECUTA se não estiver no cache
+        int actualPageSize = (pageSize != null && pageSize > 0) ? pageSize : 20;
+        return bookRepository.getBooksByGenreWithPagination(genre, lastBookId, actualPageSize);
+    }
+
+
     // Invalidar cache quando livro é atualizado
-    @CacheEvict(value = {"book-details", "books-paginated", "books-by-genre"}, key = "#book.bookId", allEntries = false)
+    @CacheEvict(value = {"book-details", "books-paginated", "books-by-genre", "books-genre-paginated"}, key = "#book.bookId", allEntries = false)
     public boolean updateBook(Book book) throws ExecutionException, InterruptedException {
 
         boolean updated = bookRepository.updateBook(book);
@@ -86,7 +94,7 @@ public class BookService {
     }
 
     // Invalidar cache quando livro é deletado
-    @CacheEvict(value = {"book-details", "books-paginated", "books-by-genre"}, key = "#bookId")
+    @CacheEvict(value = {"book-details", "books-paginated", "books-by-genre", "books-genre-paginated"}, key = "#bookId")
     public boolean deleteBook(String bookId) throws ExecutionException, InterruptedException {
         Book book = getBookById(bookId); // Buscar antes de deletar para invalidar gênero
         boolean deleted = bookRepository.deleteBook(bookId);
@@ -125,8 +133,9 @@ public class BookService {
         }
     }
 
+    /*
     // Invalidar cache quando relevanceScore é atualizado
-    @CacheEvict(value = {"book-details", "books-paginated"}, key = "#bookId")
+    @CacheEvict(value = {"book-details", "books-paginated", "books-by-genre", "books-genre-paginated"}, key = "#bookId")
     public void updateRelevanceScore(String bookId) throws ExecutionException, InterruptedException {
         Book book = getBookById(bookId);
         if (book != null) {
@@ -150,8 +159,9 @@ public class BookService {
 
         return (W * R + ratingsCount * averageRating) / (W + ratingsCount);
     }
+     */
 
-    @CacheEvict(value = {"book-details", "books-paginated"}, key = "#bookId")
+    @CacheEvict(value = {"book-details", "books-by-genre"}, key = "#bookId")
     public void evictGenreCache(String genre) {
         // INVALIDAR CACHE
     }

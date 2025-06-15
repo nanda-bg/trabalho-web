@@ -366,6 +366,91 @@ public class BookController {
         }
     }
 
+    @GetMapping("/genre/paginated")
+    @Operation(
+            summary = "Listar livros de um gênero com paginação",
+            description = "Retorna livros de um gênero específico ordenados por relevância com paginação cursor-based"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Lista de livros do gênero retornada com sucesso",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    name = "Lista paginada por gênero",
+                                    value = """
+                [
+                  {
+                    "bookId": "abc123def456",
+                    "title": "Dom Casmurro",
+                    "description": "Romance clássico da literatura brasileira",
+                    "authors": ["Machado de Assis"],
+                    "coverUrl": "https://example.com/dom-casmurro.jpg",
+                    "publicationYear": 1899,
+                    "genre": "Literatura Brasileira",
+                    "averageRating": 4.5,
+                    "ratingsCount": 150,
+                    "pagesCount": 256,
+                    "relevanceScore": 4.2
+                  },
+                  {
+                    "bookId": "def456ghi789",
+                    "title": "O Cortiço",
+                    "description": "Romance naturalista brasileiro",
+                    "authors": ["Aluísio Azevedo"],
+                    "coverUrl": "https://example.com/o-cortico.jpg",
+                    "publicationYear": 1890,
+                    "genre": "Literatura Brasileira",
+                    "averageRating": 4.2,
+                    "ratingsCount": 89,
+                    "pagesCount": 312,
+                    "relevanceScore": 4.0
+                  }
+                ]
+                """
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Parâmetro genre obrigatório não fornecido",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "\"Parâmetro 'genre' é obrigatório\""
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Erro interno do servidor",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "null"
+                            )
+                    )
+            )
+    })
+    public ResponseEntity<List<Book>> getBooksByGenreWithPagination(
+            @RequestParam String genre,
+            @RequestParam(required = false) String lastBookId,
+            @RequestParam(defaultValue = "20") Integer pageSize) {
+
+        if (genre == null || genre.trim().isEmpty()) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            List<Book> books = bookService.getBooksByGenreWithPagination(genre, lastBookId, pageSize);
+            return new ResponseEntity<>(books, HttpStatus.OK);
+        } catch (ExecutionException | InterruptedException e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
     @PutMapping("/id/{bookId}")
     @Operation(
             summary = "Atualizar dados do livro",
