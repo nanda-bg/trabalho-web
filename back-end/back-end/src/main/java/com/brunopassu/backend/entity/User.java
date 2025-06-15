@@ -5,8 +5,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 
+import java.io.Serializable;
+
 @Schema(description = "Entidade de usuário do sistema")
-public class User {
+public class User implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     @Schema(description = "UID único do usuário (chave primária)", example = "abc123def456")
     private String uid;

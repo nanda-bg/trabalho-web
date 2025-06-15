@@ -119,21 +119,21 @@ public class ReviewService {
             throws ExecutionException, InterruptedException, IOException {
 
         long startTime = System.currentTimeMillis();
-        System.out.println("🔍 [FEED] Starting optimized feed for userId: " + userId);
+        System.out.println("[FEED] Starting optimized feed for userId: " + userId);
 
         // Get following relationships - OTIMIZADO
         List<String> followingUserIds = getFollowingUserIds(userId);
-        System.out.println("🔍 [FEED] Found " + followingUserIds.size() + " followed users");
+        System.out.println("[FEED] Found " + followingUserIds.size() + " followed users");
 
         if (followingUserIds.isEmpty()) {
-            System.out.println("❌ [FEED] No followed users");
+            System.out.println("[FEED] No followed users");
             return new ArrayList<>();
         }
 
         // Firestore 'in' constraint: máximo 30 valores
         if (followingUserIds.size() > 30) {
             followingUserIds = followingUserIds.subList(0, 30);
-            System.out.println("⚠️ [FEED] Limited to 30 users due to Firestore constraints");
+            System.out.println("[FEED] Limited to 30 users due to Firestore constraints");
         }
 
         Firestore firestore = this.firestore.firestore();
@@ -154,7 +154,7 @@ public class ReviewService {
 
         // Handle pagination cursor
         if (lastReviewId != null && !lastReviewId.isEmpty()) {
-            System.out.println("📖 [FEED] Using pagination cursor: " + lastReviewId);
+            System.out.println("[FEED] Using pagination cursor: " + lastReviewId);
             DocumentSnapshot lastDoc = firestore.collection("reviews")
                     .document(lastReviewId)
                     .get()
@@ -164,13 +164,13 @@ public class ReviewService {
         }
 
         // Execute query with index
-        System.out.println("📚 [FEED] Executing indexed query...");
+        System.out.println("[FEED] Executing indexed query...");
         try {
             ApiFuture<QuerySnapshot> future = query.get();
             List<QueryDocumentSnapshot> documents = future.get().getDocuments();
             totalReads += documents.size();
 
-            System.out.println("✅ [FEED] Query successful: " + documents.size() + " reviews");
+            System.out.println("[FEED] Query successful: " + documents.size() + " reviews");
 
             List<Review> reviews = documents.stream()
                     .map(doc -> doc.toObject(Review.class))
@@ -179,19 +179,19 @@ public class ReviewService {
             List<ReviewDTO> result = convertReviewsToDTOs(reviews);
 
             long endTime = System.currentTimeMillis();
-            System.out.println("🎯 [FEED] TOTAL FIRESTORE READS: " + totalReads);
-            System.out.println("⏱️ [FEED] Execution time: " + (endTime - startTime) + "ms");
-            System.out.println("📤 [FEED] Returning " + result.size() + " reviews");
+            System.out.println("[FEED] TOTAL FIRESTORE READS: " + totalReads);
+            System.out.println("[FEED] Execution time: " + (endTime - startTime) + "ms");
+            System.out.println("[FEED] Returning " + result.size() + " reviews");
 
             return result;
 
         } catch (Exception e) {
-            System.out.println("❌ [FEED] Query failed: " + e.getMessage());
+            System.out.println("[FEED] Query failed: " + e.getMessage());
 
             // Check for specific index errors
             if (e.getMessage().contains("index") || e.getMessage().contains("FAILED_PRECONDITION")) {
-                System.out.println("🚨 [FEED] Index still propagating or incorrect structure");
-                System.out.println("   Expected: userRef (ASC) + date (DESC)");
+                System.out.println("[FEED] Index still propagating or incorrect structure");
+                System.out.println("Expected: userRef (ASC) + date (DESC)");
             }
 
             throw e;

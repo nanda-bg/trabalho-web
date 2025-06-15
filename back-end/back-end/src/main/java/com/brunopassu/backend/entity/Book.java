@@ -37,8 +37,8 @@ public class Book implements Serializable {
     @Max(value = 2100, message = "Ano de publicação inválido")
     private Integer publicationYear;
 
-    @Schema(description = "gênero do livro", example = "Romance", required = true)
-    @NotEmpty(message = "Pelo menos um gênero deve ser informado")
+    @Schema(description = "Gênero principal do livro", example = "Romance", required = true)
+    @NotBlank(message = "Gênero é obrigatório")
     private String genre;
 
     @Schema(description = "Média das avaliações do livro", example = "4.5")
@@ -59,24 +59,26 @@ public class Book implements Serializable {
     private String uniqueKey;
 
     public Book() {
+        this.authors = new ArrayList<>();
+        this.averageRating = 0.0;
+        this.ratingsCount = 0;
+        this.relevanceScore = 0.0;
     }
 
-    public Book(String book_id, String title, String description, List<String> authors, String coverUrl, Integer publicationYear, String genre, Double averageRating, Integer ratingsCount, Integer pagesCount) {
-        this.bookId = book_id;
+    public Book(String bookId, String title, String description, List<String> authors,
+                String coverUrl, Integer publicationYear, String genre,
+                Double averageRating, Integer ratingsCount, Integer pagesCount) {
+        this.bookId = bookId;
         this.title = title;
         this.description = description;
-        this.authors = authors;
+        this.authors = authors != null ? authors : new ArrayList<>();
         this.coverUrl = coverUrl;
         this.publicationYear = publicationYear;
         this.genre = genre;
-        this.averageRating = 0.0; //MEDIA DAS NOTAS!
-        this.ratingsCount = 0; //QUANTIDADE DE NOTAS
+        this.averageRating = averageRating != null ? averageRating : 0.0;
+        this.ratingsCount = ratingsCount != null ? ratingsCount : 0;
         this.relevanceScore = 0.0;
         this.pagesCount = pagesCount;
-    }
-
-    public void setGenre(String genre) {
-        this.genre = genre;
     }
 
     public Double getRelevanceScore() {
@@ -147,7 +149,7 @@ public class Book implements Serializable {
         return genre;
     }
 
-    public void setGenres(String genre) {
+    public void setGenre(String genre) {
         this.genre = genre;
     }
 

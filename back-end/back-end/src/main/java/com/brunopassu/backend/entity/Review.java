@@ -6,7 +6,10 @@ import com.google.cloud.firestore.DocumentReference;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 
-public class Review {
+import java.io.Serializable;
+
+public class Review implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private String reviewId;
 

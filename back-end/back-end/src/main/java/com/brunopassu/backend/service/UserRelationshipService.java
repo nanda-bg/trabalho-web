@@ -31,7 +31,7 @@ public class UserRelationshipService {
         this.userRepository = userRepository;
     }
 
-    // Método para ambiente de produção (com autenticação)
+    //Metod para ambiente de produção (com autenticação)
     public boolean toggleFollowWithAuth(String followingId, String token)
             throws ExecutionException, InterruptedException, IOException {
 
@@ -50,11 +50,11 @@ public class UserRelationshipService {
 
         if (sucess) {
             feedCacheManager.invalidateUserFeedCache(followerId);
-            System.out.println("✅ [FOLLOW] Successfully followed and invalidated cache");
+            System.out.println("[FOLLOW] Successfully followed and invalidated cache");
         }
         else {
             feedCacheManager.invalidateUserFeedCache(followerId);
-            System.out.println("✅ [UNFOLLOW] Successfully unfollowed and invalidated cache");
+            System.out.println("[UNFOLLOW] Successfully unfollowed and invalidated cache");
         }
         return sucess;
     }

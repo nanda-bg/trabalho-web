@@ -111,7 +111,7 @@ public class UnifiedMigrationService {
         return (W * R + ratingsCount * averageRating) / (W + ratingsCount);
     }
 
-    // Método para verificar status da migração
+    // Métod para verificar status da migração
     public MigrationStatus checkMigrationStatus() throws ExecutionException, InterruptedException {
         Firestore firestore = FirestoreClient.getFirestore();
 

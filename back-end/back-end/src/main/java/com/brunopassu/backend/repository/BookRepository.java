@@ -43,8 +43,8 @@ public class BookRepository {
         long startTime = System.currentTimeMillis();
         int totalReads = 0;
 
-        System.out.println("🔍 [FIRESTORE READ] Starting getBooksWithPagination");
-        System.out.println("   Parameters: lastBookId=" + lastBookId + ", pageSize=" + pageSize);
+        System.out.println("[FIRESTORE READ] Starting getBooksWithPagination");
+        System.out.println("Parameters: lastBookId=" + lastBookId + ", pageSize=" + pageSize);
 
         Firestore firestore = FirestoreClient.getFirestore();
 
@@ -54,22 +54,22 @@ public class BookRepository {
 
         // Se não é a primeira página, use cursor
         if (lastBookId != null && !lastBookId.isEmpty()) {
-            System.out.println("   📖 Reading cursor document: " + lastBookId);
+            System.out.println("Reading cursor document: " + lastBookId);
             DocumentSnapshot lastDoc = firestore.collection(COLLECTION_NAME)
                     .document(lastBookId)
                     .get()
                     .get();
             totalReads++; // Contabilizar leitura do cursor
             query = query.startAfter(lastDoc);
-            System.out.println("   ✅ Cursor document read successfully");
+            System.out.println("Cursor document read successfully");
         }
 
-        System.out.println("   📚 Executing pagination query...");
+        System.out.println("Executing pagination query...");
         ApiFuture<QuerySnapshot> future = query.get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
         totalReads += documents.size(); // Contabilizar documentos da paginação
 
-        System.out.println("   📊 Query results: " + documents.size() + " documents");
+        System.out.println("Query results: " + documents.size() + " documents");
 
         List<Book> books = new ArrayList<>();
         for (QueryDocumentSnapshot document : documents) {
@@ -77,10 +77,10 @@ public class BookRepository {
         }
 
         long endTime = System.currentTimeMillis();
-        System.out.println("   🎯 TOTAL FIRESTORE READS: " + totalReads);
-        System.out.println("   ⏱️  Execution time: " + (endTime - startTime) + "ms");
-        System.out.println("   📤 Returning " + books.size() + " books");
-        System.out.println("🔚 [FIRESTORE READ] Completed getBooksWithPagination\n");
+        System.out.println("TOTAL FIRESTORE READS: " + totalReads);
+        System.out.println("Execution time: " + (endTime - startTime) + "ms");
+        System.out.println("Returning " + books.size() + " books");
+        System.out.println("[FIRESTORE READ] Completed getBooksWithPagination\n");
 
         return books;
     }
@@ -88,8 +88,8 @@ public class BookRepository {
     public List<Book> getAllBooks() throws ExecutionException, InterruptedException {
         long startTime = System.currentTimeMillis();
 
-        System.out.println("🔍 [FIRESTORE READ] Starting getAllBooks");
-        System.out.println("   ⚠️  WARNING: This method reads ALL documents in collection!");
+        System.out.println("[FIRESTORE READ] Starting getAllBooks");
+        System.out.println("WARNING: This method reads ALL documents in collection!");
 
         Firestore firestore = FirestoreClient.getFirestore();
         ApiFuture<QuerySnapshot> future = firestore.collection(COLLECTION_NAME).get();
@@ -103,10 +103,10 @@ public class BookRepository {
         }
 
         long endTime = System.currentTimeMillis();
-        System.out.println("   🎯 TOTAL FIRESTORE READS: " + totalReads);
-        System.out.println("   ⏱️  Execution time: " + (endTime - startTime) + "ms");
-        System.out.println("   📤 Returning " + books.size() + " books");
-        System.out.println("🔚 [FIRESTORE READ] Completed getAllBooks\n");
+        System.out.println("TOTAL FIRESTORE READS: " + totalReads);
+        System.out.println("Execution time: " + (endTime - startTime) + "ms");
+        System.out.println("Returning " + books.size() + " books");
+        System.out.println("[FIRESTORE READ] Completed getAllBooks\n");
 
         return books;
     }
@@ -126,16 +126,39 @@ public class BookRepository {
         Book book = null;
 
         if (document.exists()) {
-            book = document.toObject(Book.class);
-            System.out.println("   ✅ Document found");
+            try {
+                // CORREÇÃO: Conversão mais robusta para evitar ClassCastException
+                Map<String, Object> data = document.getData();
+                if (data != null) {
+                    book = document.toObject(Book.class);
+                    System.out.println("Document found and converted successfully");
+                } else {
+                    System.out.println("Document exists but data is null");
+                }
+            } catch (Exception e) {
+                System.out.println("Error converting document to Book: " + e.getMessage());
+                e.printStackTrace();
+
+                // Tentativa alternativa de conversão manual
+                try {
+                    Map<String, Object> data = document.getData();
+                    if (data != null) {
+                        book = convertMapToBook(data, bookId);
+                        System.out.println("Manual conversion successful");
+                    }
+                } catch (Exception ex) {
+                    System.out.println("Manual conversion also failed: " + ex.getMessage());
+                    throw new RuntimeException("Failed to convert document to Book object", ex);
+                }
+            }
         } else {
-            System.out.println("   ❌ Document not found");
+            System.out.println("Document not found");
         }
 
         long endTime = System.currentTimeMillis();
-        System.out.println("   🎯 TOTAL FIRESTORE READS: " + totalReads);
-        System.out.println("   ⏱️  Execution time: " + (endTime - startTime) + "ms");
-        System.out.println("🔚 [FIRESTORE READ] Completed getBookById\n");
+        System.out.println("TOTAL FIRESTORE READS: " + totalReads);
+        System.out.println("Execution time: " + (endTime - startTime) + "ms");
+        System.out.println("[FIRESTORE READ] Completed getBookById\n");
 
         return book;
     }
@@ -143,8 +166,8 @@ public class BookRepository {
     public List<Book> getBooksByGenre(String genre) throws ExecutionException, InterruptedException {
         long startTime = System.currentTimeMillis();
 
-        System.out.println("🔍 [FIRESTORE READ] Starting getBooksByGenre");
-        System.out.println("   Parameters: genre=" + genre);
+        System.out.println("[FIRESTORE READ] Starting getBooksByGenre");
+        System.out.println("Parameters: genre=" + genre);
 
         Firestore firestore = FirestoreClient.getFirestore();
         ApiFuture<QuerySnapshot> future = firestore.collection(COLLECTION_NAME)
@@ -154,7 +177,7 @@ public class BookRepository {
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
         int totalReads = documents.size();
 
-        System.out.println("   📊 Query results: " + documents.size() + " documents");
+        System.out.println("Query results: " + documents.size() + " documents");
 
         List<Book> books = new ArrayList<>();
         for (QueryDocumentSnapshot document : documents) {
@@ -162,10 +185,10 @@ public class BookRepository {
         }
 
         long endTime = System.currentTimeMillis();
-        System.out.println("   🎯 TOTAL FIRESTORE READS: " + totalReads);
-        System.out.println("   ⏱️  Execution time: " + (endTime - startTime) + "ms");
-        System.out.println("   📤 Returning " + books.size() + " books");
-        System.out.println("🔚 [FIRESTORE READ] Completed getBooksByGenre\n");
+        System.out.println("TOTAL FIRESTORE READS: " + totalReads);
+        System.out.println("Execution time: " + (endTime - startTime) + "ms");
+        System.out.println("Returning " + books.size() + " books");
+        System.out.println("[FIRESTORE READ] Completed getBooksByGenre\n");
 
         return books;
     }
@@ -231,5 +254,83 @@ public class BookRepository {
         writeResult.get(); // Aguarda a operação ser concluída
 
         return true;
+    }
+
+    //MÉTOD PARA CONVERSÃO MANUAL PARA EVITAR ClassCastException
+    private Book convertMapToBook(Map<String, Object> data, String bookId) {
+        Book book = new Book();
+
+        try {
+            // Definir o bookId primeiro
+            book.setBookId(bookId);
+
+            // Converter campos básicos com verificação de null
+            if (data.get("title") != null) {
+                book.setTitle(data.get("title").toString());
+            }
+
+            if (data.get("description") != null) {
+                book.setDescription(data.get("description").toString());
+            }
+
+            if (data.get("coverUrl") != null) {
+                book.setCoverUrl(data.get("coverUrl").toString());
+            }
+
+            if (data.get("genre") != null) {
+                book.setGenre(data.get("genre").toString());
+            }
+
+            // Converter campos numéricos com tratamento de tipo
+            if (data.get("publicationYear") != null) {
+                Object yearObj = data.get("publicationYear");
+                if (yearObj instanceof Number) {
+                    book.setPublicationYear(((Number) yearObj).intValue());
+                }
+            }
+
+            if (data.get("pagesCount") != null) {
+                Object pagesObj = data.get("pagesCount");
+                if (pagesObj instanceof Number) {
+                    book.setPagesCount(((Number) pagesObj).intValue());
+                }
+            }
+
+            if (data.get("ratingsCount") != null) {
+                Object ratingsObj = data.get("ratingsCount");
+                if (ratingsObj instanceof Number) {
+                    book.setRatingsCount(((Number) ratingsObj).intValue());
+                }
+            }
+
+            if (data.get("averageRating") != null) {
+                Object avgRatingObj = data.get("averageRating");
+                if (avgRatingObj instanceof Number) {
+                    book.setAverageRating(((Number) avgRatingObj).doubleValue());
+                }
+            }
+
+            if (data.get("relevanceScore") != null) {
+                Object relevanceObj = data.get("relevanceScore");
+                if (relevanceObj instanceof Number) {
+                    book.setRelevanceScore(((Number) relevanceObj).doubleValue());
+                }
+            }
+
+            // Converter lista de autores
+            if (data.get("authors") != null && data.get("authors") instanceof List) {
+                @SuppressWarnings("unchecked")
+                List<String> authors = (List<String>) data.get("authors");
+                book.setAuthors(new ArrayList<>(authors));
+            }
+
+            System.out.println("Manual book conversion completed for: " + book.getTitle());
+
+        } catch (Exception e) {
+            System.out.println("Error in manual conversion: " + e.getMessage());
+            throw e;
+        }
+
+        return book;
     }
 }

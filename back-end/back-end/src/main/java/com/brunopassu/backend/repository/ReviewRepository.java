@@ -44,8 +44,8 @@ public class ReviewRepository {
 
     public Review getReviewById(String reviewId) throws ExecutionException, InterruptedException, IOException {
         long startTime = System.currentTimeMillis();
-        System.out.println("🔍 [FIRESTORE READ] Starting getReviewById");
-        System.out.println("   Parameters: reviewId=" + reviewId);
+        System.out.println("[FIRESTORE READ] Starting getReviewById");
+        System.out.println("Parameters: reviewId=" + reviewId);
 
         Firestore firestore = firestoreConfig.firestore();
         DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(reviewId);
@@ -56,23 +56,23 @@ public class ReviewRepository {
         Review review = null;
         if (document.exists()) {
             review = document.toObject(Review.class);
-            System.out.println("   ✅ Document found");
+            System.out.println("Document found");
         } else {
-            System.out.println("   ❌ Document not found");
+            System.out.println("Document not found");
         }
 
         long endTime = System.currentTimeMillis();
-        System.out.println("   🎯 TOTAL FIRESTORE READS: " + totalReads);
-        System.out.println("   ⏱️ Execution time: " + (endTime - startTime) + "ms");
-        System.out.println("🔚 [FIRESTORE READ] Completed getReviewById\n");
+        System.out.println("TOTAL FIRESTORE READS: " + totalReads);
+        System.out.println("Execution time: " + (endTime - startTime) + "ms");
+        System.out.println("[FIRESTORE READ] Completed getReviewById\n");
 
         return review;
     }
 
     public List<Review> getAllReviews() throws ExecutionException, InterruptedException, IOException {
         long startTime = System.currentTimeMillis();
-        System.out.println("🔍 [FIRESTORE READ] Starting getAllReviews");
-        System.out.println("   ⚠️ WARNING: This method reads ALL documents in collection!");
+        System.out.println("[FIRESTORE READ] Starting getAllReviews");
+        System.out.println("WARNING: This method reads ALL documents in collection!");
 
         Firestore firestore = firestoreConfig.firestore();
         ApiFuture<QuerySnapshot> future = firestore.collection(COLLECTION_NAME).get();
@@ -85,10 +85,10 @@ public class ReviewRepository {
         }
 
         long endTime = System.currentTimeMillis();
-        System.out.println("   🎯 TOTAL FIRESTORE READS: " + totalReads);
-        System.out.println("   ⏱️ Execution time: " + (endTime - startTime) + "ms");
-        System.out.println("   📤 Returning " + reviews.size() + " reviews");
-        System.out.println("🔚 [FIRESTORE READ] Completed getAllReviews\n");
+        System.out.println("TOTAL FIRESTORE READS: " + totalReads);
+        System.out.println("Execution time: " + (endTime - startTime) + "ms");
+        System.out.println("Returning " + reviews.size() + " reviews");
+        System.out.println("[FIRESTORE READ] Completed getAllReviews\n");
 
         return reviews;
     }
@@ -97,8 +97,8 @@ public class ReviewRepository {
             throws ExecutionException, InterruptedException, IOException {
         long startTime = System.currentTimeMillis();
         int totalReads = 0;
-        System.out.println("🔍 [FIRESTORE READ] Starting getReviewsWithPagination");
-        System.out.println("   Parameters: lastReviewId=" + lastReviewId + ", pageSize=" + pageSize);
+        System.out.println("[FIRESTORE READ] Starting getReviewsWithPagination");
+        System.out.println("Parameters: lastReviewId=" + lastReviewId + ", pageSize=" + pageSize);
 
         Firestore firestore = firestoreConfig.firestore();
         Query query = firestore.collection(COLLECTION_NAME)
@@ -107,21 +107,21 @@ public class ReviewRepository {
 
         // Se não é a primeira página, use cursor
         if (lastReviewId != null && !lastReviewId.isEmpty()) {
-            System.out.println("   📖 Reading cursor document: " + lastReviewId);
+            System.out.println("Reading cursor document: " + lastReviewId);
             DocumentSnapshot lastDoc = firestore.collection(COLLECTION_NAME)
                     .document(lastReviewId)
                     .get()
                     .get();
             totalReads++; // Contabilizar leitura do cursor
             query = query.startAfter(lastDoc);
-            System.out.println("   ✅ Cursor document read successfully");
+            System.out.println("Cursor document read successfully");
         }
 
-        System.out.println("   📚 Executing pagination query...");
+        System.out.println("Executing pagination query...");
         ApiFuture<QuerySnapshot> future = query.get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
         totalReads += documents.size(); // Contabilizar documentos da paginação
-        System.out.println("   📊 Query results: " + documents.size() + " documents");
+        System.out.println("Query results: " + documents.size() + " documents");
 
         List<Review> reviews = new ArrayList<>();
         for (QueryDocumentSnapshot document : documents) {
@@ -129,10 +129,10 @@ public class ReviewRepository {
         }
 
         long endTime = System.currentTimeMillis();
-        System.out.println("   🎯 TOTAL FIRESTORE READS: " + totalReads);
-        System.out.println("   ⏱️ Execution time: " + (endTime - startTime) + "ms");
-        System.out.println("   📤 Returning " + reviews.size() + " reviews");
-        System.out.println("🔚 [FIRESTORE READ] Completed getReviewsWithPagination\n");
+        System.out.println("TOTAL FIRESTORE READS: " + totalReads);
+        System.out.println("Execution time: " + (endTime - startTime) + "ms");
+        System.out.println("Returning " + reviews.size() + " reviews");
+        System.out.println("[FIRESTORE READ] Completed getReviewsWithPagination\n");
 
         return reviews;
     }
