@@ -3,6 +3,7 @@ package com.brunopassu.backend.service;
 import com.brunopassu.backend.config.FirestoreConfig;
 import com.brunopassu.backend.entity.AuthRequest;
 import com.brunopassu.backend.entity.User;
+import com.brunopassu.backend.entity.enums.UserType;
 import com.brunopassu.backend.exception.UserAlreadyExistsException;
 import com.brunopassu.backend.exception.UserEmailmmutableFieldException;
 import com.brunopassu.backend.exception.UserUsernameImmutableFieldException;
@@ -34,8 +35,6 @@ public class UserService {
     }
 
     public String AddUser(UserRecord userRecord, AuthRequest request) throws ExecutionException, InterruptedException{
-        // Aqui você poderia adicionar lógica como hash da senha antes de salvar
-        // Por exemplo: user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         // Cria o usuário no Firestore com o mesmo UID
         User user = new User();
@@ -49,7 +48,7 @@ public class UserService {
         user.setUsername(request.getUsername());
         user.setFollowers(0);
         user.setFollowing(0);
-        user.setUserType(request.getUserType());
+        user.setUserType(UserType.PADRAO);
 
         return userRepository.saveUser(user);
     }

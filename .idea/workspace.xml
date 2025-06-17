@@ -6,10 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="8e9f613b-8c25-4c30-8cdb-8a962897647d" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/config/RedisConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/config/RedisConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/controller/BookController.java" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/controller/BookController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/repository/BookRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/repository/BookRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/service/BookService.java" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/service/BookService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/back-end/back-end/src/main/java/com/brunopassu/backend/service/UserService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -165,7 +163,10 @@
       <workItem from="1749906309172" duration="3391000" />
       <workItem from="1749989051425" duration="1466000" />
       <workItem from="1749994203754" duration="17451000" />
-      <workItem from="1750020919861" duration="6151000" />
+      <workItem from="1750020919861" duration="7602000" />
+      <workItem from="1750036581999" duration="794000" />
+      <workItem from="1750169788076" duration="628000" />
+      <workItem from="1750203170228" duration="1341000" />
     </task>
     <servers />
   </component>
