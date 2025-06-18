@@ -112,45 +112,27 @@ public class BookRepository {
     }
 
     public Book getBookById(String bookId) throws ExecutionException, InterruptedException {
+        //tempo de procura
         long startTime = System.currentTimeMillis();
 
         System.out.println("🔍 [FIRESTORE READ] Starting getBookById");
         System.out.println("   Parameters: bookId=" + bookId);
 
+        //instanciação do firestore
         Firestore firestore = FirestoreClient.getFirestore();
+        //Cria a referência (ponteiro) do documento daquele livro
         DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(bookId);
+        //Inicia a operação de leitura assíncrona
         ApiFuture<DocumentSnapshot> future = docRef.get();
+        // bloqueia a execução até que a operação assíncrona seja concluída e obtém o resultado
         DocumentSnapshot document = future.get();
 
         int totalReads = 1; // Sempre 1 read para buscar por ID
         Book book = null;
 
         if (document.exists()) {
-            try {
-                // CORREÇÃO: Conversão mais robusta para evitar ClassCastException
-                Map<String, Object> data = document.getData();
-                if (data != null) {
-                    book = document.toObject(Book.class);
-                    System.out.println("Document found and converted successfully");
-                } else {
-                    System.out.println("Document exists but data is null");
-                }
-            } catch (Exception e) {
-                System.out.println("Error converting document to Book: " + e.getMessage());
-                e.printStackTrace();
-
-                // Tentativa alternativa de conversão manual
-                try {
-                    Map<String, Object> data = document.getData();
-                    if (data != null) {
-                        book = convertMapToBook(data, bookId);
-                        System.out.println("Manual conversion successful");
-                    }
-                } catch (Exception ex) {
-                    System.out.println("Manual conversion also failed: " + ex.getMessage());
-                    throw new RuntimeException("Failed to convert document to Book object", ex);
-                }
-            }
+            book = document.toObject(Book.class);
+            System.out.println("Document found");
         } else {
             System.out.println("Document not found");
         }

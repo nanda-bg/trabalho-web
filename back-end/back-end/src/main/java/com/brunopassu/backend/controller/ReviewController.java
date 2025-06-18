@@ -137,7 +137,7 @@ public class ReviewController {
                         "bookId": "book456",
                         "rating": 5,
                         "reviewText": "Livro excelente!",
-                        "date": "2025-06-01T18:41:00Z",
+                        "date": "2025-06-01T20:30:00Z",
                         "likeCount": 10,
                         "spoiler": false
                     },

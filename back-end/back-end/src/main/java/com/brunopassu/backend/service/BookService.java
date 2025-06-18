@@ -58,7 +58,7 @@ public class BookService {
     }
 
     //Cache para livro individual
-    //@Cacheable(value = "book-details", key = "#bookId")
+    @Cacheable(value = "book-details", key = "#bookId")
     public Book getBookById(String bookId) throws ExecutionException, InterruptedException {
         // SÓ EXECUTA se não estiver no cache
         return bookRepository.getBookById(bookId);

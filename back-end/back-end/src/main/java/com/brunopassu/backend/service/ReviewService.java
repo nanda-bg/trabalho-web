@@ -16,8 +16,12 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @Service
 public class ReviewService {
@@ -142,7 +146,7 @@ public class ReviewService {
         // Create user references
         List<DocumentReference> followingRefs = followingUserIds.stream()
                 .map(id -> firestore.collection("users").document(id))
-                .toList();
+                .collect(Collectors.toList());
 
         // Build optimized query with index
         Query query = firestore.collection("reviews")
@@ -174,7 +178,7 @@ public class ReviewService {
 
             List<Review> reviews = documents.stream()
                     .map(doc -> doc.toObject(Review.class))
-                    .toList();
+                    .collect(Collectors.toList());
 
             List<ReviewDTO> result = convertReviewsToDTOs(reviews);
 
@@ -210,7 +214,7 @@ public class ReviewService {
 
         return documents.stream()
                 .map(doc -> doc.getString("followingId"))
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Cacheable(value = "review-details", key = "#reviewId")
@@ -253,14 +257,20 @@ public class ReviewService {
                     dto.setBookId(review.getBookRef().getId());
                     dto.setRating(review.getRating());
                     dto.setReviewText(review.getReviewText());
-                    dto.setDate(review.getDate());
+                    if (review.getDate() != null) {
+                        Instant instant = Instant.ofEpochSecond(
+                                review.getDate().getSeconds(),
+                                review.getDate().getNanos()
+                        );
+                        dto.setDate(LocalDateTime.ofInstant(instant, ZoneId.systemDefault()));
+                    }
                     dto.setLikeCount(review.getLikeCount());
                     dto.setSpoiler(review.isSpoiler());
                     dto.setUser(userCache.get(review.getUserRef().getId()));
                     dto.setBook(book);
                     return dto;
                 })
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Cacheable(value = "reviews-by-user", key = "#userId")
@@ -297,14 +307,20 @@ public class ReviewService {
                     dto.setBookId(review.getBookRef().getId());
                     dto.setRating(review.getRating());
                     dto.setReviewText(review.getReviewText());
-                    dto.setDate(review.getDate());
+                    if (review.getDate() != null) {
+                        Instant instant = Instant.ofEpochSecond(
+                                review.getDate().getSeconds(),
+                                review.getDate().getNanos()
+                        );
+                        dto.setDate(LocalDateTime.ofInstant(instant, ZoneId.systemDefault()));
+                    }
                     dto.setLikeCount(review.getLikeCount());
                     dto.setSpoiler(review.isSpoiler());
                     dto.setUser(user);
                     dto.setBook(bookCache.get(review.getBookRef().getId()));
                     return dto;
                 })
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @CacheEvict(value = {"review-details", "reviews-paginated", "reviews-by-book", "reviews-by-user", "reviews-feed"}, key = "#reviewDTO.reviewId")
@@ -317,7 +333,14 @@ public class ReviewService {
 
         Review review = convertToEntity(reviewDTO);
         review.setDateLastUpdated(Timestamp.now());
-        review.setDate(existingReview.getDate());
+
+        if (existingReview.getDate() != null) {
+            Instant instant = existingReview.getDate()
+                    .atZone(ZoneId.systemDefault())
+                    .toInstant();
+            review.setDate(Timestamp.of(Date.from(instant)));
+        }
+
         boolean updated = reviewRepository.updateReview(review);
 
         if (updated) {
@@ -390,7 +413,13 @@ public class ReviewService {
         entity.setBookRef(bookRef);
         entity.setRating(dto.getRating());
         entity.setReviewText(dto.getReviewText());
-        entity.setDate(dto.getDate() != null ? dto.getDate() : Timestamp.now());
+        if (dto.getDate() != null) {
+            // Converter LocalDateTime para Timestamp
+            Instant instant = dto.getDate().atZone(ZoneId.systemDefault()).toInstant();
+            entity.setDate(Timestamp.of(Date.from(instant)));
+        } else {
+            entity.setDate(Timestamp.now());
+        }
         entity.setLikeCount(dto.getLikeCount() != null ? dto.getLikeCount() : 0);
         entity.setSpoiler(dto.isSpoiler());
         entity.setDateLastUpdated(null);
@@ -440,14 +469,20 @@ public class ReviewService {
                     dto.setBookId(review.getBookRef().getId());
                     dto.setRating(review.getRating());
                     dto.setReviewText(review.getReviewText());
-                    dto.setDate(review.getDate());
+                    if (review.getDate() != null) {
+                        Instant instant = Instant.ofEpochSecond(
+                                review.getDate().getSeconds(),
+                                review.getDate().getNanos()
+                        );
+                        dto.setDate(LocalDateTime.ofInstant(instant, ZoneId.systemDefault()));
+                    }
                     dto.setLikeCount(review.getLikeCount());
                     dto.setSpoiler(review.isSpoiler());
                     dto.setUser(userCache.get(review.getUserRef().getId()));
                     dto.setBook(bookCache.get(review.getBookRef().getId()));
                     return dto;
                 })
-                .toList();
+                .collect(Collectors.toList());
     }
 
     private ReviewDTO convertToDTOAsync(Review entity) throws ExecutionException, InterruptedException {
@@ -457,7 +492,13 @@ public class ReviewService {
         dto.setBookId(entity.getBookRef().getId());
         dto.setRating(entity.getRating());
         dto.setReviewText(entity.getReviewText());
-        dto.setDate(entity.getDate());
+        if (entity.getDate() != null) {
+            Instant instant = Instant.ofEpochSecond(
+                    entity.getDate().getSeconds(),
+                    entity.getDate().getNanos()
+            );
+            dto.setDate(LocalDateTime.ofInstant(instant, ZoneId.systemDefault()));
+        }
         dto.setLikeCount(entity.getLikeCount());
         dto.setSpoiler(entity.isSpoiler());
 
@@ -521,14 +562,20 @@ public class ReviewService {
                     dto.setBookId(review.getBookRef().getId());
                     dto.setRating(review.getRating());
                     dto.setReviewText(review.getReviewText());
-                    dto.setDate(review.getDate());
+                    if (review.getDate() != null) {
+                        Instant instant = Instant.ofEpochSecond(
+                                review.getDate().getSeconds(),
+                                review.getDate().getNanos()
+                        );
+                        dto.setDate(LocalDateTime.ofInstant(instant, ZoneId.systemDefault()));
+                    }
                     dto.setLikeCount(review.getLikeCount());
                     dto.setSpoiler(review.isSpoiler());
                     dto.setUser(userCache.get(review.getUserRef().getId()));
                     dto.setBook(bookCache.get(review.getBookRef().getId()));
                     return dto;
                 })
-                .toList();
+                .collect(Collectors.toList());
     }
 
     public User getUserFromReview(Review review) throws ExecutionException, InterruptedException {

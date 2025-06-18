@@ -2,11 +2,12 @@ package com.brunopassu.backend.dto;
 
 import com.brunopassu.backend.entity.Book;
 import com.brunopassu.backend.entity.User;
-import com.google.cloud.Timestamp;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.Data;
+
+import java.time.LocalDateTime;
 
 @Data
 @Schema(description = "DTO para reviews de livros")
@@ -30,7 +31,7 @@ public class ReviewDTO {
     private String reviewText;
 
     @Schema(description = "Data de criação da review", example = "2025-06-01T18:41:00Z")
-    private Timestamp date;
+    private LocalDateTime date;
 
     @Schema(description = "Número de likes na review", example = "15")
     private Integer likeCount;
@@ -39,12 +40,12 @@ public class ReviewDTO {
     private boolean spoiler;
 
     @Schema(description = "Data da última atualização", example = "2025-06-01T20:30:00Z")
-    private Timestamp dateLastUpdated;
+    private LocalDateTime dateLastUpdated;
 
     private User user;
     private Book book;
 
-    public ReviewDTO(String bookId, String reviewId, String userUid, Integer rating, String reviewText, Timestamp date, Integer likeCount, boolean spoiler, Timestamp dateLastUpdated, User user, Book book) {
+    public ReviewDTO(String bookId, String reviewId, String userUid, Integer rating, String reviewText, LocalDateTime date, Integer likeCount, boolean spoiler, LocalDateTime dateLastUpdated, User user, Book book) {
         this.bookId = bookId;
         this.reviewId = reviewId;
         this.userUid = userUid;
@@ -108,11 +109,11 @@ public class ReviewDTO {
         this.likeCount = likeCount;
     }
 
-    public Timestamp getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(Timestamp date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 
@@ -124,11 +125,11 @@ public class ReviewDTO {
         this.spoiler = spoiler;
     }
 
-    public Timestamp getDateLastUpdated() {
+    public LocalDateTime getDateLastUpdated() {
         return dateLastUpdated;
     }
 
-    public void setDateLastUpdated(Timestamp dateLastUpdated) {
+    public void setDateLastUpdated(LocalDateTime dateLastUpdated) {
         this.dateLastUpdated = dateLastUpdated;
     }
 

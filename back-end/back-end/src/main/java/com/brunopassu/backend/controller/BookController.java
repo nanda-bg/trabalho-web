@@ -5,6 +5,7 @@ import com.brunopassu.backend.exception.BookTitleImmutableFieldException;
 import com.brunopassu.backend.service.BookService;
 import com.brunopassu.backend.service.MigrationStatus;
 import com.brunopassu.backend.service.UnifiedMigrationService;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -580,7 +581,7 @@ public class BookController {
         }
     }
 
-
+    @Hidden
     @PostMapping("/migrate")
     @Operation(
             summary = "Executar migração de dados, não serve pra nada em produção",
@@ -597,6 +598,7 @@ public class BookController {
         }
     }
 
+    @Hidden
     @GetMapping("/migration-status")
     @Operation(
             summary = "Verificar status da migração, não serve para nada em produção",
