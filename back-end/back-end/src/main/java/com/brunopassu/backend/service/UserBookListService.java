@@ -1,7 +1,7 @@
 package com.brunopassu.backend.service;
 
 import com.brunopassu.backend.cacheManager.RedisUserBookListCacheManager;
-import com.brunopassu.backend.entity.Book;
+import com.brunopassu.backend.dto.UserBookListDTO;
 import com.brunopassu.backend.entity.enums.SortOrder;
 import com.brunopassu.backend.entity.enums.UserListType;
 import com.brunopassu.backend.repository.UserBookListRepository;
@@ -28,7 +28,7 @@ public class UserBookListService {
     private RedisUserBookListCacheManager userBookListCacheManager;
 
     @Cacheable(value = "user-favorites", key = "#userId + '_' + #lastItemId + '_' + #pageSize + '_' + #sortOrder")
-    public List<Book> getUserFavorites(String userId, String lastItemId, Integer pageSize, SortOrder sortOrder)
+    public List<UserBookListDTO> getUserFavorites(String userId, String lastItemId, Integer pageSize, SortOrder sortOrder)
             throws ExecutionException, InterruptedException {
 
         String cacheKey = userId + "_" + lastItemId + "_" + pageSize + "_" + sortOrder;
@@ -43,7 +43,7 @@ public class UserBookListService {
     }
 
     @Cacheable(value = "user-future-reads", key = "#userId + '_' + #lastItemId + '_' + #pageSize + '_' + #sortOrder")
-    public List<Book> getUserFutureReads(String userId, String lastItemId, Integer pageSize, SortOrder sortOrder)
+    public List<UserBookListDTO> getUserFutureReads(String userId, String lastItemId, Integer pageSize, SortOrder sortOrder)
             throws ExecutionException, InterruptedException {
 
         String cacheKey = userId + "_" + lastItemId + "_" + pageSize + "_" + sortOrder;

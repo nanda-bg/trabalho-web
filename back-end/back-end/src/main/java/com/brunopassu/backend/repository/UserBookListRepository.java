@@ -1,6 +1,8 @@
 package com.brunopassu.backend.repository;
 
+import com.brunopassu.backend.dto.UserBookListDTO;
 import com.brunopassu.backend.entity.Book;
+import com.brunopassu.backend.entity.User;
 import com.brunopassu.backend.entity.UserBookList;
 import com.brunopassu.backend.entity.enums.SortOrder;
 import com.brunopassu.backend.entity.enums.UserListType;
@@ -8,6 +10,9 @@ import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -70,79 +75,113 @@ public class UserBookListRepository {
         return docRef.getId();
     }
 
-    public List<Book> getUserBookListWithPagination(String userId, UserListType listType,
-                                                    String lastItemId, int pageSize, SortOrder sortOrder)
+    public List<UserBookListDTO> getUserBookListWithPagination(String userId, UserListType listType,
+                                                               String lastItemId, int pageSize, SortOrder sortOrder)
             throws ExecutionException, InterruptedException {
-        long startTime = System.currentTimeMillis();
-        int totalReads = 0;
-        System.out.println("[FIRESTORE READ] Starting getUserBookListWithPagination");
-        System.out.println("Parameters: userId=" + userId + ", listType=" + listType +
-                ", lastItemId=" + lastItemId + ", pageSize=" + pageSize + ", sortOrder=" + sortOrder);
 
-        Firestore firestore = FirestoreClient.getFirestore();
+        try {
+            long startTime = System.currentTimeMillis();
+            int totalReads = 0;
+            System.out.println("[FIRESTORE READ] Starting getUserBookListWithPagination");
+            System.out.println("Parameters: userId=" + userId + ", listType=" + listType +
+                    ", lastItemId=" + lastItemId + ", pageSize=" + pageSize + ", sortOrder=" + sortOrder);
 
-        // Determinar direção da ordenação
-        Query.Direction direction = (sortOrder == SortOrder.NEWEST_FIRST)
-                ? Query.Direction.DESCENDING
-                : Query.Direction.ASCENDING;
-        System.out.println("SortOrder: " + sortOrder + " -> Direction: " + direction);
+            Firestore firestore = FirestoreClient.getFirestore();
 
-        System.out.println("Query direction: " + direction);
+            Query.Direction direction = (sortOrder == SortOrder.NEWEST_FIRST)
+                    ? Query.Direction.DESCENDING
+                    : Query.Direction.ASCENDING;
 
-        Query query = firestore
-                .collection(USERS_COLLECTION).document(userId)
-                .collection(BOOK_LISTS_SUBCOLLECTION)
-                .whereEqualTo("listType", listType.toString())
-                .orderBy("addedAt", direction)
-                .limit(pageSize);
-
-        if (lastItemId != null && !lastItemId.isEmpty()) {
-            System.out.println("Reading cursor document: " + lastItemId);
-            DocumentSnapshot lastDoc = firestore
+            Query query = firestore
                     .collection(USERS_COLLECTION).document(userId)
                     .collection(BOOK_LISTS_SUBCOLLECTION)
-                    .document(lastItemId)
-                    .get().get();
-            totalReads++; // Contabilizar leitura do cursor
-            query = query.startAfter(lastDoc);
-            System.out.println("Cursor document read successfully");
+                    .whereEqualTo("listType", listType.toString())
+                    .orderBy("addedAt", direction)
+                    .limit(pageSize);
+
+            if (lastItemId != null && !lastItemId.isEmpty()) {
+                System.out.println("Reading cursor document: " + lastItemId);
+                DocumentSnapshot lastDoc = firestore
+                        .collection(USERS_COLLECTION).document(userId)
+                        .collection(BOOK_LISTS_SUBCOLLECTION)
+                        .document(lastItemId)
+                        .get().get();
+                totalReads++;
+
+                if (!lastDoc.exists()) {
+                    System.out.println("CURSOR ERROR: Document " + lastItemId + " does not exist");
+                    return getUserBookListWithPagination(userId, listType, null, pageSize, sortOrder);
+                }
+
+                query = query.startAfter(lastDoc);
+            }
+
+            List<QueryDocumentSnapshot> listDocs = query.get().get().getDocuments();
+            totalReads += listDocs.size();
+            System.out.println("Query results: " + listDocs.size() + " user book list documents");
+
+            // Get user data once
+            DocumentSnapshot userDoc = firestore.collection(USERS_COLLECTION).document(userId).get().get();
+            totalReads++;
+            User user = userDoc.toObject(User.class);
+
+            // Extract UserBookList objects with their document IDs
+            List<UserBookListDTO> userBookListDTOs = new ArrayList<>();
+            List<String> bookIds = new ArrayList<>();
+
+            for (QueryDocumentSnapshot doc : listDocs) {
+                UserBookList listItem = doc.toObject(UserBookList.class);
+
+                UserBookListDTO dto = new UserBookListDTO();
+                dto.setUserBookListId(doc.getId()); // PRESERVE THE DOCUMENT ID
+                dto.setUserId(userId);
+                dto.setBookId(listItem.getBookId());
+                dto.setListType(listItem.getListType());
+
+                // Convert Timestamp to LocalDateTime
+                if (listItem.getAddedAt() != null) {
+                    Instant instant = Instant.ofEpochSecond(
+                            listItem.getAddedAt().getSeconds(),
+                            listItem.getAddedAt().getNanos()
+                    );
+                    dto.setAddedAt(LocalDateTime.ofInstant(instant, ZoneId.systemDefault()));
+                }
+
+                dto.setUser(user); // Set user data
+
+                userBookListDTOs.add(dto);
+                bookIds.add(listItem.getBookId());
+            }
+
+            // Fetch books and associate them with list items
+            List<Book> books = getBooksById(bookIds);
+            Map<String, Book> bookMap = books.stream()
+                    .collect(Collectors.toMap(Book::getBookId, book -> book));
+
+            // Associate books with DTOs
+            for (UserBookListDTO dto : userBookListDTOs) {
+                Book book = bookMap.get(dto.getBookId());
+                dto.setBook(book);
+            }
+
+            long endTime = System.currentTimeMillis();
+            System.out.println("TOTAL FIRESTORE READS: " + totalReads);
+            System.out.println("Execution time: " + (endTime - startTime) + "ms");
+            System.out.println("Returning " + userBookListDTOs.size() + " user book list DTOs");
+            System.out.println("[FIRESTORE READ] Completed getUserBookListWithPagination\n");
+
+            return userBookListDTOs;
+
+        } catch (Exception e) {
+            System.out.println("PAGINATION ERROR: " + e.getMessage());
+            if (lastItemId != null) {
+                System.out.println("CURSOR RECOVERY: Retrying without cursor");
+                return getUserBookListWithPagination(userId, listType, null, pageSize, sortOrder);
+            }
+            throw e;
         }
-
-        // Adicione este debug após executar a query
-        System.out.println("Executing user book list query...");
-        List<QueryDocumentSnapshot> listDocs = query.get().get().getDocuments();
-        totalReads += listDocs.size();
-
-// DEBUG ESPECÍFICO DOS TIMESTAMPS
-        System.out.println("TIMESTAMP DEBUG for sortOrder: " + sortOrder + " (Direction: " + direction + ")");
-        for (int i = 0; i < listDocs.size(); i++) {
-            UserBookList item = listDocs.get(i).toObject(UserBookList.class);
-            System.out.println("   Position " + i + ": bookId=" + item.getBookId() +
-                    " | addedAt=" + item.getAddedAt() +
-                    " | seconds=" + item.getAddedAt().getSeconds());
-        }
-
-
-        System.out.println("Query results: " + listDocs.size() + " user book list documents");
-
-        List<String> bookIds = listDocs.stream()
-                .map(doc -> doc.toObject(UserBookList.class).getBookId())
-                .collect(Collectors.toList());
-
-        System.out.println("Extracted " + bookIds.size() + " book IDs");
-
-        List<Book> books = getBooksById(bookIds);
-        int bookReads = calculateBookReads(bookIds.size());
-        totalReads += bookReads;
-
-        long endTime = System.currentTimeMillis();
-        System.out.println("TOTAL FIRESTORE READS: " + totalReads);
-        System.out.println("Execution time: " + (endTime - startTime) + "ms");
-        System.out.println("Returning " + books.size() + " books");
-        System.out.println("[FIRESTORE READ] Completed getUserBookListWithPagination\n");
-
-        return books;
     }
+
 
     private List<Book> getBooksById(List<String> bookIds) throws ExecutionException, InterruptedException {
         if (bookIds.isEmpty()) {

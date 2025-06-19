@@ -1,6 +1,6 @@
 package com.brunopassu.backend.controller;
 
-import com.brunopassu.backend.entity.Book;
+import com.brunopassu.backend.dto.UserBookListDTO;
 import com.brunopassu.backend.entity.enums.SortOrder;
 import com.brunopassu.backend.service.BookService;
 import com.brunopassu.backend.service.UserBookListService;
@@ -8,6 +8,7 @@ import com.brunopassu.backend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,8 +38,8 @@ public class UserBookListController {
 
     @GetMapping("/favorites")
     @Operation(
-            summary = "Listar livros favoritos do usuário com paginação e ordenação",
-            description = "Retorna a lista de livros favoritos do usuário autenticado com suporte a paginação e ordenação por data de adição"
+            summary = "Listar livros favoritos com dados completos",
+            description = "Retorna a lista de livros favoritos do usuário autenticado com dados completos do usuário, livro e metadados da lista, incluindo suporte a paginação e ordenação"
     )
     @ApiResponses({
             @ApiResponse(
@@ -46,22 +47,36 @@ public class UserBookListController {
                     description = "Lista de favoritos retornada com sucesso",
                     content = @Content(
                             mediaType = "application/json",
+                            schema = @Schema(implementation = UserBookListDTO.class),
                             examples = @ExampleObject(
-                                    name = "Lista de favoritos",
+                                    name = "Lista de favoritos completa",
                                     value = """
                     [
-                        {
-                            "bookId": "abc123def456",
-                            "title": "Dom Casmurro",
-                            "description": "Romance clássico da literatura brasileira",
-                            "authors": ["Machado de Assis"],
-                            "coverUrl": "https://example.com/dom-casmurro.jpg",
-                            "publicationYear": 1899,
-                            "genres": ["Romance", "Literatura Brasileira"],
-                            "averageRating": 4.5,
-                            "ratingsCount": 150,
-                            "pagesCount": 256
+                      {
+                        "userBookListId": "qIYHqtp7FG7UDejLb4KJ",
+                        "userId": "2jbzAtVP3eQJsEIYVICa9jb79sq1",
+                        "bookId": "3LrcuZa9kG4GmPm56Oql",
+                        "listType": "FAVORITES",
+                        "addedAt": "2025-06-19T20:15:30",
+                        "user": {
+                          "userId": "2jbzAtVP3eQJsEIYVICa9jb79sq1",
+                          "name": "Bruno Passu",
+                          "email": "bruno@example.com",
+                          "profilePictureUrl": "https://example.com/profile.jpg"
+                        },
+                        "book": {
+                          "bookId": "3LrcuZa9kG4GmPm56Oql",
+                          "title": "O homem duplicado",
+                          "description": "Romance de José Saramago sobre identidade e duplicação",
+                          "authors": ["José Saramago"],
+                          "coverUrl": "https://example.com/cover.jpg",
+                          "publicationYear": 2008,
+                          "genre": "Ficção",
+                          "averageRating": 4.2,
+                          "ratingsCount": 156,
+                          "pagesCount": 292
                         }
+                      }
                     ]
                     """
                             )
@@ -84,14 +99,14 @@ public class UserBookListController {
                     )
             )
     })
-    public ResponseEntity<List<Book>> getUserFavorites(
+    public ResponseEntity<List<UserBookListDTO>> getUserFavorites(
             @RequestParam(required = false) String lastItemId,
             @RequestParam(defaultValue = "20") Integer pageSize,
             @RequestParam(defaultValue = "NEWEST_FIRST") SortOrder sortOrder,
             @RequestHeader HttpHeaders headers) {
         try {
             String userId = extractUserIdFromToken(headers);
-            List<Book> favorites = userBookListService.getUserFavorites(userId, lastItemId, pageSize, sortOrder);
+            List<UserBookListDTO> favorites = userBookListService.getUserFavorites(userId, lastItemId, pageSize, sortOrder);
             return new ResponseEntity<>(favorites, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
@@ -100,10 +115,11 @@ public class UserBookListController {
         }
     }
 
+
     @GetMapping("/future-reads")
     @Operation(
-            summary = "Listar livros para leitura futura com paginação e ordenação",
-            description = "Retorna a lista de livros marcados para leitura futura do usuário autenticado com suporte a paginação e ordenação por data de adição"
+            summary = "Listar livros para leitura futura com dados completos",
+            description = "Retorna a lista de livros marcados para leitura futura do usuário autenticado com dados completos do usuário, livro e metadados da lista"
     )
     @ApiResponses({
             @ApiResponse(
@@ -111,22 +127,36 @@ public class UserBookListController {
                     description = "Lista de leituras futuras retornada com sucesso",
                     content = @Content(
                             mediaType = "application/json",
+                            schema = @Schema(implementation = UserBookListDTO.class),
                             examples = @ExampleObject(
-                                    name = "Lista de leituras futuras",
+                                    name = "Lista de leituras futuras completa",
                                     value = """
                     [
-                        {
-                            "bookId": "def456ghi789",
-                            "title": "O Cortiço",
-                            "description": "Romance naturalista brasileiro",
-                            "authors": ["Aluísio Azevedo"],
-                            "coverUrl": "https://example.com/o-cortico.jpg",
-                            "publicationYear": 1890,
-                            "genres": ["Romance", "Literatura Brasileira"],
-                            "averageRating": 4.2,
-                            "ratingsCount": 89,
-                            "pagesCount": 312
+                      {
+                        "userBookListId": "mN8pQr2TvX9YzA5bC7dE",
+                        "userId": "2jbzAtVP3eQJsEIYVICa9jb79sq1",
+                        "bookId": "def456ghi789",
+                        "listType": "FUTURE_READS",
+                        "addedAt": "2025-06-18T14:30:15",
+                        "user": {
+                          "userId": "2jbzAtVP3eQJsEIYVICa9jb79sq1",
+                          "name": "Bruno Passu",
+                          "email": "bruno@example.com",
+                          "profilePictureUrl": "https://example.com/profile.jpg"
+                        },
+                        "book": {
+                          "bookId": "def456ghi789",
+                          "title": "O Cortiço",
+                          "description": "Romance naturalista brasileiro de Aluísio Azevedo",
+                          "authors": ["Aluísio Azevedo"],
+                          "coverUrl": "https://example.com/cortico.jpg",
+                          "publicationYear": 1890,
+                          "genre": "Romance",
+                          "averageRating": 4.2,
+                          "ratingsCount": 89,
+                          "pagesCount": 312
                         }
+                      }
                     ]
                     """
                             )
@@ -149,14 +179,15 @@ public class UserBookListController {
                     )
             )
     })
-    public ResponseEntity<List<Book>> getUserFutureReads(
+    public ResponseEntity<List<UserBookListDTO>> getUserFutureReads(
             @RequestParam(required = false) String lastItemId,
             @RequestParam(defaultValue = "20") Integer pageSize,
             @RequestParam(defaultValue = "NEWEST_FIRST") SortOrder sortOrder,
             @RequestHeader HttpHeaders headers) {
+
         try {
             String userId = extractUserIdFromToken(headers);
-            List<Book> futureReads = userBookListService.getUserFutureReads(userId, lastItemId, pageSize, sortOrder);
+            List<UserBookListDTO> futureReads = userBookListService.getUserFutureReads(userId, lastItemId, pageSize, sortOrder);
             return new ResponseEntity<>(futureReads, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED);
@@ -179,8 +210,8 @@ public class UserBookListController {
                     content = @Content(
                             mediaType = "application/json",
                             examples = @ExampleObject(
-                                    name = "Livro adicionado",
-                                    value = "\"Livro adicionado aos favoritos: abc123def456\""
+                                    name = "Livro adicionado com sucesso",
+                                    value = "\"Livro adicionado aos favoritos: qIYHqtp7FG7UDejLb4KJ\""
                             )
                     )
             ),
@@ -244,7 +275,7 @@ public class UserBookListController {
     @PostMapping("/future-reads/{bookId}")
     @Operation(
             summary = "Adicionar livro às leituras futuras",
-            description = "Adiciona um livro específico à lista de leituras futuras do usuário autenticado"
+            description = "Adiciona um livro específico à lista de leituras futuras do usuário autenticado. O usuário é extraído automaticamente do token JWT."
     )
     @ApiResponses({
             @ApiResponse(
@@ -253,8 +284,8 @@ public class UserBookListController {
                     content = @Content(
                             mediaType = "application/json",
                             examples = @ExampleObject(
-                                    name = "Livro adicionado",
-                                    value = "\"Livro adicionado às leituras futuras: abc123def456\""
+                                    name = "Livro adicionado com sucesso",
+                                    value = "\"Livro adicionado às leituras futuras: mN8pQr2TvX9YzA5bC7dE\""
                             )
                     )
             ),

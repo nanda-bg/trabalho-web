@@ -64,4 +64,5 @@ public class UserBookList implements Serializable {
     public void setAddedAt(Timestamp addedAt) {
         this.addedAt = addedAt;
     }
+
 }
