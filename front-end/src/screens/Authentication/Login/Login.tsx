@@ -3,16 +3,16 @@ import LoginForm from "./components/Form/Form";
 
 export default function Login() {
   return (
-    <S.ContainerFluid>
+    <S.Container>
       <S.Row>
-        <S.ContainerForm>
+        <S.FormContainer>
           <S.Logo>LETTERBOX</S.Logo>
 
           <S.Title>Entrar</S.Title>
 
           <LoginForm />
-        </S.ContainerForm>
+        </S.FormContainer>
       </S.Row>
-    </S.ContainerFluid>
+    </S.Container>
   );
 }

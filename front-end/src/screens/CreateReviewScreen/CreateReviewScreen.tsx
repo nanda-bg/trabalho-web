@@ -4,23 +4,24 @@ import { useAppSelector } from "@app/store/rootReducer";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Header from "@app/screens/BookDetails/components/Header/Header";
 import { GlobalStyle } from "@app/styles/GlobalStyles";
 import TextArea from "../CommomComponents/TextArea/TextArea";
 import { createReview, setReviewSlice } from "@app/store/slices/ReviewsSlice";
 import ErrorAlert from "../Authentication/commonComponents/ErrorAlert/ErrorAlert";
 import * as S from "./styles";
-import { ArrowLeft } from "lucide-react";
 import { getBookDetails } from "@app/store/slices/BookDetailsSlice";
+import SecondaryHeader from "../CommomComponents/SecondaryHeader/SecondaryHeader";
 
 const CreateReviewScreen = () => {
   const dispatch = useDispatch();
-  const navigation = useNavigate();
 
   const { bookId } = useParams();
 
-  const { selectedBook: book } = useAppSelector((state) => state.bookDetailsSlice);
+  const { selectedBook: book } = useAppSelector(
+    (state) => state.bookDetailsSlice
+  );
   const { createReviewSuccess, createReviewError } = useAppSelector(
     (state) => state.reviewSlice
   );
@@ -70,30 +71,20 @@ const CreateReviewScreen = () => {
         spoiler: hasSpoilers,
       })
     );
-  
+
     setRating(0);
     setComment("");
     setHasSpoilers(false);
-  };
-
-  const handleGoBack = () => {
-    navigation(-1);
   };
 
   return (
     <>
       <GlobalStyle />
       <S.Container>
-        <S.Header>
-          <S.GoBack onClick={handleGoBack}>
-            <ArrowLeft size={20} />
-          </S.GoBack>
-          <S.HeaderTitle>Avaliação</S.HeaderTitle>
-        </S.Header>
-
-        <Header bookDetails={book} />
+        <SecondaryHeader title="Criar avaliação" />
 
         <S.ReviewSection>
+          <Header bookDetails={book} />
           <S.SectionTitle>Deixe sua avaliação</S.SectionTitle>
           <S.ReviewForm onSubmit={handleSubmit}>
             <S.RatingContainer>

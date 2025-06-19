@@ -15,12 +15,13 @@ export const initialState: UserState = {
   userId: null,
   email: null,
   name: null,
-  isLoading: false,
-  followers: 0,
-  following: 0,
   error: null,
   profilePicture: null,
   bio: null,
+  type: null,
+  isLoading: false,
+  followers: 0,
+  following: 0,
 };
 
 const userSlice = createSlice({

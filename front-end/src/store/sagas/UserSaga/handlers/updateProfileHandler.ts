@@ -8,7 +8,8 @@ export function* updateProfileHandler({ payload }: UpdateProfilePayloadAction) {
   try {
     yield put(setUserSliceField({ key: "isLoading", value: true }));
 
-    const { email, name, username, profileImage, bio } = payload;
+    const { email, name, username, profileImage, bio, type } = payload;
+
     const userId = yield select((state) => state.userSlice.userId);
     const token = Cookies.get("token");
 
@@ -21,6 +22,7 @@ export function* updateProfileHandler({ payload }: UpdateProfilePayloadAction) {
         username: username,
         profilePicture: profileImage,
         bio: bio,
+        ...(type !== null ? { userType: type } : {})
       },
       {
         headers: {

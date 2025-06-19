@@ -10,7 +10,7 @@ import {
   differenceInMonths,
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { User } from "@app/store/slices/UserSlice/types";
+import { User } from "@app/types/User";
 
 interface HeaderProps {
   user: User;

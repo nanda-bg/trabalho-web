@@ -1,8 +1,8 @@
-import { Review } from "@app/store/slices/ReviewsSlice/types";
 import * as S from "./styles";
 import { FC } from "react";
 import { Star } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
+import { Review } from "@app/types/Review";
 
 interface RatingsBarsProps {
   bookRating: number;

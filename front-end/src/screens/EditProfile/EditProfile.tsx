@@ -1,6 +1,6 @@
 import type React from "react";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import * as S from "./styles";
 import { ArrowLeft, Check } from "lucide-react";
 import { GlobalStyle } from "@app/styles/GlobalStyles";
@@ -11,7 +11,9 @@ import TextArea from "../CommomComponents/TextArea/TextArea";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { updateProfile } from "@app/store/slices/UserSlice";
-import Loading from "./components/LoadingAnimations";
+import { listReviewsByUser } from "@app/store/slices/ReviewsByUserSlice";
+import Loading from "./components/LoadingAnimation/LoadingAnimation";
+import UserTypeRatio from "./components/UserTypeRatio/UserTypeRatio";
 
 interface ProfileData {
   name: string;
@@ -19,17 +21,27 @@ interface ProfileData {
   email: string;
   bio: string;
   profileImage: string;
+  type: "CONTRIBUIDOR" | "PADRAO" | null;
 }
 
 export default function EditProfile() {
   const navigation = useNavigate();
   const dispatch = useDispatch();
 
-  const { email, username, name, profilePicture, bio } = useAppSelector(
-    (state) => state.userSlice
-  );
+  const {
+    email,
+    username,
+    name,
+    profilePicture,
+    bio,
+    userId,
+    type,
+    isLoading,
+  } = useAppSelector((state) => state.userSlice);
 
-  const { isLoading } = useAppSelector((state) => state.userSlice);
+  const { reviewsByUser, isLoading: isLoadingUserReviews } = useAppSelector(
+    (state) => state.reviewsByUserlice
+  );
 
   const [profile, setProfile] = useState<ProfileData>({
     name: name,
@@ -37,9 +49,17 @@ export default function EditProfile() {
     email: email,
     bio: bio,
     profileImage: profilePicture,
+    type: type,
   });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    dispatch(listReviewsByUser({ userId }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -76,7 +96,12 @@ export default function EditProfile() {
   };
 
   const handleSave = () => {
-    dispatch(updateProfile({ ...profile }));
+    dispatch(
+      updateProfile({
+        ...profile,
+        type: profile.type,
+      })
+    );
 
     navigation(-1);
   };
@@ -84,7 +109,7 @@ export default function EditProfile() {
   return (
     <S.Container>
       <GlobalStyle />
-      <Loading active={isLoading} />
+      <Loading active={isLoading || isLoadingUserReviews} />
       <S.Header>
         <S.SaveButton onClick={handleGoBack}>
           <ArrowLeft size={20} />
@@ -156,6 +181,24 @@ export default function EditProfile() {
               rows={4}
             />
           </S.InputGroup>
+
+          {reviewsByUser?.length > 0 && (
+            <S.InputGroup>
+              <S.Label>Tipo de perfil</S.Label>
+              <UserTypeRatio
+                value={
+                  profile.type === "CONTRIBUIDOR" ? "CONTRIBUIDOR" : "PADRAO"
+                }
+                onChange={(e) =>
+                  setProfile((prev) => ({
+                    ...prev,
+                    type:
+                      e.target.value === "CONTRIBUIDOR" ? "CONTRIBUIDOR" : null,
+                  }))
+                }
+              />
+            </S.InputGroup>
+          )}
         </S.FormSection>
       </S.Content>
 

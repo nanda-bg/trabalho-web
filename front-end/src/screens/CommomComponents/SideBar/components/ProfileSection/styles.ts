@@ -15,12 +15,6 @@ export const Avatar = styled.div`
   justify-content: center;
 `
 
-export const ProfileImage = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-`
-
 export const Username = styled.h3`
   font-size: 18px;
   font-weight: 600;

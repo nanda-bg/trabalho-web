@@ -1,68 +1,13 @@
 import styled from "styled-components";
 
 export const Container = styled.div`
-  max-width: 430px;
   margin: 0 auto;
   background-color: #1a1a2e;
   min-height: 100vh;
   position: relative;
-  padding-bottom: 70px;
-`;
-
-export const Header = styled.header`
-  display: flex;
-  align-items: center;
-  padding: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  position: relative;
-`;
-
-export const HeaderTitle = styled.h1`
-  font-size: 18px;
-  font-weight: 600;
-  margin: 0;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-`;
-
-export const SaveButton = styled.button`
-  background: none;
-  border: none;
-  color: #ff0080;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px;
-`;
-
-export const BackButton = styled.button`
-  background: none;
-  border: none;
-  color: #ffffff;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-export const Title = styled.h1`
-  font-size: 20px;
-  font-weight: 600;
-  margin: 0;
-`;
-
-export const SearchButton = styled.button`
-  background: none;
-  border: none;
-  color: #ffffff;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding-bottom: 40px;
+  padding-left: 16px;
+  padding-right: 16px;
 `;
 
 export const GenreFilter = styled.div`
@@ -70,24 +15,16 @@ export const GenreFilter = styled.div`
   gap: 10px;
   padding: 16px;
   overflow-x: auto;
-  scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-`;
 
-export const FilterButton = styled.button`
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background-color: #2a2a2a;
-  border: none;
-  border-radius: 20px;
-  color: #ffffff;
-  padding: 8px 16px;
-  font-size: 14px;
-  cursor: pointer;
-  white-space: nowrap;
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+  margin-bottom: 20px;
 `;
 
 export const GenreButton = styled.button<{ active: boolean }>`
@@ -140,10 +77,11 @@ export const StatLabel = styled.div`
 `;
 
 export const BookGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 16px;
-  padding: 16px;
 `;
 
 export const BookCard = styled.div`
@@ -222,71 +160,4 @@ export const SectionTitle = styled.h2`
   font-size: 18px;
   font-weight: 600;
   margin: 0 0 16px 0;
-`;
-
-export const RecommendationScroll = styled.div`
-  display: flex;
-  gap: 16px;
-  overflow-x: auto;
-  padding-bottom: 16px;
-  scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-`;
-
-export const RecommendationCard = styled.div`
-  min-width: 120px;
-  max-width: 120px;
-`;
-
-export const RecommendationCover = styled.img`
-  width: 100%;
-  aspect-ratio: 2/3;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-bottom: 8px;
-`;
-
-export const RecommendationTitle = styled.h4`
-  font-size: 14px;
-  font-weight: 600;
-  margin: 0 0 4px 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-export const RecommendationAuthor = styled.p`
-  font-size: 12px;
-  color: #b3b3b3;
-  margin: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-export const BottomNav = styled.nav`
-  display: flex;
-  justify-content: space-around;
-  background-color: #1a1a1a;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 12px 0;
-  border-top: 1px solid #2a2a2a;
-`;
-
-export const NavItem = styled.div<{ active?: boolean }>`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: ${(props) => (props.active ? "#FF4081" : "#b3b3b3")};
-  cursor: pointer;
-`;
-
-export const NavText = styled.span`
-  font-size: 12px;
-  margin-top: 4px;
 `;

@@ -33,7 +33,7 @@ export const MenuToggle = styled.button`
 `;
 
 export const CloseIcon = styled.button`
-  position: absolute;
+  position: fixed;
   top: 20px;
   left: 20px;
   background: none;
@@ -44,10 +44,6 @@ export const CloseIcon = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-
-  @media (max-width: 768px) {
-    position: fixed;
-  }
 `;
 
 export const NavContainer = styled.nav`

@@ -1,12 +1,20 @@
 import styled from "styled-components";
 
 export const Container = styled.div`
-  max-width: 430px;
   margin: 0 auto;
   background-color: #1a1a2e;
   min-height: 100vh;
   position: relative;
-  padding-bottom: 70px;
+  padding-bottom: 40px;
+  padding-left: 16px;
+  padding-right: 16px;
+`;
+
+export const EditContainer = styled.div`
+  max-width: 700px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
 `;
 
 export const Header = styled.header`
@@ -35,11 +43,9 @@ export const SaveButton = styled.button`
 `;
 
 export const Content = styled.div`
-  flex: 1;
-  padding: 24px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
+  max-width: 700px;
+  margin: 16px auto;
+  position: relative;
 `;
 
 export const ProfileImageSection = styled.div`
@@ -70,26 +76,6 @@ export const ProfileImageContainer = styled.div`
   }
 `;
 
-export const OverlayIcon = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
-  opacity: 0;
-  transition: opacity 0.2s;
-  z-index: 2;
-
-  ${ProfileImageContainer}:hover & {
-    opacity: 1;
-  }
-`;
-
-export const ChangePhotoText = styled.span`
-  font-size: 14px;
-  color: #ff0080;
-`;
-
 export const FormSection = styled.div`
   display: flex;
   flex-direction: column;
@@ -105,24 +91,6 @@ export const InputGroup = styled.div`
 export const Label = styled.label`
   font-size: 14px;
   color: rgba(255, 255, 255, 0.7);
-`;
-
-export const Input = styled.input`
-  background-color: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  padding: 12px 16px;
-  color: white;
-  font-size: 16px;
-
-  &:focus {
-    outline: none;
-    border-color: #ff0080;
-  }
-
-  &::placeholder {
-    color: rgba(255, 255, 255, 0.4);
-  }
 `;
 
 export const LogoSection = styled.div`

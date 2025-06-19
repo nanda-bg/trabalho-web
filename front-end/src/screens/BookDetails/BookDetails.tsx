@@ -1,9 +1,9 @@
 import { FC, useEffect, useState } from "react";
-import { BookOpen, Heart, ArrowLeft } from "lucide-react";
+import { BookOpen, Heart } from "lucide-react";
 import { GlobalStyle } from "@app/styles/GlobalStyles";
 import * as S from "./styles";
 import HorizontalBooksList from "../CommomComponents/HorizontalBooksList/HorizontalBooksList";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Header from "./components/Header/Header";
 import { useAppSelector } from "@app/store/rootReducer";
 import RatingsBars from "./components/RatingBars/RatingsBar";
@@ -12,9 +12,9 @@ import ReviewsSection from "./components/ReviewsSection/ReviewsSection";
 import { useDispatch } from "react-redux";
 import { listReviewsByBook } from "@app/store/slices/ReviewsSlice";
 import { getBookDetails } from "@app/store/slices/BookDetailsSlice";
+import SecondaryHeader from "../CommomComponents/SecondaryHeader/SecondaryHeader";
 
 const BookDetails: FC = () => {
-  const navigation = useNavigate();
   const dispatch = useDispatch();
 
   const { id } = useParams();
@@ -28,10 +28,6 @@ const BookDetails: FC = () => {
   const [activeTab, setActiveTab] = useState<"summary" | "details" | "reviews">(
     "summary"
   );
-
-  const handleGoBack = () => {
-    navigation(-1);
-  };
 
   useEffect(() => {
     dispatch(getBookDetails({ uid: id }));
@@ -57,76 +53,73 @@ const BookDetails: FC = () => {
     <>
       <GlobalStyle />
       <S.Container>
-        <S.Header>
-          <S.GoBack onClick={handleGoBack}>
-            <ArrowLeft size={20} />
-          </S.GoBack>
-          <S.HeaderTitle>Detalhes</S.HeaderTitle>
-        </S.Header>
+        <SecondaryHeader title="Detalhes" />
 
-        <Header bookDetails={selectedBook} />
+        <S.DetailsContainer>
+          <Header bookDetails={selectedBook} />
 
-        <S.ActionButtons>
-          <S.ActionButton $primary>
-            <BookOpen size={16} />
-            Adicionar a lista de leituras
-          </S.ActionButton>
-          <S.ActionButton>
-            <Heart size={16} />
-            Favoritar
-          </S.ActionButton>
-        </S.ActionButtons>
+          <S.ActionButtons>
+            <S.ActionButton $primary>
+              <BookOpen size={16} />
+              Adicionar a lista de leituras
+            </S.ActionButton>
+            <S.ActionButton>
+              <Heart size={16} />
+              Favoritar
+            </S.ActionButton>
+          </S.ActionButtons>
 
-        {reviews && (
-          <RatingsBars
-            bookRating={selectedBook.averageRating}
-            reviews={reviews}
-          />
-        )}
-
-        <S.TabsContainer>
-          <S.Tab
-            active={activeTab === "summary"}
-            onClick={() => setActiveTab("summary")}
-          >
-            Descrição
-          </S.Tab>
-          <S.Tab
-            active={activeTab === "details"}
-            onClick={() => setActiveTab("details")}
-          >
-            Detalhes
-          </S.Tab>
-          <S.Tab
-            active={activeTab === "reviews"}
-            onClick={() => setActiveTab("reviews")}
-          >
-            Avaliações
-          </S.Tab>
-        </S.TabsContainer>
-
-        <S.TabContent>
-          {activeTab === "summary" && (
-            <div>
-              <p>{selectedBook.description}</p>
-            </div>
+          {reviews && (
+            <RatingsBars
+              bookRating={selectedBook.averageRating}
+              reviews={reviews}
+            />
           )}
 
-          {activeTab === "details" && (
-            <DetailsSection selectedBook={selectedBook} />
-          )}
+          <S.TabsContainer>
+            <S.Tab
+              active={activeTab === "summary"}
+              onClick={() => setActiveTab("summary")}
+            >
+              Descrição
+            </S.Tab>
+            <S.Tab
+              active={activeTab === "details"}
+              onClick={() => setActiveTab("details")}
+            >
+              Detalhes
+            </S.Tab>
+            <S.Tab
+              active={activeTab === "reviews"}
+              onClick={() => setActiveTab("reviews")}
+            >
+              Avaliações
+            </S.Tab>
+          </S.TabsContainer>
 
-          {activeTab === "reviews" && <ReviewsSection reviews={reviews} />}
-        </S.TabContent>
+          <S.TabContent>
+            {activeTab === "summary" && (
+              <div>
+                <p>{selectedBook.description}</p>
+              </div>
+            )}
 
-        <S.RecommendedSection>
-          <S.RecommendedHeader>
-            <S.RecommendedTitle>Recomendados</S.RecommendedTitle>
-            <S.SeeAllLink href="#">Ver mais</S.SeeAllLink>
-          </S.RecommendedHeader>
+            {activeTab === "details" && (
+              <DetailsSection selectedBook={selectedBook} />
+            )}
 
-          {books && <HorizontalBooksList books={books} />}
-        </S.RecommendedSection>
+            {activeTab === "reviews" && <ReviewsSection reviews={reviews} />}
+          </S.TabContent>
+
+          <S.RecommendedSection>
+            <S.RecommendedHeader>
+              <S.RecommendedTitle>Recomendados</S.RecommendedTitle>
+              <S.SeeAllLink href="#">Ver mais</S.SeeAllLink>
+            </S.RecommendedHeader>
+
+            {books && <HorizontalBooksList books={books} />}
+          </S.RecommendedSection>
+        </S.DetailsContainer>
       </S.Container>
     </>
   );

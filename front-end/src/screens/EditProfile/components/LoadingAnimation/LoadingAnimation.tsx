@@ -1,11 +1,11 @@
-import React from "react";
+import { FC } from "react";
 import * as S from "./styles";
 
 interface LoadingProps {
   active: boolean;
 }
 
-const Loading: React.FC<LoadingProps> = ({ active }) => {
+const Loading: FC<LoadingProps> = ({ active }) => {
   if (!active) return null;
 
   return (

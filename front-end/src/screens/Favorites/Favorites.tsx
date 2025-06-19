@@ -1,17 +1,15 @@
-import type React from "react";
 import { FC, useEffect, useState } from "react";
-import { ArrowLeft } from "lucide-react";
 import { GlobalStyle } from "@app/styles/GlobalStyles";
 import * as S from "./styles";
-import { useNavigate } from "react-router-dom";
 import BookListItem from "../CommomComponents/HorizontalBooksList/components/BookListItem/BookListItem";
 import { useAppSelector } from "@app/store/rootReducer";
 import { useDispatch } from "react-redux";
 import { listBooks } from "@app/store/slices/BooksSlice";
+import PrimaryHeader from "../CommomComponents/PrimaryHeader/PrimaryHeader";
+import HorizontalBooksList from "../CommomComponents/HorizontalBooksList/HorizontalBooksList";
 
 const FavoriteBooks: FC = () => {
   const dispatch = useDispatch();
-  const navigation = useNavigate();
   
   const { books } = useAppSelector((state) => state.bookSlice);
 
@@ -29,20 +27,12 @@ const FavoriteBooks: FC = () => {
 
   const genres = Array.from(new Set(books.flatMap((book) => book.genre)));
 
-  const handleGoBack = () => {
-    navigation(-1);
-  };
-
   return (
     <>
       <GlobalStyle />
       <S.Container>
-        <S.Header>
-          <S.SaveButton onClick={handleGoBack}>
-            <ArrowLeft size={20} />
-          </S.SaveButton>
-          <S.HeaderTitle>Livros Favoritos</S.HeaderTitle>
-        </S.Header>
+
+        <PrimaryHeader title={"Livros Favoritos"} activeScreen="Favorites"/>
 
         <S.GenreFilter>
           {genres.map((genre) => (
@@ -81,17 +71,7 @@ const FavoriteBooks: FC = () => {
 
         <S.RecommendationSection>
           <S.SectionTitle>Baseado nos seus favoritos</S.SectionTitle>
-          <S.RecommendationScroll>
-            {books.slice(0, 3).map((book) => (
-              <S.RecommendationCard key={book.bookId}>
-                <S.RecommendationCover src={book.coverUrl} alt={book.title} />
-                <S.RecommendationTitle>{book.title}</S.RecommendationTitle>
-                <S.RecommendationAuthor>
-                  {book.authors.join(", ")}
-                </S.RecommendationAuthor>
-              </S.RecommendationCard>
-            ))}
-          </S.RecommendationScroll>
+          <HorizontalBooksList books={books.slice(0, 3)}/>
         </S.RecommendationSection>
       </S.Container>
     </>

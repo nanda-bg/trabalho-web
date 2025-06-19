@@ -28,22 +28,6 @@ export const SubmitButton = styled.button`
   }
 `;
 
-// Animação de rotação para o spinner
-const spin = keyframes`
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-`;
-
-// Componente do spinner de loading
-export const LoadingSpinner = styled.div`
-  width: 20px;
-  height: 20px;
-  border: 3px solid rgba(31, 29, 54, 0.3);
-  border-radius: 50%;
-  border-top: 3px solid #1f1d36;
-  animation: ${spin} 1s linear infinite;
-`;
-
 export const FooterText = styled.p`
   color: #ffffff;
   text-decoration: none;
@@ -60,4 +44,18 @@ export const Link = styled.a`
   color: #ffffff;
   text-decoration: none;
   font-size: 10px;
+`;
+
+const spin = keyframes`
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+`;
+
+export const LoadingSpinner = styled.div`
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(31, 29, 54, 0.3);
+  border-radius: 50%;
+  border-top: 3px solid #1f1d36;
+  animation: ${spin} 1s linear infinite;
 `;
