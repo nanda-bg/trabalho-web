@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -18,8 +19,15 @@ public class FirebaseConfig {
     public FirebaseApp firebaseApp() throws IOException {
         // Verifica se já existe uma instância do Firebase inicializada
         if (FirebaseApp.getApps().isEmpty()) {
+            InputStream serviceAccount;
+
             // Carrega o arquivo de credenciais do Firebase
-            InputStream serviceAccount = new ClassPathResource("serviceAccountKey.json").getInputStream();
+            try {
+                serviceAccount = new ClassPathResource("serviceAccountKey.json").getInputStream();
+            } catch (Exception e) {
+                // Fallback para arquivo no sistema de arquivos
+                serviceAccount = new FileInputStream("/app/serviceAccountKey.json");
+            }
 
             FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
