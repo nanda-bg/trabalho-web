@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const ContainerFluid = styled.div`
+export const Container = styled.div`
   display: flex;
   flex: 1;
   height: 100vh;
@@ -16,7 +16,7 @@ export const Row = styled.div`
   align-items: center;
 `;
 
-export const ContainerForm = styled.div`
+export const FormContainer = styled.div`
   margin: 0 auto;
   padding: 20px;
   gap: 30px;

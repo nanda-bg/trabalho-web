@@ -29,6 +29,8 @@ import bookDetailsSlice from "./slices/BookDetailsSlice";
 import { watchBookDetailsSagas } from "./sagas/BookDetailsSaga";
 import bookByGenreSlice from "./slices/BookByGenreSlice";
 import { watchBooksByGenreSagas } from "./sagas/BookByGenreSaga";
+import { watchReviewsByUserSagas } from "./sagas/ReviewsByUserSaga";
+import reviewsByUserlice from "./slices/ReviewsByUserSlice";
 
 function* rootSaga() {
   yield all([
@@ -40,6 +42,7 @@ function* rootSaga() {
     watchReviewsSagas(),
     watchBookDetailsSagas(),
     watchBooksByGenreSagas(),
+    watchReviewsByUserSagas(),
   ]);
 }
 
@@ -59,6 +62,7 @@ const rootReducer = combineReducers({
   reviewSlice: reviewSlice.reducer,
   bookDetailsSlice: bookDetailsSlice.reducer,
   bookByGenreSlice: bookByGenreSlice.reducer,
+  reviewsByUserlice: reviewsByUserlice.reducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

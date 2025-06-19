@@ -2,12 +2,13 @@ import { FC } from "react";
 import styled from "styled-components";
 
 export const AppContainer = styled.div`
-  max-width: 430px;
   margin: 0 auto;
   background-color: #1a1a2e;
   min-height: 100vh;
   position: relative;
-  padding-bottom: 70px;
+  padding-bottom: 40px;
+  padding-left: 16px;
+  padding-right: 16px;
 `;
 
 export const Header = styled.header`
@@ -68,7 +69,7 @@ export const UserAvatar: FC<UserAvatarProps> = styled.div<UserAvatarProps>`
   background-size: cover;
   background-position: center;
   background-image: url(${(props) => props.imgUrl});
-  /* background-color: red; */
+
   ${(props) =>
     !props.imgUrl &&
     `

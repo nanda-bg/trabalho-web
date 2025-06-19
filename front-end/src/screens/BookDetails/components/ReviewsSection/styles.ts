@@ -9,7 +9,7 @@ export const ReviewsSection = styled.div`
 
 export const SeeAllContainer = styled.div`
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
 `;
 
 export const SeeAll = styled.button`

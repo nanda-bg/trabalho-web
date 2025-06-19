@@ -47,17 +47,6 @@ export const Description = styled.p`
   transition: all 0.3s ease;
 `;
 
-export const ReadMoreButton = styled.button`
-  background: none;
-  border: none;
-  color: #ff0080;
-  font-size: 14px;
-  padding: 0;
-  margin: 0 0 12px 0;
-  cursor: pointer;
-  text-decoration: underline;
-`;
-
 export const GenreContainer = styled.div`
   display: flex;
   flex-wrap: wrap;

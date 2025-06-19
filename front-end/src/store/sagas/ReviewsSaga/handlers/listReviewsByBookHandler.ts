@@ -19,12 +19,6 @@ export function* listReviewsByReviewHandler({
       },
     });
 
-    for (const review of data) {
-      if (review.date) {
-        review.date = new Date(review.date.seconds * 1000).toISOString();
-      }
-    }
-
     yield put(
       setReviewSliceField({
         key: "reviews",

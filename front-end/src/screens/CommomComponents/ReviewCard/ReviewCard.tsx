@@ -2,7 +2,7 @@ import * as S from "./styles";
 import Header from "./components/Header/Header";
 import { type FC, useState } from "react";
 import { AlertTriangle, Eye } from "lucide-react";
-import { Review } from "@app/store/slices/ReviewsSlice/types";
+import { Review } from "@app/types/Review";
 
 interface ReviewCardProps {
   review: Review;

@@ -1,12 +1,15 @@
 import { Book } from "@app/types/Book";
 import { User } from "@app/types/User";
 
-export type Review = {
-    id: string;
-    rating: number;
-    comment: string;
-    createdAt: string;
-    user: User;
-    book: Book;
-    has_spoiler?: boolean;
-  };
+export interface Review {
+  reviewId: string;
+  userUid: string;
+  bookId: string;
+  rating: number;
+  reviewText: string;
+  date: string;
+  likeCount: number;
+  spoiler: boolean;
+  user: User;
+  book: Book;
+}

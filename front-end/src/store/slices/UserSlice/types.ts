@@ -1,16 +1,18 @@
+import { User } from "@app/types/User";
 import { PayloadAction } from "@reduxjs/toolkit";
 
 export interface UserState {
-  username: string;
-  userId: string;
-  email: string;
-  name: string;
-  profilePicture?: string;
-  bio?: string;
+  username: User["username"];
+  userId: User["uid"];
+  email: User["email"];
+  name: User["name"];
+  profilePicture?: User["profilePicture"];
+  bio?: User["bio"];
   isLoading: boolean;
   error?: string;
-  followers: number;
-  following: number;
+  followers: User["followers"];
+  following: User["following"];
+  type: User["type"];
 }
 
 export type UpdateProfilePayloadAction = PayloadAction<{
@@ -19,19 +21,9 @@ export type UpdateProfilePayloadAction = PayloadAction<{
   name: string;
   profileImage: string;
   bio: string;
+  type: "CONTRIBUIDOR" | "PADRAO" | null
 }>;
 
 export type FetchUserInfoPayloadAction = PayloadAction<{
   uid: string;
 }>;
-
-export interface User {
-  uid: string;
-  email: string;
-  name: string;
-  username: string;
-  profilePicture: string;
-  bio: string;
-  followers: number;
-  following: number;
-}

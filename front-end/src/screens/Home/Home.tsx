@@ -1,4 +1,3 @@
-import Header from "./components/Header/Header";
 import HorizontalBooksList from "../CommomComponents/HorizontalBooksList/HorizontalBooksList";
 import WelcomeCard from "./components/WelcomeCard/WelcomeCard";
 import * as S from "./styles";
@@ -7,6 +6,7 @@ import { useAppSelector } from "@app/store/rootReducer";
 import { GlobalStyle } from "@app/styles/GlobalStyles";
 import { useDispatch } from "react-redux";
 import { listBooks } from "@app/store/slices/BooksSlice";
+import PrimaryHeader from "../CommomComponents/PrimaryHeader/PrimaryHeader";
 
 export default function HomeScreen() {
   const dispatch = useDispatch();
@@ -28,7 +28,7 @@ export default function HomeScreen() {
     <>
       <GlobalStyle />
       <S.AppContainer>
-        <Header />
+        <PrimaryHeader activeScreen="Home" />
 
         <S.MainContent>
           <WelcomeCard />

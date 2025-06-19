@@ -1,5 +1,4 @@
-import type React from "react";
-import { useState } from "react";
+import { FC, useState } from "react";
 import {
   Home,
   BookOpen,
@@ -16,13 +15,15 @@ import * as S from "./styles";
 import { useDispatch } from "react-redux";
 import { logout } from "@app/store/slices/LoginSlice";
 import { useNavigate } from "react-router-dom";
-import { useAppSelector } from "@app/store/rootReducer";
 
-const Sidebar = () => {
+interface SidebarProps {
+  activeScreen: "Books" | "Favorites" | "Home";
+}
+
+const Sidebar: FC<SidebarProps> = ({ activeScreen }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const user = useAppSelector((state) => state.userSlice);
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -57,19 +58,20 @@ const Sidebar = () => {
       )}
 
       <S.SidebarContainer isOpen={isOpen}>
-        <ProfileSection followers={user.followers || 0 } following={user.following || 0} />
+        <ProfileSection />
 
         <S.NavContainer>
           <NavItem
             icon={<Home size={20} />}
             label="Início"
             onClick={goToHome}
-            isActive={true}
+            isActive={activeScreen === "Home"}
           />
-          <NavItem 
-            icon={<Book size={20} />} 
-            label="Livros" 
+          <NavItem
+            icon={<Book size={20} />}
+            label="Livros"
             onClick={goToBooks}
+            isActive={activeScreen === "Books"}
           />
           <NavItem icon={<Star size={20} />} label="Avaliações" />
           <NavItem icon={<BookOpen size={20} />} label="Lista de leitura" />
@@ -77,6 +79,7 @@ const Sidebar = () => {
             icon={<Heart size={20} />}
             label="Favoritos"
             onClick={goToFavorites}
+            isActive={activeScreen === "Favorites"}
           />
 
           <S.LogoutButton onClick={signOut}>

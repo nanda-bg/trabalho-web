@@ -26,6 +26,7 @@ export function* fetchUserInfoHandler({ payload }: FetchUserInfoPayloadAction) {
         bio: data.bio,
         followers: data.followers,
         following: data.following,
+        type: data.userType,
       })
     );
   } catch (error) {
