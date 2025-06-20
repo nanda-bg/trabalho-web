@@ -11,6 +11,7 @@ export const initialState: BooksState = {
   isLoading: false,
   error: null,
   lastBookId: null,
+  hasMore: true,
 };
 
 const bookSlice = createSlice({

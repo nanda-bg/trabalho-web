@@ -30,6 +30,7 @@ export function* listBooksHandler() {
       setBookSlice({
         lastBookId: _.last(data)?.bookId,
         books: [...books, ...data],
+        hasMore: data.length > 0,
       })
     );
   } catch (error) {

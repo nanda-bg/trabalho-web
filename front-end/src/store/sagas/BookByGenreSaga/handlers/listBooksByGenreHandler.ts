@@ -7,12 +7,16 @@ import {
 } from "@app/store/slices/BookByGenreSlice";
 import { ListBookByGenrePayloadAction } from "@app/store/slices/BookByGenreSlice/types";
 import Cookies from "js-cookie";
+import _ from "lodash";
 
 export function* listBooksByGenreHandler({
   payload,
 }: ListBookByGenrePayloadAction) {
   try {
-    const { isLoading } = yield select((state) => state.bookByGenreSlice);
+    const { isLoading, lastBookIdByGenre } = yield select(
+      (state) => state.bookByGenreSlice
+    );
+
     yield put(
       setBookByGenreSliceField({
         key: "isLoading",
@@ -25,10 +29,11 @@ export function* listBooksByGenreHandler({
 
     const { data }: AxiosResponse<Book[]> = yield call(
       axios.get,
-      `/books/genre`,
+      `/books/genre/paginated`,
       {
         params: {
           genre: payload.genre,
+          lastBookId: lastBookIdByGenre[payload.genre],
         },
         headers: {
           Authorization: `Bearer ${token}`,
@@ -36,11 +41,27 @@ export function* listBooksByGenreHandler({
       }
     );
 
-    const { booksByGenre } = yield select((state) => state.bookByGenreSlice);
+    const { booksByGenre, hasMore } = yield select((state) => state.bookByGenreSlice);
+
+    const books = _.uniqBy(
+      [...(booksByGenre[payload.genre] || []), ...data],
+      "bookId"
+    );
 
     yield put(
       setBookByGenreSlice({
-        booksByGenre: { ...booksByGenre, [payload.genre]: data },
+        booksByGenre: {
+          ...booksByGenre,
+          [payload.genre]: books,
+        },
+        lastBookIdByGenre: {
+          ...lastBookIdByGenre,
+          [payload.genre]: _.last(data)?.bookId,
+        },
+        hasMore: {
+          ...hasMore,
+          [payload.genre]: data.length > 0,
+        },
       })
     );
   } catch (error) {

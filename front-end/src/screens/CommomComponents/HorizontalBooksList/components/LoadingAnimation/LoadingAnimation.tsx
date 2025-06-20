@@ -3,7 +3,7 @@ import { FC } from "react";
 
 const LoadingAnimation: FC = () => {
   return (
-    <S.HorizontalScroll>
+    <>
       {[...Array(15)].map((_, index) => (
         <S.SkeletonBookCard key={index}>
           <S.SkeletonBookCover />
@@ -14,7 +14,7 @@ const LoadingAnimation: FC = () => {
           </S.SkeletonBookInfo>
         </S.SkeletonBookCard>
       ))}
-    </S.HorizontalScroll>
+    </>
   );
 };
 

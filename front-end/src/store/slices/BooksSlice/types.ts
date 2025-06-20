@@ -5,4 +5,5 @@ export interface BooksState {
   isLoading: boolean;
   error: string | null;
   lastBookId: string | null;
+  hasMore: boolean;
 }

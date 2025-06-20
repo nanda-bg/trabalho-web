@@ -10,6 +10,8 @@ export const initialState: BookByGenreState = {
   isLoading: {},
   error: null,
   booksByGenre: {},
+  lastBookIdByGenre: {},
+  hasMore: {},
 };
 
 const bookByGenreSlice = createSlice({

@@ -5,22 +5,26 @@ import { useEffect } from "react";
 import { useAppSelector } from "@app/store/rootReducer";
 import { GlobalStyle } from "@app/styles/GlobalStyles";
 import { useDispatch } from "react-redux";
-import { listBooks } from "@app/store/slices/BooksSlice";
+import { listBooks, resetBookSlice } from "@app/store/slices/BooksSlice";
 import PrimaryHeader from "../CommomComponents/PrimaryHeader/PrimaryHeader";
 
 export default function HomeScreen() {
   const dispatch = useDispatch();
 
-  const { books, isLoading } = useAppSelector((state) => state.bookSlice);
+  const { books, isLoading, hasMore} = useAppSelector((state) => state.bookSlice);
 
   useEffect(() => {
-    if (books.length > 0) return;
-
     dispatch(listBooks());
+
+    return () => {
+      dispatch(resetBookSlice());
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onHorizontalListEnd = () => {
+    if (!hasMore) return;
+    
     dispatch(listBooks());
   };
 
