@@ -134,3 +134,10 @@ export const ErrorContainer = styled.div`
   align-items: center;
   justify-content: center;
 `;
+
+export const NoBookMessage = styled.div`
+  color: #ffffff;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 24px;
+`;

@@ -5,7 +5,10 @@ import BookListItem from "../CommomComponents/HorizontalBooksList/components/Boo
 import { useAppSelector } from "@app/store/rootReducer";
 import { useDispatch } from "react-redux";
 import PrimaryHeader from "../CommomComponents/PrimaryHeader/PrimaryHeader";
-import { listFavoriteBooks } from "@app/store/slices/FavoriteBooksSlice";
+import {
+  listFavoriteBooks,
+  resetFavoriteBooksSlice,
+} from "@app/store/slices/FavoriteBooksSlice";
 
 const FavoriteBooks: FC = () => {
   const dispatch = useDispatch();
@@ -38,7 +41,7 @@ const FavoriteBooks: FC = () => {
 
   useEffect(() => {
     setHasCalledListEnd(false);
-  }, [filteredBooks.length]);
+  }, [favoriteBooks.length]);
 
   useEffect(() => {
     if (!lastBookRef.current) return;
@@ -58,11 +61,18 @@ const FavoriteBooks: FC = () => {
       observer.disconnect();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filteredBooks, hasCalledListEnd, lastBookRef.current]);
+  }, [favoriteBooks, hasCalledListEnd, lastBookRef.current]);
 
   useEffect(() => {
-    setHasCalledListEnd(false);
+    dispatch(listFavoriteBooks());
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetFavoriteBooksSlice());
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

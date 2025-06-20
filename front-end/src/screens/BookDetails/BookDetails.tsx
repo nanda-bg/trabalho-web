@@ -11,8 +11,18 @@ import DetailsSection from "./components/DetailsSection/DetailsSection";
 import ReviewsSection from "./components/ReviewsSection/ReviewsSection";
 import { useDispatch } from "react-redux";
 import { listReviewsByBook } from "@app/store/slices/ReviewsSlice";
-import { getBookDetails } from "@app/store/slices/BookDetailsSlice";
+import {
+  getBookDetails,
+  resetBookDetailsSlice,
+} from "@app/store/slices/BookDetailsSlice";
 import SecondaryHeader from "../CommomComponents/SecondaryHeader/SecondaryHeader";
+import { listBookByGenre } from "@app/store/slices/BookByGenreSlice";
+import LoadingAnimation from "../CommomComponents/LoadingAnimation/LoadingAnimation";
+import {
+  checkIsBookFavorite,
+  addBookToFavorites,
+  removeBookFromFavorites,
+} from "@app/store/slices/FavoriteBooksSlice";
 
 const BookDetails: FC = () => {
   const dispatch = useDispatch();
@@ -22,8 +32,16 @@ const BookDetails: FC = () => {
   const { selectedBook, isLoading } = useAppSelector(
     (state) => state.bookDetailsSlice
   );
-  const { books } = useAppSelector((state) => state.bookSlice);
+
+  const { booksByGenre, isLoading: isLoadingBooksByGenre } = useAppSelector(
+    (state) => state.bookByGenreSlice
+  );
+
   const { reviews } = useAppSelector((state) => state.reviewSlice);
+
+  const { isSelectedBookFavorite } = useAppSelector(
+    (state) => state.favoriteBooksSlice
+  );
 
   const [activeTab, setActiveTab] = useState<"summary" | "details" | "reviews">(
     "summary"
@@ -32,6 +50,7 @@ const BookDetails: FC = () => {
   useEffect(() => {
     dispatch(getBookDetails({ uid: id }));
     dispatch(listReviewsByBook({ bookId: id }));
+    dispatch(checkIsBookFavorite({ bookId: id }));
 
     window.scrollTo({
       top: 0,
@@ -41,13 +60,28 @@ const BookDetails: FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  useEffect(() => {
+    if (selectedBook && !isLoading) {
+      dispatch(listBookByGenre({ genre: selectedBook.genre }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedBook, isLoading]);
 
-  if (!selectedBook) {
-    return <div>Não rolou</div>;
-  }
+  const handleAddBookToFavorites = () => {
+    if (!selectedBook) return;
+    dispatch(addBookToFavorites({ bookId: selectedBook.bookId }));
+  };
+
+  const handleRemoveBookFromFavorites = () => {
+    if (!selectedBook) return;
+    dispatch(removeBookFromFavorites({ bookId: selectedBook.bookId }));
+  };
+
+  useEffect(() => {
+    return () => {
+      dispatch(resetBookDetailsSlice());
+    };
+  }, []);
 
   return (
     <>
@@ -55,71 +89,97 @@ const BookDetails: FC = () => {
       <S.Container>
         <SecondaryHeader title="Detalhes" />
 
-        <S.DetailsContainer>
-          <Header bookDetails={selectedBook} />
+        <LoadingAnimation active={isLoading} />
 
-          <S.ActionButtons>
-            <S.ActionButton $primary>
-              <BookOpen size={16} />
-              Adicionar a lista de leituras
-            </S.ActionButton>
-            <S.ActionButton>
-              <Heart size={16} />
-              Favoritar
-            </S.ActionButton>
-          </S.ActionButtons>
+        {!selectedBook && !isLoading && (
+          <S.NoBookMessage>
+            Livro indisponivel ou não encontrado, por favor verifique o ID do
+            livro ou tente novamente mais tarde.
+          </S.NoBookMessage>
+        )}
 
-          {reviews && (
-            <RatingsBars
-              bookRating={selectedBook.averageRating}
-              reviews={reviews}
-            />
-          )}
+        {selectedBook && !isLoading && (
+          <S.DetailsContainer>
+            <Header bookDetails={selectedBook} />
 
-          <S.TabsContainer>
-            <S.Tab
-              active={activeTab === "summary"}
-              onClick={() => setActiveTab("summary")}
-            >
-              Descrição
-            </S.Tab>
-            <S.Tab
-              active={activeTab === "details"}
-              onClick={() => setActiveTab("details")}
-            >
-              Detalhes
-            </S.Tab>
-            <S.Tab
-              active={activeTab === "reviews"}
-              onClick={() => setActiveTab("reviews")}
-            >
-              Avaliações
-            </S.Tab>
-          </S.TabsContainer>
+            <S.ActionButtons>
+              <S.ActionButton $primary>
+                <BookOpen size={16} />
+                Adicionar a lista de leituras
+              </S.ActionButton>
+              <S.ActionButton
+                onClick={
+                  isSelectedBookFavorite
+                    ? handleRemoveBookFromFavorites
+                    : handleAddBookToFavorites
+                }
+              >
+                <Heart
+                  size={16}
+                  color={isSelectedBookFavorite ? "#ff0080" : undefined}
+                  fill={isSelectedBookFavorite ? "#ff0080" : "none"}
+                />
+                Favoritar
+              </S.ActionButton>
+            </S.ActionButtons>
 
-          <S.TabContent>
-            {activeTab === "summary" && (
-              <div>
-                <p>{selectedBook.description}</p>
-              </div>
+            {reviews && (
+              <RatingsBars
+                bookRating={selectedBook.averageRating}
+                reviews={reviews}
+              />
             )}
 
-            {activeTab === "details" && (
-              <DetailsSection selectedBook={selectedBook} />
+            <S.TabsContainer>
+              <S.Tab
+                active={activeTab === "summary"}
+                onClick={() => setActiveTab("summary")}
+              >
+                Descrição
+              </S.Tab>
+              <S.Tab
+                active={activeTab === "details"}
+                onClick={() => setActiveTab("details")}
+              >
+                Detalhes
+              </S.Tab>
+              <S.Tab
+                active={activeTab === "reviews"}
+                onClick={() => setActiveTab("reviews")}
+              >
+                Avaliações
+              </S.Tab>
+            </S.TabsContainer>
+
+            <S.TabContent>
+              {activeTab === "summary" && (
+                <div>
+                  <p>{selectedBook.description}</p>
+                </div>
+              )}
+
+              {activeTab === "details" && (
+                <DetailsSection selectedBook={selectedBook} />
+              )}
+
+              {activeTab === "reviews" && <ReviewsSection reviews={reviews} />}
+            </S.TabContent>
+
+            {(isLoadingBooksByGenre[selectedBook.genre] ||
+              booksByGenre[selectedBook.genre]) && (
+              <S.RecommendedSection>
+                <S.RecommendedHeader>
+                  <S.RecommendedTitle>Recomendados</S.RecommendedTitle>
+                </S.RecommendedHeader>
+
+                <HorizontalBooksList
+                  books={booksByGenre[selectedBook.genre]}
+                  isLoading={isLoadingBooksByGenre[selectedBook.genre]}
+                />
+              </S.RecommendedSection>
             )}
-
-            {activeTab === "reviews" && <ReviewsSection reviews={reviews} />}
-          </S.TabContent>
-
-          <S.RecommendedSection>
-            <S.RecommendedHeader>
-              <S.RecommendedTitle>Recomendados</S.RecommendedTitle>
-              <S.SeeAllLink href="#">Ver mais</S.SeeAllLink>
-            </S.RecommendedHeader>
-
-            {books && <HorizontalBooksList books={books} />}
-          </S.RecommendedSection>
-        </S.DetailsContainer>
+          </S.DetailsContainer>
+        )}
       </S.Container>
     </>
   );

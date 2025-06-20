@@ -10,6 +10,13 @@ export const Container = styled.div`
   padding-right: 16px;
 `;
 
+export const NoBookMessage = styled.div`
+  color: #ffffff;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 24px;
+`;
+
 export const DetailsContainer = styled.div`
   max-width: 700px;
   margin: 0 auto;
@@ -66,12 +73,6 @@ export const Tab = styled.button<{ active: boolean }>`
 
 export const TabContent = styled.div`
   padding: 16px;
-`;
-
-export const SeeAllLink = styled.a`
-  color: #ff0080;
-  font-size: 14px;
-  text-decoration: none;
 `;
 
 export const RecommendedSection = styled.div`

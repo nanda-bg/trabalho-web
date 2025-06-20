@@ -38,9 +38,9 @@ export const SkeletonBookCover = styled.div`
   width: 100%;
   height: 180px;
   border-radius: 8px;
-  background: linear-gradient(90deg, #d0d0d0 0%, #e8e8e8 50%, #d0d0d0 100%);
+  background: linear-gradient(90deg, #16162a 25%, #2a2a4a 50%, #16162a 75%);
   background-size: 200% 100%;
-  animation: ${shimmer} 1.5s infinite linear;
+  animation: ${shimmer} 1.5s infinite;
   margin-bottom: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 `;
@@ -51,11 +51,11 @@ export const SkeletonBookInfo = styled.div`
 
 export const SkeletonText = styled.div`
   height: 12px;
-  background: linear-gradient(90deg, #d0d0d0 0%, #e8e8e8 50%, #d0d0d0 100%);
+  background: linear-gradient(90deg, #16162a 25%, #2a2a4a 50%, #16162a 75%);
   background-size: 200% 100%;
+  animation: ${shimmer} 1.5s infinite;
   border-radius: 4px;
   margin-bottom: 4px;
-  animation: ${shimmer} 1.5s infinite linear;
   &:last-child {
     width: 60%;
   }

@@ -8,11 +8,9 @@ interface RatingsBarsProps {
   bookRating: number;
   reviews: Review[];
 }
-const RatingsBars: FC<RatingsBarsProps> = ({ reviews }) => {
+const RatingsBars: FC<RatingsBarsProps> = ({ reviews, bookRating }) => {
   const navigate = useNavigate();
   const { id: bookId } = useParams();
-  const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
-  const bookRating = Math.round(totalRating / (reviews.length || 1));
 
   const ratingCounts: Record<number, number> = [5, 4, 3, 2, 1, 0].reduce(
     (acc, value) => {
@@ -43,22 +41,26 @@ const RatingsBars: FC<RatingsBarsProps> = ({ reviews }) => {
           />
         ))}
       </S.RatingStars>
-      <S.RatingGraph>
-        {[5, 4, 3, 2, 1, 0].map((value) => (
-          <S.RatingBar key={value}>
-            <S.RatingBarValue>{value}</S.RatingBarValue>
-            <S.RatingBarGraph>
-              <S.RatingBarFill
-                width={
-                  reviewsCount ? (ratingCounts[value] / reviewsCount) * 100 : 0
-                }
-                value={value}
-              />
-            </S.RatingBarGraph>
-            <span style={{ marginLeft: 8 }}>{ratingCounts[value]}</span>
-          </S.RatingBar>
-        ))}
-      </S.RatingGraph>
+      {reviews.length > 0 && (
+        <S.RatingGraph>
+          {[5, 4, 3, 2, 1, 0].map((value) => (
+            <S.RatingBar key={value}>
+              <S.RatingBarValue>{value}</S.RatingBarValue>
+              <S.RatingBarGraph>
+                <S.RatingBarFill
+                  width={
+                    reviewsCount
+                      ? (ratingCounts[value] / reviewsCount) * 100
+                      : 0
+                  }
+                  value={value}
+                />
+              </S.RatingBarGraph>
+              <span style={{ marginLeft: 8 }}>{ratingCounts[value]}</span>
+            </S.RatingBar>
+          ))}
+        </S.RatingGraph>
+      )}
 
       <S.EvaluateButton onClick={onEvaluateClick}>
         <Star size={16} />

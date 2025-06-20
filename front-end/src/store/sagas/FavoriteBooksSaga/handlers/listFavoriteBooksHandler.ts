@@ -20,7 +20,7 @@ export function* listFavoriteBooksHandler() {
     const { data } = yield call(axios.get, `/users/books/favorites`, {
       params: {
         lastItemId: lastBookId,
-        pageSize: 1,
+        pageSize: 20,
       },
       headers: {
         Authorization: `Bearer ${token}`,

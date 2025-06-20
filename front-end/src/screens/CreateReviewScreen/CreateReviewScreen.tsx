@@ -13,13 +13,14 @@ import ErrorAlert from "../Authentication/commonComponents/ErrorAlert/ErrorAlert
 import * as S from "./styles";
 import { getBookDetails } from "@app/store/slices/BookDetailsSlice";
 import SecondaryHeader from "../CommomComponents/SecondaryHeader/SecondaryHeader";
+import LoadingAnimation from "../CommomComponents/LoadingAnimation/LoadingAnimation";
 
 const CreateReviewScreen = () => {
   const dispatch = useDispatch();
 
   const { bookId } = useParams();
 
-  const { selectedBook: book } = useAppSelector(
+  const { selectedBook: book, isLoading } = useAppSelector(
     (state) => state.bookDetailsSlice
   );
   const { createReviewSuccess, createReviewError } = useAppSelector(
@@ -76,6 +77,33 @@ const CreateReviewScreen = () => {
     setComment("");
     setHasSpoilers(false);
   };
+
+  if (isLoading) {
+    return (
+      <>
+        <GlobalStyle />
+        <S.Container>
+          <LoadingAnimation active={isLoading} />
+          <SecondaryHeader title="Criar avaliação" />
+        </S.Container>
+      </>
+    );
+  }
+
+  if (!book) {
+    return (
+      <>
+        <GlobalStyle />
+        <S.Container>
+          <SecondaryHeader title="Criar avaliação" />
+          <S.NoBookMessage>
+            Livro indisponível ou não encontrado, por favor verifique o ID do
+            livro ou tente novamente mais tarde.
+          </S.NoBookMessage>
+        </S.Container>
+      </>
+    );
+  }
 
   return (
     <>

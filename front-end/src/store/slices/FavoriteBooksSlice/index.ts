@@ -4,13 +4,21 @@ import {
   SetStateSliceFieldReducerPayload,
 } from "../../utils/setStateSliceFieldReducer";
 import { setStateSliceReducer } from "../../utils/setStateSliceReducer";
-import { FavoriteBooksState } from "./types";
+import {
+  AddBookToFavoritesPayloadAction,
+  CheckIsBookFavoritePayloadAction,
+  FavoriteBooksState,
+  RemoveBookFromFavoritesPayloadAction,
+} from "./types";
 
 export const initialState: FavoriteBooksState = {
   favoriteBooks: [],
   isLoading: false,
   error: null,
   lastBookId: null,
+  isSelectedBookFavorite: false,
+  isLoadingAddOrRemove: false,
+  isLoadingCheck: false,
 };
 
 const favoriteBooksSlice = createSlice({
@@ -21,13 +29,34 @@ const favoriteBooksSlice = createSlice({
       state,
       action: SetStateSliceFieldReducerPayload<FavoriteBooksState>
     ) => setStateSliceFieldReducer<FavoriteBooksState>(state, action),
-    setFavoriteBooksSlice: (state, action: PayloadAction<Partial<FavoriteBooksState>>) =>
-      setStateSliceReducer<FavoriteBooksState>(state, action),
+    setFavoriteBooksSlice: (
+      state,
+      action: PayloadAction<Partial<FavoriteBooksState>>
+    ) => setStateSliceReducer<FavoriteBooksState>(state, action),
     listFavoriteBooks: () => {},
+    checkIsBookFavorite: (
+      _state,
+      _action: CheckIsBookFavoritePayloadAction
+    ) => {},
+    addBookToFavorites: (
+      _state,
+      _action: AddBookToFavoritesPayloadAction
+    ) => {},
+    removeBookFromFavorites: (
+      _state,
+      _action: RemoveBookFromFavoritesPayloadAction
+    ) => {},
     resetFavoriteBooksSlice: () => initialState,
   },
 });
 
-export const { setFavoriteBooksSliceField, setFavoriteBooksSlice, listFavoriteBooks, resetFavoriteBooksSlice } =
-  favoriteBooksSlice.actions;
+export const {
+  setFavoriteBooksSliceField,
+  setFavoriteBooksSlice,
+  listFavoriteBooks,
+  checkIsBookFavorite,
+  addBookToFavorites,
+  removeBookFromFavorites,
+  resetFavoriteBooksSlice,
+} = favoriteBooksSlice.actions;
 export default favoriteBooksSlice;
