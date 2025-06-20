@@ -1,6 +1,5 @@
 package com.brunopassu.backend.repository;
 
-import com.brunopassu.backend.config.FirestoreConfig;
 import com.brunopassu.backend.entity.Review;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
@@ -16,11 +15,11 @@ import java.util.concurrent.ExecutionException;
 public class ReviewRepository {
 
     private static final String COLLECTION_NAME = "reviews";
-    private final FirestoreConfig firestoreConfig;
+    //private final FirestoreConfig firestoreConfig;
 
-    public ReviewRepository(FirestoreConfig firestoreConfig) {
-        this.firestoreConfig = firestoreConfig;
-    }
+    //public ReviewRepository(FirestoreConfig firestoreConfig) {
+        //this.firestoreConfig = firestoreConfig;
+    //}
 
     public String saveReview(Review review) throws ExecutionException, InterruptedException {
         Firestore firestore = FirestoreClient.getFirestore();
@@ -47,7 +46,7 @@ public class ReviewRepository {
         System.out.println("[FIRESTORE READ] Starting getReviewById");
         System.out.println("Parameters: reviewId=" + reviewId);
 
-        Firestore firestore = firestoreConfig.firestore();
+        Firestore firestore = FirestoreClient.getFirestore();
         DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(reviewId);
         ApiFuture<DocumentSnapshot> future = docRef.get();
         DocumentSnapshot document = future.get();
@@ -74,7 +73,7 @@ public class ReviewRepository {
         System.out.println("[FIRESTORE READ] Starting getAllReviews");
         System.out.println("WARNING: This method reads ALL documents in collection!");
 
-        Firestore firestore = firestoreConfig.firestore();
+        Firestore firestore = FirestoreClient.getFirestore();
         ApiFuture<QuerySnapshot> future = firestore.collection(COLLECTION_NAME).get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
         int totalReads = documents.size();
@@ -100,7 +99,7 @@ public class ReviewRepository {
         System.out.println("[FIRESTORE READ] Starting getReviewsWithPagination");
         System.out.println("Parameters: lastReviewId=" + lastReviewId + ", pageSize=" + pageSize);
 
-        Firestore firestore = firestoreConfig.firestore();
+        Firestore firestore = FirestoreClient.getFirestore();
         Query query = firestore.collection(COLLECTION_NAME)
                 .orderBy("date", Query.Direction.DESCENDING)
                 .limit(pageSize);
@@ -139,7 +138,7 @@ public class ReviewRepository {
 
 
     public List<Review> getReviewsByBookId(String bookId) throws ExecutionException, InterruptedException, IOException {
-        Firestore firestore = firestoreConfig.firestore();
+        Firestore firestore = FirestoreClient.getFirestore();
         DocumentReference bookRef = firestore.collection("books").document(bookId);
 
         ApiFuture<QuerySnapshot> future = firestore.collection("reviews")
@@ -156,7 +155,7 @@ public class ReviewRepository {
     }
 
     public List<Review> getReviewsByUserId(String userId) throws ExecutionException, InterruptedException, IOException {
-        Firestore firestore = firestoreConfig.firestore();
+        Firestore firestore = FirestoreClient.getFirestore();
         DocumentReference userRef = firestore.collection("users").document(userId);
 
         ApiFuture<QuerySnapshot> future = firestore.collection("reviews")
@@ -173,7 +172,7 @@ public class ReviewRepository {
     }
 
     public boolean updateReview(Review review) throws ExecutionException, InterruptedException, IOException {
-        Firestore firestore = firestoreConfig.firestore();
+        Firestore firestore = FirestoreClient.getFirestore();
         DocumentReference docRef = firestore.collection("reviews").document(review.getReviewId());
 
         ApiFuture<WriteResult> writeResult = docRef.set(review);
@@ -183,7 +182,7 @@ public class ReviewRepository {
     }
 
     public boolean incrementLikeCount(String reviewId) throws ExecutionException, InterruptedException, IOException {
-        Firestore firestore = firestoreConfig.firestore();
+        Firestore firestore = FirestoreClient.getFirestore();
         DocumentReference docRef = firestore.collection("reviews").document(reviewId);
 
         // Primeiro, verifique se o documento existe
@@ -200,7 +199,7 @@ public class ReviewRepository {
     }
 
     public boolean deleteReview(String reviewId) throws ExecutionException, InterruptedException, IOException {
-        Firestore firestore = firestoreConfig.firestore();
+        Firestore firestore = FirestoreClient.getFirestore();
         ApiFuture<WriteResult> writeResult = firestore.collection("reviews").document(reviewId).delete();
         writeResult.get();
 

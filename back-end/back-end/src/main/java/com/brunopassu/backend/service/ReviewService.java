@@ -11,6 +11,7 @@ import com.brunopassu.backend.repository.ReviewRepository;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.*;
+import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -27,13 +28,13 @@ import java.util.stream.Collectors;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
-    private final FirestoreConfig firestore;
+    //private final FirestoreConfig firestore;
     private final LikeRepository likeRepository;
     private final BookService bookService;
 
     public ReviewService(ReviewRepository reviewRepository, FirestoreConfig firestore, LikeRepository likeRepository1, BookService bookService) {
         this.reviewRepository = reviewRepository;
-        this.firestore = firestore;
+        //this.firestore = firestore;
         this.likeRepository = likeRepository1;
         this.bookService = bookService;
 
@@ -82,7 +83,7 @@ public class ReviewService {
         double relevanceScore = calculateRelevanceScore(average, count);
 
         // Atualizar o livro com AMBOS os campos
-        Firestore firestore = this.firestore.firestore();
+        Firestore firestore = FirestoreClient.getFirestore();
         DocumentReference bookRef = firestore.collection("books").document(bookId);
         WriteBatch batch = firestore.batch();
         batch.update(bookRef, "averageRating", average);
@@ -140,7 +141,7 @@ public class ReviewService {
             System.out.println("[FEED] Limited to 30 users due to Firestore constraints");
         }
 
-        Firestore firestore = this.firestore.firestore();
+        Firestore firestore = FirestoreClient.getFirestore();
         int actualPageSize = (pageSize != null && pageSize > 0) ? pageSize : 20;
 
         // Create user references
@@ -203,7 +204,7 @@ public class ReviewService {
     }
 
     private List<String> getFollowingUserIds(String userId) throws ExecutionException, InterruptedException, IOException {
-        Firestore firestore = this.firestore.firestore();
+        Firestore firestore = FirestoreClient.getFirestore();
 
         Query query = firestore.collection("user_relationships") // CORRECT collection
                 .whereEqualTo("followerId", userId)
@@ -229,7 +230,7 @@ public class ReviewService {
 
         // Otimização para buscar usuários em lote
         Map<String, ApiFuture<DocumentSnapshot>> userFutures = new HashMap<>();
-        Firestore firestore = this.firestore.firestore();
+        Firestore firestore = FirestoreClient.getFirestore();
 
         for (Review review : reviews) {
             String userId = review.getUserRef().getId();
@@ -279,7 +280,7 @@ public class ReviewService {
 
         // Otimização para buscar livros em lote
         Map<String, ApiFuture<DocumentSnapshot>> bookFutures = new HashMap<>();
-        Firestore firestore = this.firestore.firestore();
+        Firestore firestore = FirestoreClient.getFirestore();
 
         for (Review review : reviews) {
             String bookId = review.getBookRef().getId();
@@ -406,8 +407,9 @@ public class ReviewService {
         entity.setReviewId(dto.getReviewId());
 
         // Criar referências para usuário e livro
-        DocumentReference userRef = firestore.firestore().collection("users").document(dto.getUserUid());
-        DocumentReference bookRef = firestore.firestore().collection("books").document(dto.getBookId());
+        Firestore firestore = FirestoreClient.getFirestore();
+        DocumentReference userRef = firestore.collection("users").document(dto.getUserUid());
+        DocumentReference bookRef = firestore.collection("books").document(dto.getBookId());
 
         entity.setUserRef(userRef);
         entity.setBookRef(bookRef);
@@ -432,7 +434,7 @@ public class ReviewService {
         // Otimização para buscar usuários e livros em lote
         Map<String, ApiFuture<DocumentSnapshot>> userFutures = new HashMap<>();
         Map<String, ApiFuture<DocumentSnapshot>> bookFutures = new HashMap<>();
-        Firestore firestore = this.firestore.firestore();
+        Firestore firestore = FirestoreClient.getFirestore();
 
         for (Review review : reviews) {
             String userId = review.getUserRef().getId();
@@ -523,7 +525,7 @@ public class ReviewService {
         Map<String, ApiFuture<DocumentSnapshot>> userFutures = new HashMap<>();
         Map<String, ApiFuture<DocumentSnapshot>> bookFutures = new HashMap<>();
 
-        Firestore firestore = this.firestore.firestore();
+        Firestore firestore = FirestoreClient.getFirestore();
 
         // Preparar todas as consultas
         for (Review review : reviews) {
