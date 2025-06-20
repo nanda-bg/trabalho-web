@@ -1,10 +1,11 @@
 import * as S from "./styles";
 import Sidebar from "../SideBar/SideBar";
 import { FC } from "react";
+import { ActiveScreen } from "@app/types/Screens";
 
 interface PrimaryHeaderProps {
   title?: string;
-  activeScreen: "Books" | "Favorites" | "Home";
+  activeScreen: ActiveScreen;
 }
 
 const PrimaryHeader: FC<PrimaryHeaderProps> = ({ title, activeScreen }) => {

@@ -9,8 +9,10 @@ import reviewSlice from "./slices/ReviewsSlice";
 import bookDetailsSlice from "./slices/BookDetailsSlice";
 import bookByGenreSlice from "./slices/BookByGenreSlice";
 import reviewsByUserlice from "./slices/ReviewsByUserSlice";
+import favoriteBooksSlice from "./slices/FavoriteBooksSlice";
+import createBookSlice from "./slices/CreateBookSlice";
 
-const appReducer = combineReducers({
+export const appReducer = combineReducers({
   userSlice: userSlice.reducer,
   loginSlice: loginSlice.reducer,
   signUpSlice: signUpSlice.reducer,
@@ -20,6 +22,8 @@ const appReducer = combineReducers({
   reviewSlice: reviewSlice.reducer,
   bookByGenreSlice: bookByGenreSlice.reducer,
   reviewsByUserlice: reviewsByUserlice.reducer,
+  favoriteBooksSlice: favoriteBooksSlice.reducer,
+  createBookSlice: createBookSlice.reducer,
 });
 
 const rootReducer: Reducer<ReturnType<typeof appReducer>, AnyAction> = (

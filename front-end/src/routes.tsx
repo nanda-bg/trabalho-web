@@ -11,6 +11,7 @@ import FavoriteBooks from "./screens/Favorites/Favorites";
 import ReviewsScreen from "./screens/Reviews/ReviewsScreen";
 import CreateReviewScreen from "./screens/CreateReviewScreen/CreateReviewScreen";
 import BooksScreen from "./screens/Books/BooksScreen";
+import CreateBookScreen from "./screens/CreateBookScreen/CreateBookScreen";
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
   const { isAuthenticated } = useAppSelector((state) => state.authSlice);
@@ -86,6 +87,14 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <BooksScreen />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/book/create",
+    element: (
+      <ProtectedRoute>
+        <CreateBookScreen />
       </ProtectedRoute>
     ),
   },

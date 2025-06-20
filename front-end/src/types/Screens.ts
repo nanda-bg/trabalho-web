@@ -1,0 +1,1 @@
+export type ActiveScreen = "Books" | "Favorites" | "Home" | "CreateBook";

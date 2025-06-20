@@ -2,18 +2,11 @@ import { configureStore } from "@reduxjs/toolkit";
 import createSagaMiddleware from "redux-saga";
 import { all } from "redux-saga/effects";
 import { watchUserSagas } from "./sagas/UserSaga";
-import userSlice from "./slices/UserSlice";
 import { watchLoginSagas } from "./sagas/LoginSaga";
 import { watchSignUpSagas } from "./sagas/SignUpSaga";
-import loginSlice from "./slices/LoginSlice";
-import signUpSlice from "./slices/SignUpSlice";
 import { watchAuthSagas } from "./sagas/AuthSaga";
-import authSlice from "./slices/Auth";
-import bookSlice from "./slices/BooksSlice";
-import { combineReducers } from "redux";
 import { watchBooksSagas } from "./sagas/BooksSaga";
 import { watchReviewsSagas } from "./sagas/ReviewsSaga";
-import reviewSlice from "./slices/ReviewsSlice";
 import {
   FLUSH,
   PAUSE,
@@ -25,12 +18,12 @@ import {
   REHYDRATE,
 } from "redux-persist";
 import storageSession from "redux-persist/lib/storage/session";
-import bookDetailsSlice from "./slices/BookDetailsSlice";
 import { watchBookDetailsSagas } from "./sagas/BookDetailsSaga";
-import bookByGenreSlice from "./slices/BookByGenreSlice";
 import { watchBooksByGenreSagas } from "./sagas/BookByGenreSaga";
 import { watchReviewsByUserSagas } from "./sagas/ReviewsByUserSaga";
-import reviewsByUserlice from "./slices/ReviewsByUserSlice";
+import { appReducer } from "./rootReducer";
+import { watchFavoriteBooksSagas } from "./sagas/FavoriteBooksSaga";
+import { watchCreateBookSagas } from "./sagas/CreateBookSaga";
 
 function* rootSaga() {
   yield all([
@@ -43,6 +36,8 @@ function* rootSaga() {
     watchBookDetailsSagas(),
     watchBooksByGenreSagas(),
     watchReviewsByUserSagas(),
+    watchFavoriteBooksSagas(),
+    watchCreateBookSagas(),
   ]);
 }
 
@@ -53,19 +48,7 @@ const persistConfig = {
 
 const sagaMiddleware = createSagaMiddleware();
 
-const rootReducer = combineReducers({
-  userSlice: userSlice.reducer,
-  loginSlice: loginSlice.reducer,
-  signUpSlice: signUpSlice.reducer,
-  authSlice: authSlice.reducer,
-  bookSlice: bookSlice.reducer,
-  reviewSlice: reviewSlice.reducer,
-  bookDetailsSlice: bookDetailsSlice.reducer,
-  bookByGenreSlice: bookByGenreSlice.reducer,
-  reviewsByUserlice: reviewsByUserlice.reducer,
-});
-
-const persistedReducer = persistReducer(persistConfig, rootReducer);
+const persistedReducer = persistReducer(persistConfig, appReducer);
 
 const store = configureStore({
   reducer: persistedReducer,

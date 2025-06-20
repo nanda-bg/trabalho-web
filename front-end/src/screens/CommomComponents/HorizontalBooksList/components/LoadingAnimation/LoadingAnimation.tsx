@@ -4,7 +4,7 @@ import { FC } from "react";
 const LoadingAnimation: FC = () => {
   return (
     <S.HorizontalScroll>
-      {[...Array(5)].map((_, index) => (
+      {[...Array(15)].map((_, index) => (
         <S.SkeletonBookCard key={index}>
           <S.SkeletonBookCover />
           <S.SkeletonBookInfo>

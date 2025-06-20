@@ -8,6 +8,7 @@ import {
   Menu,
   X,
   Book,
+  BookPlus,
 } from "lucide-react";
 import ProfileSection from "./components/ProfileSection/ProfileSection";
 import NavItem from "./components/NavItem/NavItem";
@@ -15,15 +16,19 @@ import * as S from "./styles";
 import { useDispatch } from "react-redux";
 import { logout } from "@app/store/slices/LoginSlice";
 import { useNavigate } from "react-router-dom";
+import { ActiveScreen } from "@app/types/Screens";
+import { useAppSelector } from "@app/store/rootReducer";
 
 interface SidebarProps {
-  activeScreen: "Books" | "Favorites" | "Home";
+  activeScreen: ActiveScreen;
 }
 
 const Sidebar: FC<SidebarProps> = ({ activeScreen }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const { type } = useAppSelector((state) => state.userSlice);
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -43,6 +48,10 @@ const Sidebar: FC<SidebarProps> = ({ activeScreen }) => {
 
   const goToHome = () => {
     navigate("/home");
+  };
+
+  const goToCreateBook = () => {
+    navigate("/book/create");
   };
 
   return (
@@ -81,6 +90,14 @@ const Sidebar: FC<SidebarProps> = ({ activeScreen }) => {
             onClick={goToFavorites}
             isActive={activeScreen === "Favorites"}
           />
+          {type === "CONTRIBUIDOR" && (
+            <NavItem
+              icon={<BookPlus size={20} />}
+              label="Criar Livro"
+              onClick={goToCreateBook}
+              isActive={activeScreen === "CreateBook"}
+            />
+          )}
 
           <S.LogoutButton onClick={signOut}>
             <LogOut size={20} />

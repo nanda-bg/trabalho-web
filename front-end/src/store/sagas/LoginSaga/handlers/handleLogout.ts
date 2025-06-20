@@ -2,10 +2,13 @@ import { resetAuthSlice } from "@app/store/slices/Auth";
 import { resetBookByGenreSlice } from "@app/store/slices/BookByGenreSlice";
 import { resetBookDetailsSlice } from "@app/store/slices/BookDetailsSlice";
 import { resetBookSlice } from "@app/store/slices/BooksSlice";
+import { resetCreateBookSlice } from "@app/store/slices/CreateBookSlice";
+import { resetFavoriteBooksSlice } from "@app/store/slices/FavoriteBooksSlice";
 import {
   resetLoginSlice,
   setLoginSliceField,
 } from "@app/store/slices/LoginSlice";
+import { resetReviewsByUserlice } from "@app/store/slices/ReviewsByUserSlice";
 import { resetReviewSlice } from "@app/store/slices/ReviewsSlice";
 import { resetSignUpSlice } from "@app/store/slices/SignUpSlice";
 import { resetUserSlice } from "@app/store/slices/UserSlice";
@@ -29,6 +32,9 @@ export function* handleLogout() {
       put(resetUserSlice()),
       put(resetBookByGenreSlice()),
       put(resetBookDetailsSlice()),
+      put(resetCreateBookSlice()),
+      put(resetFavoriteBooksSlice()),
+      put(resetReviewsByUserlice()),
     ]);
 
     yield call(persistor.purge);

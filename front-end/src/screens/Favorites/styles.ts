@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 
 export const Container = styled.div`
   margin: 0 auto;
@@ -15,6 +15,7 @@ export const GenreFilter = styled.div`
   gap: 10px;
   padding: 16px;
   overflow-x: auto;
+  justify-content: center;
 
   &::-webkit-scrollbar {
     height: 8px;
@@ -43,6 +44,7 @@ export const GenreButton = styled.button<{ active: boolean }>`
     props.active ? "#ff0080" : "rgba(255, 255, 255, 0.1)"};
   color: ${(props) => (props.active ? "white" : "#ccc")};
   transition: all 0.2s ease;
+  max-width: 150px;
 
   &:hover {
     opacity: 0.9;
@@ -51,9 +53,10 @@ export const GenreButton = styled.button<{ active: boolean }>`
 
 export const StatsSection = styled.div`
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   padding: 16px;
   margin-bottom: 20px;
+  gap: 32px;
 `;
 
 export const StatCard = styled.div`
@@ -62,6 +65,7 @@ export const StatCard = styled.div`
   padding: 16px;
   text-align: center;
   width: 45%;
+  max-width: 300px;
 `;
 
 export const StatValue = styled.div`
@@ -84,80 +88,16 @@ export const BookGrid = styled.div`
   gap: 16px;
 `;
 
-export const BookCard = styled.div`
-  background-color: #1a1a1a;
-  border-radius: 12px;
-  overflow: hidden;
-  position: relative;
-  transition: transform 0.3s;
-
-  &:hover {
-    transform: translateY(-5px);
-  }
+const spin = keyframes`
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 `;
 
-export const BookCover = styled.img`
-  width: 100%;
-  aspect-ratio: 2/3;
-  object-fit: cover;
-`;
-
-export const BookInfo = styled.div`
-  padding: 12px;
-`;
-
-export const BookTitle = styled.h3`
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0 0 4px 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-export const BookAuthor = styled.p`
-  font-size: 14px;
-  color: #b3b3b3;
-  margin: 0 0 8px 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`;
-
-export const RatingContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 4px;
-`;
-
-export const Rating = styled.span`
-  font-size: 14px;
-  font-weight: 600;
-`;
-
-export const FavoriteButton = styled.button<{ isFavorite: boolean }>`
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background-color: rgba(0, 0, 0, 0.6);
-  border: none;
+export const LoadingSpinner = styled.div`
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(31, 29, 54, 0.3);
   border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: ${(props) => (props.isFavorite ? "#FF4081" : "#ffffff")};
-`;
-
-export const RecommendationSection = styled.div`
-  padding: 16px;
-  margin-top: 20px;
-`;
-
-export const SectionTitle = styled.h2`
-  font-size: 18px;
-  font-weight: 600;
-  margin: 0 0 16px 0;
+  border-top: 3px solid #1f1d36;
+  animation: ${spin} 1s linear infinite;
 `;

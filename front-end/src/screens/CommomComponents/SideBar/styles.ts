@@ -5,7 +5,7 @@ export const SidebarContainer = styled.div<{ isOpen: boolean }>`
   flex-direction: column;
   width: ${({ isOpen }) => (isOpen ? "240px" : "0")};
   height: 100vh;
-  background-color: #1e1a2e;
+  background-color:rgb(25, 21, 37);
   color: #fff;
   position: fixed;
   top: 0;
@@ -64,7 +64,7 @@ export const LogoutButton = styled.button`
   cursor: pointer;
   transition: all 0.2s ease;
   margin-top: auto;
-  margin-bottom: 60px;
+  bottom: 0;
 
   &:hover {
     color: #fff;
