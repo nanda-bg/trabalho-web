@@ -6,7 +6,7 @@ export default function Login() {
     <S.Container>
       <S.Row>
         <S.FormContainer>
-          <S.Logo>LETTERBOX</S.Logo>
+          <S.Logo>LITLOG</S.Logo>
 
           <S.Title>Entrar</S.Title>
 

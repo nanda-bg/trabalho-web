@@ -49,7 +49,7 @@ const SignUpForm = () => {
         icon={"user-round"}
         type={"text"}
         onChange={handleChange}
-        placeholder="Name"
+        placeholder="Nome"
         value={formData.name}
         name="name"
       />
@@ -58,7 +58,7 @@ const SignUpForm = () => {
         icon={"at-sign"}
         type={"text"}
         onChange={handleChange}
-        placeholder="Username"
+        placeholder="Nome de usuário"
         value={formData.username}
         name="username"
       />

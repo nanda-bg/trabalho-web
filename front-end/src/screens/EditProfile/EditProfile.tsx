@@ -114,7 +114,7 @@ export default function EditProfile() {
         <S.SaveButton onClick={handleGoBack}>
           <ArrowLeft size={20} />
         </S.SaveButton>
-        <S.Title>Edit Profile</S.Title>
+        <S.Title>Editar Perfil</S.Title>
         <S.SaveButton onClick={handleSave}>
           <Check size={20} />
         </S.SaveButton>
@@ -136,48 +136,48 @@ export default function EditProfile() {
 
         <S.FormSection>
           <S.InputGroup>
-            <S.Label>Name</S.Label>
+            <S.Label>Nome</S.Label>
             <InputField
               type="text"
               name="name"
               value={profile.name}
               onChange={handleInputChange}
-              placeholder="Your name"
+              placeholder="Seu nome"
               icon={"user-round"}
             />
           </S.InputGroup>
 
           <S.InputGroup>
-            <S.Label>Username</S.Label>
+            <S.Label>Nome de usuário</S.Label>
             <InputField
               type="text"
               name="username"
               value={profile.username}
               onChange={handleInputChange}
-              placeholder="Your username"
+              placeholder="Seu nome de usuário"
               icon={"at-sign"}
             />
           </S.InputGroup>
 
           <S.InputGroup>
-            <S.Label>Email</S.Label>
+            <S.Label>E-mail</S.Label>
             <InputField
               type="email"
               name="email"
               value={profile.email}
               onChange={handleInputChange}
-              placeholder="Your email"
+              placeholder="Seu e-mail"
               icon={"mail"}
             />
           </S.InputGroup>
 
           <S.InputGroup>
-            <S.Label>Bio</S.Label>
+            <S.Label>Biografia</S.Label>
             <TextArea
               name="bio"
               value={profile.bio}
               handleChange={handleInputChange}
-              placeholder="Tell us about yourself"
+              placeholder="Toda história começa com uma boa introdução. Escreva a sua aqui."
               rows={4}
             />
           </S.InputGroup>
@@ -204,10 +204,10 @@ export default function EditProfile() {
 
       <S.LogoSection>
         <S.LogoContainer>
-          <S.LogoDot color="#FF8000" />
-          <S.LogoDot color="#00CCFF" />
-          <S.LogoDot color="#FF0080" />
-          <S.LogoText>Letterboxd</S.LogoText>
+          <S.LogoDot color="#9C4A8B" />
+          <S.LogoDot color="#EB62AB" />
+          <S.LogoDot color="#E9A6A6" />
+          <S.LogoText>LitLog</S.LogoText>
         </S.LogoContainer>
       </S.LogoSection>
     </S.Container>

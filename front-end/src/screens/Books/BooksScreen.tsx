@@ -13,10 +13,11 @@ import PrimaryHeader from "../CommomComponents/PrimaryHeader/PrimaryHeader";
 
 const GENRES = [
   "Ficção",
+  "Ficção juvenil",
   "Autoajuda",
-  "Arquitetura",
   "Poesia",
   "Coleções literárias",
+  "Biografia e autobiografia",
   "História",
   "Ciências sociais",
 ];
