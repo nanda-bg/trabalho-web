@@ -23,6 +23,11 @@ import {
   addBookToFavorites,
   removeBookFromFavorites,
 } from "@app/store/slices/FavoriteBooksSlice";
+import {
+  checkIsBookInReadingList,
+  addBookToReadingList,
+  removeBookFromReadingList,
+} from "@app/store/slices/ReadingListSlice";
 
 const BookDetails: FC = () => {
   const dispatch = useDispatch();
@@ -43,6 +48,10 @@ const BookDetails: FC = () => {
     (state) => state.favoriteBooksSlice
   );
 
+  const { isSelectedBookInReadingList } = useAppSelector(
+    (state) => state.readingListSlice
+  );
+
   const [activeTab, setActiveTab] = useState<"summary" | "details" | "reviews">(
     "summary"
   );
@@ -51,6 +60,7 @@ const BookDetails: FC = () => {
     dispatch(getBookDetails({ uid: id }));
     dispatch(listReviewsByBook({ bookId: id }));
     dispatch(checkIsBookFavorite({ bookId: id }));
+    dispatch(checkIsBookInReadingList({ bookId: id }));
 
     window.scrollTo({
       top: 0,
@@ -75,6 +85,16 @@ const BookDetails: FC = () => {
   const handleRemoveBookFromFavorites = () => {
     if (!selectedBook) return;
     dispatch(removeBookFromFavorites({ bookId: selectedBook.bookId }));
+  };
+
+  const handleAddBookToReadingList = () => {
+    if (!selectedBook) return;
+    dispatch(addBookToReadingList({ bookId: selectedBook.bookId }));
+  };
+
+  const handleRemoveBookFromReadingList = () => {
+    if (!selectedBook) return;
+    dispatch(removeBookFromReadingList({ bookId: selectedBook.bookId }));
   };
 
   useEffect(() => {
@@ -103,9 +123,21 @@ const BookDetails: FC = () => {
             <Header bookDetails={selectedBook} />
 
             <S.ActionButtons>
-              <S.ActionButton $primary>
-                <BookOpen size={16} />
-                Adicionar a lista de leituras
+              <S.ActionButton 
+                $primary
+                onClick={
+                  isSelectedBookInReadingList
+                    ? handleRemoveBookFromReadingList
+                    : handleAddBookToReadingList
+                }
+              >
+                <BookOpen 
+                  size={16}
+                />
+                {isSelectedBookInReadingList 
+                  ? "Remover da lista de leituras" 
+                  : "Adicionar a lista de leituras"
+                }
               </S.ActionButton>
               <S.ActionButton
                 onClick={

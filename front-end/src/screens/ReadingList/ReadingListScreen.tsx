@@ -6,25 +6,25 @@ import { useAppSelector } from "@app/store/rootReducer";
 import { useDispatch } from "react-redux";
 import PrimaryHeader from "../CommomComponents/PrimaryHeader/PrimaryHeader";
 import {
-  listFavoriteBooks,
-  resetFavoriteBooksSlice,
-} from "@app/store/slices/FavoriteBooksSlice";
+  listReadingListBooks,
+  resetReadingListSlice,
+} from "@app/store/slices/ReadingListSlice";
 
-const FavoriteBooks: FC = () => {
+const ReadingListScreen: FC = () => {
   const dispatch = useDispatch();
 
-  const { favoriteBooks, isLoading } = useAppSelector(
-    (state) => state.favoriteBooksSlice
+  const { readingListBooks, isLoading } = useAppSelector(
+    (state) => state.readingListSlice
   );
 
   const [activeGenre, setActiveGenre] = useState<string | null>(null);
 
   const filteredBooks = activeGenre
-    ? favoriteBooks?.filter((book) => book.genre === activeGenre)
-    : favoriteBooks;
+    ? readingListBooks?.filter((book) => book.genre === activeGenre)
+    : readingListBooks;
 
   const genres = Array.from(
-    new Set(favoriteBooks.flatMap((book) => book.genre))
+    new Set(readingListBooks.flatMap((book) => book.genre))
   );
 
   const containerRef = useRef(null);
@@ -34,14 +34,14 @@ const FavoriteBooks: FC = () => {
 
   const onListEnd = () => {
     if (!hasCalledListEnd) {
-      dispatch(listFavoriteBooks());
+      dispatch(listReadingListBooks({}));
       setHasCalledListEnd(true);
     }
   };
 
   useEffect(() => {
     setHasCalledListEnd(false);
-  }, [favoriteBooks.length]);
+  }, [readingListBooks.length]);
 
   useEffect(() => {
     if (!lastBookRef.current) return;
@@ -61,25 +61,25 @@ const FavoriteBooks: FC = () => {
       observer.disconnect();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [favoriteBooks, hasCalledListEnd, lastBookRef.current]);
+  }, [readingListBooks, hasCalledListEnd, lastBookRef.current]);
 
   useEffect(() => {
-    dispatch(listFavoriteBooks());
+    dispatch(listReadingListBooks({ reset: true }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     return () => {
-      dispatch(resetFavoriteBooksSlice());
+      dispatch(resetReadingListSlice());
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <>
       <GlobalStyle />
       <S.Container ref={containerRef}>
-        <PrimaryHeader title={"Livros Favoritos"} activeScreen="Favorites" />
+        <PrimaryHeader title={"Lista de Leitura"} activeScreen="ReadingList" />
 
         <S.GenreFilter>
           {genres.map((genre) => (
@@ -111,4 +111,4 @@ const FavoriteBooks: FC = () => {
   );
 };
 
-export default FavoriteBooks;
+export default ReadingListScreen;

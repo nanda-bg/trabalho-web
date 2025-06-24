@@ -1,1 +1,1 @@
-export type ActiveScreen = "Books" | "Favorites" | "Home" | "CreateBook";
+export type ActiveScreen = "Books" | "Favorites" | "Home" | "CreateBook" | "ReadingList";

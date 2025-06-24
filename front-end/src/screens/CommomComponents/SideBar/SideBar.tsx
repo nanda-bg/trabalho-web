@@ -46,6 +46,10 @@ const Sidebar: FC<SidebarProps> = ({ activeScreen }) => {
     navigate("/books");
   };
 
+  const goToReadingList = () => {
+  navigate("/reading-list");
+  };
+
   const goToHome = () => {
     navigate("/home");
   };
@@ -83,7 +87,12 @@ const Sidebar: FC<SidebarProps> = ({ activeScreen }) => {
             isActive={activeScreen === "Books"}
           />
           <NavItem icon={<Star size={20} />} label="Avaliações" />
-          <NavItem icon={<BookOpen size={20} />} label="Lista de leitura" />
+          <NavItem 
+            icon={<BookOpen size={20} />} 
+            label="Lista de leitura" 
+            onClick={goToReadingList} 
+            isActive={activeScreen === "ReadingList"} 
+          />
           <NavItem
             icon={<Heart size={20} />}
             label="Favoritos"
