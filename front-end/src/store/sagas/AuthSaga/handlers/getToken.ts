@@ -20,10 +20,7 @@ export function* getToken(email: string, password: string) {
       }
     );
 
-    Cookies.set("token", response.data.idToken, {
-      secure: true,
-      sameSite: "strict"
-    });
+    Cookies.set("token", response.data.idToken);
 
     yield put(setAuthSlice({ isAuthenticated: true }));
     return response.data.idToken;
