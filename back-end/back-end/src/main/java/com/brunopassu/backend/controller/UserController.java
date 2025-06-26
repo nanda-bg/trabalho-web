@@ -1,5 +1,6 @@
 package com.brunopassu.backend.controller;
 
+import com.brunopassu.backend.cacheManager.SmartCacheManager;
 import com.brunopassu.backend.entity.User;
 import com.brunopassu.backend.exception.UserAlreadyExistsException;
 import com.brunopassu.backend.exception.UserEmailmmutableFieldException;
@@ -28,6 +29,9 @@ import java.util.concurrent.ExecutionException;
 public class UserController {
 
     private final UserService userService;
+
+    @Autowired
+    SmartCacheManager smartCacheManager;
 
     @Autowired
     public UserController(UserService userService) {
@@ -322,9 +326,11 @@ public class UserController {
         try {
             // Garante que o ID no path seja o mesmo usado para atualização
             user.setUid(id);
-            boolean updated = userService.updateUser(user);
+            User updatedUser = userService.updateUser(user);
 
-            if (updated) {
+            if (updatedUser != null) {
+                // ATUALIZA TODOS OS CACHES RELACIONADOS
+                smartCacheManager.updateUserInAllCaches(updatedUser);
                 return new ResponseEntity<>("Usuário atualizado com sucesso", HttpStatus.OK);
             } else {
                 return new ResponseEntity<>("Usuário não encontrado", HttpStatus.NOT_FOUND);

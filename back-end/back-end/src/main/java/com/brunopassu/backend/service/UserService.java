@@ -14,6 +14,7 @@ import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -75,22 +76,23 @@ public class UserService {
         return userRepository.getUsersWithPagination(lastUserId, actualPageSize);
     }
 
-    @CacheEvict(value = {"user-details", "user-by-username", "users-paginated"}, key = "#user.uid")
-    public boolean updateUser(User user) throws ExecutionException, InterruptedException, IOException,
+    @CachePut(value = "user-details", key = "#user.uid")
+    @CacheEvict(value = {"user-by-username", "users-paginated"}, allEntries = true)
+    public User updateUser(User user) throws ExecutionException, InterruptedException, IOException,
             UserAlreadyExistsException, UserUsernameImmutableFieldException, UserEmailmmutableFieldException, FirebaseAuthException {
 
         if (user.getUid() == null || user.getUid().isEmpty()) {
-            return false; // Não podemos atualizar sem um ID
+            return null; // Não podemos atualizar sem um ID
         }
 
         // Obter usuário atual para comparação
         User existingUser = getUserById(user.getUid());
         if (existingUser == null) {
-            return false;
+            return null;
         }
 
         // Verificar se o username foi alterado
-        if (!existingUser.getUsername().equals(user.getUsername())) {
+        if (existingUser.getUsername() != user.getUsername() || existingUser.getUsername() == null || user.getUsername() == null) {
             // Verificar se o novo username já existe
             if (checkUsernameExists(user.getUsername())) {
                 throw new UserUsernameImmutableFieldException("Username já está em uso por outro usuário!");
@@ -114,9 +116,14 @@ public class UserService {
                 throw new FirebaseAuthException(e);
             }
         }
+        boolean updated = userRepository.updateUser(user);
+        if (!updated) {
+            return null;
+        }
 
-        // Atualiza o documento no Firestore
-        return userRepository.updateUser(user);
+        // RETORNA O OBJETO ATUALIZADO PARA O CACHE
+        return user;
+
     }
 
     @CacheEvict(value = {"user-details", "user-by-username", "users-paginated"}, key = "#userId")

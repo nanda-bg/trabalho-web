@@ -44,4 +44,5 @@ public class FirebaseConfig {
     public FirebaseAuth firebaseAuth(FirebaseApp firebaseApp) {
         return FirebaseAuth.getInstance(firebaseApp);
     }
+
 }

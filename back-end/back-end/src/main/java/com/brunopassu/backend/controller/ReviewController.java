@@ -1,5 +1,6 @@
 package com.brunopassu.backend.controller;
 
+import com.brunopassu.backend.cacheManager.SmartCacheManager;
 import com.brunopassu.backend.dto.ReviewDTO;
 import com.brunopassu.backend.service.AuthService;
 import com.brunopassu.backend.service.ReviewService;
@@ -29,6 +30,9 @@ import java.util.concurrent.ExecutionException;
 public class ReviewController {
 
     private final ReviewService reviewService;
+
+    @Autowired
+    SmartCacheManager smartCacheManager;
 
     @Autowired
     private AuthService authService;
@@ -524,14 +528,18 @@ public class ReviewController {
     public ResponseEntity<String> updateReview(@PathVariable String reviewId, @RequestBody ReviewDTO reviewDTO) {
         try {
             reviewDTO.setReviewId(reviewId);
-            boolean updated = reviewService.updateReview(reviewDTO);
-            return updated ?
-                    new ResponseEntity<>("Review atualizada com sucesso", HttpStatus.OK) :
-                    new ResponseEntity<>("Falha ao atualizar review", HttpStatus.BAD_REQUEST);
-        } catch (ExecutionException | InterruptedException e) {
+
+            ReviewDTO updatedReview = reviewService.updateReview(reviewDTO);
+
+            if (updatedReview != null) {
+                // ATUALIZA TODOS OS CACHES RELACIONADOS
+                smartCacheManager.updateReviewInAllCaches(updatedReview);
+                return new ResponseEntity<>("Review atualizada com sucesso", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Falha ao atualizar review", HttpStatus.BAD_REQUEST);
+            }
+        } catch (Exception e) {
             return new ResponseEntity<>("Erro ao atualizar review: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 

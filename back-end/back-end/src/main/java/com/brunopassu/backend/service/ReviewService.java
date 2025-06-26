@@ -13,6 +13,7 @@ import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -324,12 +325,13 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
-    @CacheEvict(value = {"review-details", "reviews-paginated", "reviews-by-book", "reviews-by-user", "reviews-feed"}, key = "#reviewDTO.reviewId")
-    public boolean updateReview(ReviewDTO reviewDTO) throws ExecutionException, InterruptedException, IOException {
+    @CachePut(value = "review-details", key = "#reviewDTO.reviewId")
+    @CacheEvict(value = {"reviews-paginated", "reviews-by-book", "reviews-by-user", "reviews-feed"}, allEntries = true)
+    public ReviewDTO updateReview(ReviewDTO reviewDTO) throws ExecutionException, InterruptedException, IOException {
         //GAMBIARRA DO BRUNÃO:
         ReviewDTO existingReview = getReviewById(reviewDTO.getReviewId());
         if (existingReview == null) {
-            return false;
+            return null;
         }
 
         Review review = convertToEntity(reviewDTO);
@@ -343,13 +345,13 @@ public class ReviewService {
         }
 
         boolean updated = reviewRepository.updateReview(review);
-
         if (updated) {
-            // Atualizar a média de avaliação e contador do livro
             updateBookRating(review.getBookRef().getId());
+            // RETORNA O DTO ATUALIZADO PARA O CACHE
+            return reviewDTO;
         }
 
-        return updated;
+        return null;
     }
 
     @CacheEvict(value = {"review-details", "reviews-paginated", "reviews-by-book", "reviews-by-user", "reviews-feed"}, key = "#reviewId")
@@ -401,7 +403,7 @@ public class ReviewService {
         }
     }
 
-    // Métodos de conversão entre DTO e Entidade
+    // Métodos de conversão de Reviews de DTO e Entidade
     private Review convertToEntity(ReviewDTO dto) throws IOException {
         Review entity = new Review();
         entity.setReviewId(dto.getReviewId());
