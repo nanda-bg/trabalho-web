@@ -10,7 +10,7 @@ export function* fetchUserInfoHandler({ payload }: FetchUserInfoPayloadAction) {
 
     const token = Cookies.get("token");
 
-    const { data } = yield call(axios.get, `/users/id/${payload.uid}`, {
+    const { data } = yield call(axios.get, `/api/users/id/${payload.uid}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

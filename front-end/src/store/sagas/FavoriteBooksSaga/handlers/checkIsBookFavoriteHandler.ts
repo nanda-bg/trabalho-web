@@ -19,7 +19,7 @@ export function* checkIsBookFavoriteHandler({
 
     const { data } = yield call(
       axios.get,
-      `/users/books/favorites/${payload.bookId}/exists`,
+      `/api/users/books/favorites/${payload.bookId}/exists`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

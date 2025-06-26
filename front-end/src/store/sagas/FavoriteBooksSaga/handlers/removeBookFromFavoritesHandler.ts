@@ -17,7 +17,7 @@ export function* removeBookFromFavoritesHandler({
 
     const token = Cookies.get("token");
 
-    yield call(axios.delete, `/users/books/favorites/${payload.bookId}`, {
+    yield call(axios.delete, `/api/users/books/favorites/${payload.bookId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

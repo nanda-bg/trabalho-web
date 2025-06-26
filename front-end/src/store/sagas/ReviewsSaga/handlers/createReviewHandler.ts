@@ -23,7 +23,7 @@ export function* createReviewHandler({ payload }: CreateReviewPayloadAction) {
 
     yield call(
       axios.post,
-      `/reviews`,
+      `/api/reviews`,
       {
         userUid: userId,
         ...payload,

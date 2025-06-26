@@ -82,7 +82,7 @@ export function* handleSignUp({ payload }: SignUpPayloadAction) {
       return;
     }
 
-    yield call(axios.post, "/auth/register", {
+    yield call(axios.post, "/api/auth/register", {
       email,
       password,
       name,

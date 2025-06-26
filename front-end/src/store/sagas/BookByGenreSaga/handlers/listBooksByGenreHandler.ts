@@ -29,7 +29,7 @@ export function* listBooksByGenreHandler({
 
     const { data }: AxiosResponse<Book[]> = yield call(
       axios.get,
-      `/books/genre/paginated`,
+      `/api/books/genre/paginated`,
       {
         params: {
           genre: payload.genre,

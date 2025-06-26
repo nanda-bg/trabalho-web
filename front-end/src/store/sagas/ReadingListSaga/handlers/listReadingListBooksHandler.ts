@@ -22,7 +22,7 @@ export function* listReadingListBooksHandler({
 
     const token = Cookies.get("token");
 
-    const { data } = yield call(axios.get, `users/books/future-reads`, {
+    const { data } = yield call(axios.get, `/api/users/books/future-reads`, {
       params: {
         lastItemId: lastBookId,
         pageSize: 20,

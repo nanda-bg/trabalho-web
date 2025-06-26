@@ -21,7 +21,7 @@ export function* createBookHandler({ payload }: CreateBookPayloadAction) {
 
     const { data } = yield call(
       axios.post,
-      `/books`,
+      `/api/books`,
       {
         ...payload,
         genres: [payload.genre]

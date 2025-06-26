@@ -15,7 +15,7 @@ export function* listBooksHandler() {
 
     const { data }: AxiosResponse<Book[]> = yield call(
       axios.get,
-      `/books/paginated`,
+      `/api/books/paginated`,
       {
         params: {
           lastBookId,

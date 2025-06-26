@@ -15,7 +15,7 @@ export function* getBookDetailsHandler({
 
     const token = Cookies.get("token");
 
-    const { data } = yield call(axios.get, `/books/id/${payload.uid}`, {
+    const { data } = yield call(axios.get, `/api/books/id/${payload.uid}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

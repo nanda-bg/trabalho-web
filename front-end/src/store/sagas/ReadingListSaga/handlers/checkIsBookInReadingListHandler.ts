@@ -12,7 +12,7 @@ export function* checkIsBookInReadingListHandler({
 
     const { data } = yield call(
       axios.get,
-      `/users/books/future-reads/${payload.bookId}/exists`,
+      `/api/users/books/future-reads/${payload.bookId}/exists`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

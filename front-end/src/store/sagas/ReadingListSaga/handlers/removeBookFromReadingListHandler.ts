@@ -12,7 +12,7 @@ export function* removeBookFromReadingListHandler({
 
     yield call(
       axios.delete,
-      `/users/books/future-reads/${payload.bookId}`,
+      `/api/users/books/future-reads/${payload.bookId}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

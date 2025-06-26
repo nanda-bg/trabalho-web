@@ -15,7 +15,7 @@ export function* listReviewsByUserHandler({
 
     const token = Cookies.get("token");
 
-    const { data } = yield call(axios.get, `/reviews/user/${payload.userId}`, {
+    const { data } = yield call(axios.get, `/api/reviews/user/${payload.userId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

@@ -13,7 +13,7 @@ export function* listReviewsByReviewHandler({
 
     const token = Cookies.get("token");
 
-    const { data } = yield call(axios.get, `/reviews/book/${payload.bookId}`, {
+    const { data } = yield call(axios.get, `/api/reviews/book/${payload.bookId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

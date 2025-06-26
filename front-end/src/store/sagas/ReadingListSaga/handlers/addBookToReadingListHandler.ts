@@ -12,7 +12,7 @@ export function* addBookToReadingListHandler({
 
     yield call(
       axios.post,
-      `/users/books/future-reads/${payload.bookId}`,
+      `/api/users/books/future-reads/${payload.bookId}`,
       {},
       {
         headers: {

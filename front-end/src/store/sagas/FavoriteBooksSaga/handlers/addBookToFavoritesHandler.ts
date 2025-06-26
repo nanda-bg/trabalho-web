@@ -19,7 +19,7 @@ export function* addBookToFavoritesHandler({
 
     yield call(
       axios.post,
-      `/users/books/favorites/${payload.bookId}`,
+      `/api/users/books/favorites/${payload.bookId}`,
       {},
       {
         headers: {

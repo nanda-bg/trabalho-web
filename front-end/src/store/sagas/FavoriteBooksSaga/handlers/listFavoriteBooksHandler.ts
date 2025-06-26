@@ -17,7 +17,7 @@ export function* listFavoriteBooksHandler() {
       (state) => state.favoriteBooksSlice
     );
 
-    const { data } = yield call(axios.get, `/users/books/favorites`, {
+    const { data } = yield call(axios.get, `/api/users/books/favorites`, {
       params: {
         lastItemId: lastBookId,
         pageSize: 20,

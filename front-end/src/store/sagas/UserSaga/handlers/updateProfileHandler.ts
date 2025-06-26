@@ -15,7 +15,7 @@ export function* updateProfileHandler({ payload }: UpdateProfilePayloadAction) {
 
     yield call(
       axios.put,
-      `/users/id/${userId}`,
+      `/api/users/id/${userId}`,
       {
         email: email,
         name: name,

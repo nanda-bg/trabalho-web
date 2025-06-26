@@ -15,7 +15,7 @@ export function* handleLogin({ payload }: LoginPayloadAction) {
 
     const token = Cookies.get("token");
 
-    const response = yield call(axios.post, "/auth/verify-token", {
+    const response = yield call(axios.post, "/api/auth/verify-token", {
       token: token,
     });
 
