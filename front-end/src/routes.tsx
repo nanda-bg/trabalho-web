@@ -11,6 +11,7 @@ import FavoriteBooks from "./screens/Favorites/Favorites";
 import ReviewsScreen from "./screens/Reviews/ReviewsScreen";
 import CreateReviewScreen from "./screens/CreateReviewScreen/CreateReviewScreen";
 import BooksScreen from "./screens/Books/BooksScreen";
+import ReviewsFeedScreen from "./screens/ReviewsFeed/ReviewsFeedScreen";
 import ReadingListScreen from "./screens/ReadingList/ReadingListScreen";
 import CreateBookScreen from "./screens/CreateBookScreen/CreateBookScreen";
 
@@ -91,6 +92,14 @@ const router = createBrowserRouter([
         <BooksScreen />
       </ProtectedRoute>
     ),
+  },
+  {
+  path: "/reviews",
+  element: (
+    <ProtectedRoute>
+      <ReviewsFeedScreen />
+    </ProtectedRoute>
+  ),
   },
   {
   path: "/reading-list",

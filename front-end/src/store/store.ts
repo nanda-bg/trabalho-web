@@ -25,6 +25,7 @@ import { watchReviewsByUserSagas } from "./sagas/ReviewsByUserSaga";
 import { appReducer } from "./rootReducer";
 import { watchFavoriteBooksSagas } from "./sagas/FavoriteBooksSaga";
 import { watchCreateBookSagas } from "./sagas/CreateBookSaga";
+import { watchReviewsFeedSagas } from "./sagas/ReviewsFeedSaga";
 
 function* rootSaga() {
   yield all([
@@ -40,6 +41,7 @@ function* rootSaga() {
     watchFavoriteBooksSagas(),
     watchReadingListSagas(),
     watchCreateBookSagas(),
+    watchReviewsFeedSagas(),
   ]);
 }
 

@@ -24,7 +24,7 @@ export function* createBookHandler({ payload }: CreateBookPayloadAction) {
       `/api/books`,
       {
         ...payload,
-        genres: [payload.genre]
+        genres: [payload.genre],
       },
       {
         headers: {

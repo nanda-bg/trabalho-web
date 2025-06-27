@@ -12,6 +12,7 @@ import reviewsByUserlice from "./slices/ReviewsByUserSlice";
 import favoriteBooksSlice from "./slices/FavoriteBooksSlice";
 import createBookSlice from "./slices/CreateBookSlice";
 import readingListSlice from "./slices/ReadingListSlice";
+import reviewsFeedSlice from "./slices/ReviewsFeedSlice";
 
 export const appReducer = combineReducers({
   userSlice: userSlice.reducer,
@@ -26,6 +27,7 @@ export const appReducer = combineReducers({
   favoriteBooksSlice: favoriteBooksSlice.reducer,
   readingListSlice: readingListSlice.reducer,
   createBookSlice: createBookSlice.reducer,
+  reviewsFeedSlice: reviewsFeedSlice.reducer,
 });
 
 const rootReducer: Reducer<ReturnType<typeof appReducer>, AnyAction> = (
