@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 import { call, put } from "redux-saga/effects";
 import { setReadingListSliceField } from "@app/store/slices/ReadingListSlice";
 import { CheckIsBookInReadingListPayloadAction } from "@app/store/slices/ReadingListSlice/types";

@@ -10,7 +10,7 @@ import RatingsBars from "./components/RatingBars/RatingsBar";
 import DetailsSection from "./components/DetailsSection/DetailsSection";
 import ReviewsSection from "./components/ReviewsSection/ReviewsSection";
 import { useDispatch } from "react-redux";
-import { listReviewsByBook } from "@app/store/slices/ReviewsSlice";
+import { listReviewsByBook } from "@app/store/slices/ReviewsByBookSlice";
 import {
   getBookDetails,
   resetBookDetailsSlice,
@@ -42,7 +42,7 @@ const BookDetails: FC = () => {
     (state) => state.bookByGenreSlice
   );
 
-  const { reviews } = useAppSelector((state) => state.reviewSlice);
+  const { reviewsByBook } = useAppSelector((state) => state.reviewsByBookSlice);
 
   const { isSelectedBookFavorite } = useAppSelector(
     (state) => state.favoriteBooksSlice
@@ -101,6 +101,7 @@ const BookDetails: FC = () => {
     return () => {
       dispatch(resetBookDetailsSlice());
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -123,7 +124,7 @@ const BookDetails: FC = () => {
             <Header bookDetails={selectedBook} />
 
             <S.ActionButtons>
-              <S.ActionButton 
+              <S.ActionButton
                 $primary
                 onClick={
                   isSelectedBookInReadingList
@@ -131,13 +132,10 @@ const BookDetails: FC = () => {
                     : handleAddBookToReadingList
                 }
               >
-                <BookOpen 
-                  size={16}
-                />
-                {isSelectedBookInReadingList 
-                  ? "Remover da lista de leituras" 
-                  : "Adicionar a lista de leituras"
-                }
+                <BookOpen size={16} />
+                {isSelectedBookInReadingList
+                  ? "Remover da lista de leituras"
+                  : "Adicionar a lista de leituras"}
               </S.ActionButton>
               <S.ActionButton
                 onClick={
@@ -155,10 +153,10 @@ const BookDetails: FC = () => {
               </S.ActionButton>
             </S.ActionButtons>
 
-            {reviews && (
+            {reviewsByBook && (
               <RatingsBars
                 bookRating={selectedBook.averageRating}
-                reviews={reviews}
+                reviews={reviewsByBook}
               />
             )}
 
@@ -194,7 +192,9 @@ const BookDetails: FC = () => {
                 <DetailsSection selectedBook={selectedBook} />
               )}
 
-              {activeTab === "reviews" && <ReviewsSection reviews={reviews} />}
+              {activeTab === "reviews" && (
+                <ReviewsSection reviews={reviewsByBook} />
+              )}
             </S.TabContent>
 
             {(isLoadingBooksByGenre[selectedBook.genre] ||

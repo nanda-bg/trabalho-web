@@ -117,3 +117,9 @@ export const LogoText = styled.span`
   font-weight: 600;
   margin-left: 4px;
 `;
+
+export const ErrorContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-self: center;
+`;

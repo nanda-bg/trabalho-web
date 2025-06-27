@@ -41,7 +41,9 @@ export function* listBooksByGenreHandler({
       }
     );
 
-    const { booksByGenre, hasMore } = yield select((state) => state.bookByGenreSlice);
+    const { booksByGenre, hasMore } = yield select(
+      (state) => state.bookByGenreSlice
+    );
 
     const books = _.uniqBy(
       [...(booksByGenre[payload.genre] || []), ...data],

@@ -4,12 +4,7 @@ import {
   SetStateSliceFieldReducerPayload,
 } from "../../utils/setStateSliceFieldReducer";
 import { setStateSliceReducer } from "../../utils/setStateSliceReducer";
-import {
-  ReviewsState,
-  GetReviewPayloadAction,
-  ListReviewsByBookPayloadAction,
-  CreateReviewPayloadAction,
-} from "./types";
+import { ReviewsState } from "./types";
 
 export const initialState: ReviewsState = {
   reviews: [],
@@ -20,29 +15,25 @@ export const initialState: ReviewsState = {
   createReviewSuccess: false,
 };
 
-const reviewSlice = createSlice({
-  name: "review",
+const reviewsSlice = createSlice({
+  name: "reviews",
   initialState,
   reducers: {
-    setReviewSliceField: (
+    setReviewsSliceField: (
       state,
       action: SetStateSliceFieldReducerPayload<ReviewsState>
     ) => setStateSliceFieldReducer<ReviewsState>(state, action),
-    setReviewSlice: (state, action: PayloadAction<Partial<ReviewsState>>) =>
+    setReviewsSlice: (state, action: PayloadAction<Partial<ReviewsState>>) =>
       setStateSliceReducer<ReviewsState>(state, action),
-    getReview: (_state, _action: GetReviewPayloadAction) => {},
-    listReviewsByBook: (_state, _action: ListReviewsByBookPayloadAction) => {},
-    createReview: (_state, _action: CreateReviewPayloadAction) => {},
-    resetReviewSlice: () => initialState,
+    listReviews: () => {},
+    resetReviewsSlice: () => initialState,
   },
 });
 
 export const {
-  setReviewSliceField,
-  setReviewSlice,
-  getReview,
-  listReviewsByBook,
-  createReview,
-  resetReviewSlice,
-} = reviewSlice.actions;
-export default reviewSlice;
+  setReviewsSliceField,
+  setReviewsSlice,
+  listReviews,
+  resetReviewsSlice,
+} = reviewsSlice.actions;
+export default reviewsSlice;

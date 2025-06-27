@@ -22,7 +22,7 @@ export function* updateProfileHandler({ payload }: UpdateProfilePayloadAction) {
         username: username,
         profilePicture: profileImage,
         bio: bio,
-        ...(type !== null ? { userType: type } : {})
+        ...(type !== null ? { userType: type } : {}),
       },
       {
         headers: {

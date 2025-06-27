@@ -33,8 +33,7 @@ export function* addBookToFavoritesHandler({
     yield put(
       setFavoriteBooksSliceField({
         key: "error",
-        value:
-          "Erro ao adicionar livro aos favoritos, tente novamente.",
+        value: "Erro ao adicionar livro aos favoritos, tente novamente.",
       })
     );
   } finally {

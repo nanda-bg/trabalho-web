@@ -1,4 +1,4 @@
-import styled, { css } from "styled-components"
+import styled, { css } from "styled-components";
 
 export const ReviewCard = styled.div`
   background-color: #16162a;
@@ -7,26 +7,34 @@ export const ReviewCard = styled.div`
   margin-bottom: 16px;
   display: flex;
   flex-direction: column;
-`
+`;
 
 export const InfoContainer = styled.div`
   display: flex;
   flex-direction: row;
   gap: 10px;
-`
+`;
 
 export const BookCover = styled.img`
   border-radius: 12px;
   max-width: 90px;
   max-height: 120px;
   align-self: center;
+`;
+
+export const NoCover = styled.img`
+  border-radius: 12px;
+  width: 90px;
+  height: 120px;
+  align-self: center;
+  background-color:rgb(202, 202, 204);
 `
 
 export const ReviewInfo = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
-`
+`;
 
 export const BookTitle = styled.h5`
   font-size: 14px;
@@ -35,12 +43,12 @@ export const BookTitle = styled.h5`
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
-`
+`;
 
 export const Rating = styled.div`
   display: flex;
   align-items: center;
-`
+`;
 
 export const SpoilerContainer = styled.div`
   display: flex;
@@ -49,7 +57,7 @@ export const SpoilerContainer = styled.div`
   position: relative;
   z-index: 2;
   justify-content: center;
-`
+`;
 
 export const SpoilerAlert = styled.div`
   display: flex;
@@ -61,7 +69,7 @@ export const SpoilerAlert = styled.div`
   border-left: 3px solid #ff4d4d;
   font-size: 12px;
   color: #ff4d4d;
-`
+`;
 
 export const SpoilerButton = styled.button`
   display: flex;
@@ -81,7 +89,7 @@ export const SpoilerButton = styled.button`
   &:hover {
     background-color: rgba(255, 255, 255, 0.2);
   }
-`
+`;
 
 export const ReviewContent = styled.p<{ spoiler?: boolean }>`
   font-size: 14px;
@@ -92,17 +100,16 @@ export const ReviewContent = styled.p<{ spoiler?: boolean }>`
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  
+
   ${({ spoiler }) =>
     spoiler &&
     css`
-    opacity: 0.2;
-    filter: blur(4px);
-    user-select: none;
-    pointer-events: none;
-  `}
-`
-
+      opacity: 0.2;
+      filter: blur(4px);
+      user-select: none;
+      pointer-events: none;
+    `}
+`;
 
 export const Star = styled.div<{ filled: boolean; half?: boolean }>`
   width: 12px;

@@ -5,12 +5,12 @@ import ReviewCard from "../CommomComponents/ReviewCard/ReviewCard";
 import { useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useEffect } from "react";
-import { listReviewsByBook } from "@app/store/slices/ReviewsSlice";
+import { listReviewsByBook } from "@app/store/slices/ReviewsByBookSlice";
 import SecondaryHeader from "../CommomComponents/SecondaryHeader/SecondaryHeader";
 
 export default function ReviewsScreen() {
   const dispatch = useDispatch();
-  const { reviews } = useAppSelector((state) => state.reviewSlice);
+  const { reviewsByBook } = useAppSelector((state) => state.reviewsByBookSlice);
   const { id } = useParams();
 
   useEffect(() => {
@@ -20,14 +20,13 @@ export default function ReviewsScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-
   return (
     <>
       <GlobalStyle />
       <S.Container>
         <SecondaryHeader title="Avaliações" />
         <S.ReviewsContainer>
-          {reviews?.map((review) => (
+          {reviewsByBook?.map((review) => (
             <ReviewCard review={review} key={review.reviewId} />
           ))}
         </S.ReviewsContainer>

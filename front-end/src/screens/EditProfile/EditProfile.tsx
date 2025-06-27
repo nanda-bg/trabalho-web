@@ -10,10 +10,11 @@ import InputField from "../CommomComponents/InputField/InputField";
 import TextArea from "../CommomComponents/TextArea/TextArea";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { updateProfile } from "@app/store/slices/UserSlice";
+import { setUserSliceField, updateProfile } from "@app/store/slices/UserSlice";
 import { listReviewsByUser } from "@app/store/slices/ReviewsByUserSlice";
 import Loading from "./components/LoadingAnimation/LoadingAnimation";
 import UserTypeRatio from "./components/UserTypeRatio/UserTypeRatio";
+import ErrorAlert from "../Authentication/commonComponents/ErrorAlert/ErrorAlert";
 
 interface ProfileData {
   name: string;
@@ -37,6 +38,7 @@ export default function EditProfile() {
     userId,
     type,
     isLoading,
+    error,
   } = useAppSelector((state) => state.userSlice);
 
   const { reviewsByUser, isLoading: isLoadingUserReviews } = useAppSelector(
@@ -60,6 +62,11 @@ export default function EditProfile() {
     dispatch(listReviewsByUser({ userId }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
+
+  useEffect(() => {
+    dispatch(setUserSliceField({ key: "error", value: null }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -99,11 +106,8 @@ export default function EditProfile() {
     dispatch(
       updateProfile({
         ...profile,
-        type: profile.type,
       })
     );
-
-    navigation(-1);
   };
 
   return (
@@ -193,13 +197,20 @@ export default function EditProfile() {
                   setProfile((prev) => ({
                     ...prev,
                     type:
-                      e.target.value === "CONTRIBUIDOR" ? "CONTRIBUIDOR" : null,
+                      e.target.value === "CONTRIBUIDOR"
+                        ? "CONTRIBUIDOR"
+                        : "PADRAO",
                   }))
                 }
               />
             </S.InputGroup>
           )}
         </S.FormSection>
+        {error && (
+          <S.ErrorContainer>
+            <ErrorAlert error={error} size="lg" />
+          </S.ErrorContainer>
+        )}
       </S.Content>
 
       <S.LogoSection>

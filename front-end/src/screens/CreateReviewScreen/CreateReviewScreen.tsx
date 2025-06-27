@@ -8,7 +8,10 @@ import { useParams } from "react-router-dom";
 import Header from "@app/screens/BookDetails/components/Header/Header";
 import { GlobalStyle } from "@app/styles/GlobalStyles";
 import TextArea from "../CommomComponents/TextArea/TextArea";
-import { createReview, setReviewSlice } from "@app/store/slices/ReviewsSlice";
+import {
+  createReview,
+  setReviewsByBookSlice,
+} from "@app/store/slices/ReviewsByBookSlice";
 import ErrorAlert from "../Authentication/commonComponents/ErrorAlert/ErrorAlert";
 import * as S from "./styles";
 import { getBookDetails } from "@app/store/slices/BookDetailsSlice";
@@ -24,7 +27,7 @@ const CreateReviewScreen = () => {
     (state) => state.bookDetailsSlice
   );
   const { createReviewSuccess, createReviewError } = useAppSelector(
-    (state) => state.reviewSlice
+    (state) => state.reviewsByBookSlice
   );
 
   const [noCommentError, setNoCommentError] = useState<string | null>(null);
@@ -37,7 +40,7 @@ const CreateReviewScreen = () => {
   useEffect(() => {
     return () => {
       dispatch(
-        setReviewSlice({
+        setReviewsByBookSlice({
           createReviewSuccess: false,
           createReviewError: null,
         })

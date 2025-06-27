@@ -1,22 +1,24 @@
 import { call, put, select } from "redux-saga/effects";
 import axios from "axios";
-import { CreateReviewPayloadAction } from "@app/store/slices/ReviewsSlice/types";
+import { CreateReviewPayloadAction } from "@app/store/slices/ReviewsByBookSlice/types";
 import {
-  setReviewSlice,
-  setReviewSliceField,
-} from "@app/store/slices/ReviewsSlice";
+  setReviewsByBookSlice,
+  setReviewsByBookSliceField,
+} from "@app/store/slices/ReviewsByBookSlice";
 import Cookies from "js-cookie";
 
 export function* createReviewHandler({ payload }: CreateReviewPayloadAction) {
   try {
     yield put(
-      setReviewSlice({
+      setReviewsByBookSlice({
         isLoading: true,
         createReviewError: null,
         createReviewSuccess: false,
       })
     );
-    yield put(setReviewSliceField({ key: "createReviewError", value: null }));
+    yield put(
+      setReviewsByBookSliceField({ key: "createReviewError", value: null })
+    );
 
     const token = Cookies.get("token");
     const userId = yield select((state) => state.userSlice.userId);
@@ -36,19 +38,19 @@ export function* createReviewHandler({ payload }: CreateReviewPayloadAction) {
     );
 
     yield put(
-      setReviewSliceField({
+      setReviewsByBookSliceField({
         key: "createReviewSuccess",
         value: true,
       })
     );
   } catch (error) {
     yield put(
-      setReviewSliceField({
+      setReviewsByBookSliceField({
         key: "createReviewError",
         value: "Erro ao criar avaliação, tente novamente mais tarde.",
       })
     );
   } finally {
-    yield put(setReviewSliceField({ key: "isLoading", value: false }));
+    yield put(setReviewsByBookSliceField({ key: "isLoading", value: false }));
   }
 }

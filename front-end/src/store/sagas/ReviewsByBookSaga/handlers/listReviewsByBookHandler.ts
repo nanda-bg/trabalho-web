@@ -1,15 +1,15 @@
-import { setReviewSliceField } from "@app/store/slices/ReviewsSlice";
-import { ListReviewsByBookPayloadAction } from "@app/store/slices/ReviewsSlice/types";
+import { setReviewsByBookSliceField } from "@app/store/slices/ReviewsByBookSlice";
+import { ListReviewsByBookPayloadAction } from "@app/store/slices/ReviewsByBookSlice/types";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { call, put } from "redux-saga/effects";
 
-export function* listReviewsByReviewHandler({
+export function* listReviewsByBookHandler({
   payload,
 }: ListReviewsByBookPayloadAction) {
   try {
-    yield put(setReviewSliceField({ key: "isLoading", value: true }));
-    yield put(setReviewSliceField({ key: "error", value: null }));
+    yield put(setReviewsByBookSliceField({ key: "isLoading", value: true }));
+    yield put(setReviewsByBookSliceField({ key: "error", value: null }));
 
     const token = Cookies.get("token");
 
@@ -20,19 +20,19 @@ export function* listReviewsByReviewHandler({
     });
 
     yield put(
-      setReviewSliceField({
-        key: "reviews",
+      setReviewsByBookSliceField({
+        key: "reviewsByBook",
         value: data,
       })
     );
   } catch (error) {
     yield put(
-      setReviewSliceField({
+      setReviewsByBookSliceField({
         key: "error",
         value: "Erro ao resgatar livros, tente novamente.",
       })
     );
   } finally {
-    yield put(setReviewSliceField({ key: "isLoading", value: false }));
+    yield put(setReviewsByBookSliceField({ key: "isLoading", value: false }));
   }
 }

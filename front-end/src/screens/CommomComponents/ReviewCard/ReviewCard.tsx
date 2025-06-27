@@ -19,10 +19,22 @@ const ReviewCard: FC<ReviewCardProps> = ({ review }) => {
     <S.ReviewCard>
       <Header createdAt={review.date} user={review.user} />
       <S.InfoContainer>
-        <S.BookCover
-          src={review.book?.coverUrl}
-          alt={`Cover of the book ${review.book?.title}`}
-        />
+
+        {review.book?.coverUrl ? (
+          <S.BookCover
+            src={review.book?.coverUrl}
+            alt={`Cover of the book ${review.book?.title}`}
+          />
+        ) : (
+          <S.NoCover
+            src={
+              review.book?.coverUrl ||
+              "https://static.thenounproject.com/png/2341922-200.png"
+            }
+            alt={`Cover of the book ${review.book?.title} not found`}
+          />
+        )}
+
 
         <S.ReviewInfo>
           <div>

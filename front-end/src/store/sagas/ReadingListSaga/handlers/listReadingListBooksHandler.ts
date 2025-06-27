@@ -1,6 +1,5 @@
-import axios, { AxiosResponse } from "axios";
+import axios from "axios";
 import { call, put, select } from "redux-saga/effects";
-import { Book } from "@app/types/Book";
 import {
   setReadingListSlice,
   setReadingListSliceField,

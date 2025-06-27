@@ -7,24 +7,31 @@ import { GlobalStyle } from "@app/styles/GlobalStyles";
 import { useDispatch } from "react-redux";
 import { listBooks, resetBookSlice } from "@app/store/slices/BooksSlice";
 import PrimaryHeader from "../CommomComponents/PrimaryHeader/PrimaryHeader";
+import { listReviews, resetReviewsSlice } from "@app/store/slices/ReviewsSlice";
+import ReviewCard from "../CommomComponents/ReviewCard/ReviewCard";
 
 export default function HomeScreen() {
   const dispatch = useDispatch();
 
-  const { books, isLoading, hasMore} = useAppSelector((state) => state.bookSlice);
+  const { books, isLoading, hasMore } = useAppSelector(
+    (state) => state.bookSlice
+  );
+  const { reviews } = useAppSelector((state) => state.reviewsSlice);
 
   useEffect(() => {
     dispatch(listBooks());
+    dispatch(listReviews());
 
     return () => {
       dispatch(resetBookSlice());
+      dispatch(resetReviewsSlice());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onHorizontalListEnd = () => {
     if (!hasMore) return;
-    
+
     dispatch(listBooks());
   };
 
@@ -46,11 +53,15 @@ export default function HomeScreen() {
             />
           )}
 
-          <S.SectionTitle>Avaliações de amigos</S.SectionTitle>
+          <S.SectionTitle>Avaliações recentes</S.SectionTitle>
 
-          {/* {mockedReviews.map((review) => (
-            <ReviewCard review={review} key={review.id} />
-          ))} */}
+          {reviews && (
+            <S.ReviewsContainer>
+              {reviews.map((review) => (
+                <ReviewCard review={review} key={review.reviewId} />
+              ))}
+            </S.ReviewsContainer>
+          )}
         </S.MainContent>
       </S.AppContainer>
     </>

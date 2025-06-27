@@ -9,12 +9,13 @@ import {
   setLoginSliceField,
 } from "@app/store/slices/LoginSlice";
 import { resetReviewsByUserlice } from "@app/store/slices/ReviewsByUserSlice";
-import { resetReviewSlice } from "@app/store/slices/ReviewsSlice";
+import { resetReviewsByBookSlice } from "@app/store/slices/ReviewsByBookSlice";
 import { resetSignUpSlice } from "@app/store/slices/SignUpSlice";
 import { resetUserSlice } from "@app/store/slices/UserSlice";
 import { persistor } from "@app/store/store";
 import Cookies from "js-cookie";
 import { all, call, put } from "redux-saga/effects";
+import { resetReviewsSlice } from "@app/store/slices/ReviewsSlice";
 
 export function* handleLogout() {
   try {
@@ -27,7 +28,7 @@ export function* handleLogout() {
       put(resetAuthSlice()),
       put(resetBookSlice()),
       put(resetLoginSlice()),
-      put(resetReviewSlice()),
+      put(resetReviewsByBookSlice()),
       put(resetSignUpSlice()),
       put(resetUserSlice()),
       put(resetBookByGenreSlice()),
@@ -35,6 +36,7 @@ export function* handleLogout() {
       put(resetCreateBookSlice()),
       put(resetFavoriteBooksSlice()),
       put(resetReviewsByUserlice()),
+      put(resetReviewsSlice()),
     ]);
 
     yield call(persistor.purge);

@@ -7,7 +7,7 @@ import { watchSignUpSagas } from "./sagas/SignUpSaga";
 import { watchAuthSagas } from "./sagas/AuthSaga";
 import { watchBooksSagas } from "./sagas/BooksSaga";
 import { watchReadingListSagas } from "./sagas/ReadingListSaga";
-import { watchReviewsSagas } from "./sagas/ReviewsSaga";
+import { watchReviewsByBookSagas } from "./sagas/ReviewsByBookSaga";
 import {
   FLUSH,
   PAUSE,
@@ -26,6 +26,7 @@ import { appReducer } from "./rootReducer";
 import { watchFavoriteBooksSagas } from "./sagas/FavoriteBooksSaga";
 import { watchCreateBookSagas } from "./sagas/CreateBookSaga";
 import { watchReviewsFeedSagas } from "./sagas/ReviewsFeedSaga";
+import { watchReviewsSagas } from "./sagas/ReviewsSaga";
 
 function* rootSaga() {
   yield all([
@@ -34,7 +35,7 @@ function* rootSaga() {
     watchSignUpSagas(),
     watchAuthSagas(),
     watchBooksSagas(),
-    watchReviewsSagas(),
+    watchReviewsByBookSagas(),
     watchBookDetailsSagas(),
     watchBooksByGenreSagas(),
     watchReviewsByUserSagas(),
@@ -42,6 +43,7 @@ function* rootSaga() {
     watchReadingListSagas(),
     watchCreateBookSagas(),
     watchReviewsFeedSagas(),
+    watchReviewsSagas(),
   ]);
 }
 
