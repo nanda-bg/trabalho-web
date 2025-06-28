@@ -6,6 +6,17 @@ export const ReviewHeader = styled.div`
   gap: 12px;
   margin-bottom: 12px;
 `
+export const ClickableUserInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.8;
+  }
+`;
 
 export const ReviewUserInfo = styled.div`
   flex: 1;
