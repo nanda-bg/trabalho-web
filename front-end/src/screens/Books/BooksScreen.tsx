@@ -18,8 +18,13 @@ const GENRES = [
   "Poesia",
   "Coleções literárias",
   "Biografia e autobiografia",
+  "Arte",
   "História",
+  "Ciências",
+  "Música",
   "Ciências sociais",
+  "Culinária",
+  "Viagem"
 ];
 
 const BooksScreen: FC = () => {

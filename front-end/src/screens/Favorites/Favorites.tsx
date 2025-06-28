@@ -106,6 +106,12 @@ const FavoriteBooks: FC = () => {
           })}
         </S.BookGrid>
         {isLoading && <S.LoadingSpinner />}
+
+        {filteredBooks.length === 0 && !isLoading && (
+          <S.NoFavoritesMessage>
+            Você ainda não tem livros favoritos.
+          </S.NoFavoritesMessage>
+        )}
       </S.Container>
     </>
   );

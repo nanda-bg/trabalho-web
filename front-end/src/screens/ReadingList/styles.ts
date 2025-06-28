@@ -72,3 +72,9 @@ export const LoadingSpinner = styled.div`
   border-top: 3px solid #1f1d36;
   animation: ${spin} 1s linear infinite;
 `;
+
+export const NoReadingListMessage = styled.div`
+  color: #ffffff;
+  font-size: 16px;
+  text-align: center;
+`;

@@ -106,6 +106,12 @@ const ReadingListScreen: FC = () => {
           })}
         </S.BookGrid>
         {isLoading && <S.LoadingSpinner />}
+
+        {filteredBooks.length === 0 && !isLoading && (
+        <S.NoReadingListMessage>
+          Você ainda não tem livros na sua lista de leitura.
+        </S.NoReadingListMessage>
+      )}
       </S.Container>
     </>
   );
