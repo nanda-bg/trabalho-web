@@ -14,6 +14,7 @@ import BooksScreen from "./screens/Books/BooksScreen";
 import ReviewsFeedScreen from "./screens/ReviewsFeed/ReviewsFeedScreen";
 import ReadingListScreen from "./screens/ReadingList/ReadingListScreen";
 import CreateBookScreen from "./screens/CreateBookScreen/CreateBookScreen";
+import UserProfileScreen from "./screens/UserProfile/UserProfileScreen";
 
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
@@ -116,6 +117,14 @@ const router = createBrowserRouter([
         <CreateBookScreen />
       </ProtectedRoute>
     ),
+  },
+  {
+  path: "/user/:userId",
+  element: (
+    <ProtectedRoute>
+      <UserProfileScreen />
+    </ProtectedRoute>
+  ),
   },
 ]);
 

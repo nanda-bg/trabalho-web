@@ -8,6 +8,7 @@ import { watchAuthSagas } from "./sagas/AuthSaga";
 import { watchBooksSagas } from "./sagas/BooksSaga";
 import { watchReadingListSagas } from "./sagas/ReadingListSaga";
 import { watchReviewsSagas } from "./sagas/ReviewsSaga";
+import { watchUserProfileSagas } from "./sagas/UserProfileSaga";
 import {
   FLUSH,
   PAUSE,
@@ -42,6 +43,7 @@ function* rootSaga() {
     watchReadingListSagas(),
     watchCreateBookSagas(),
     watchReviewsFeedSagas(),
+    watchUserProfileSagas(),
   ]);
 }
 

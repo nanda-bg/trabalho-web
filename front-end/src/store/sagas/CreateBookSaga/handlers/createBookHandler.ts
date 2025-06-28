@@ -32,7 +32,6 @@ export function* createBookHandler({ payload }: CreateBookPayloadAction) {
         },
       }
     );
-    console.log("Book created successfully:", data);
 
     yield put(
       setCreateBookSliceField({

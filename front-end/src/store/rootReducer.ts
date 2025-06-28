@@ -13,6 +13,7 @@ import favoriteBooksSlice from "./slices/FavoriteBooksSlice";
 import createBookSlice from "./slices/CreateBookSlice";
 import readingListSlice from "./slices/ReadingListSlice";
 import reviewsFeedSlice from "./slices/ReviewsFeedSlice";
+import userProfileSlice from "./slices/UserProfileSlice";
 
 export const appReducer = combineReducers({
   userSlice: userSlice.reducer,
@@ -28,6 +29,7 @@ export const appReducer = combineReducers({
   readingListSlice: readingListSlice.reducer,
   createBookSlice: createBookSlice.reducer,
   reviewsFeedSlice: reviewsFeedSlice.reducer,
+  userProfileSlice: userProfileSlice.reducer,
 });
 
 const rootReducer: Reducer<ReturnType<typeof appReducer>, AnyAction> = (
@@ -37,9 +39,10 @@ const rootReducer: Reducer<ReturnType<typeof appReducer>, AnyAction> = (
   return appReducer(state, action);
 };
 
-export type RootCombinedReducer = ReturnType<typeof rootReducer>;
+export type RootCombinedReducer = ReturnType<typeof rootReducer>; 
 
 export const useAppSelector: TypedUseSelectorHook<RootCombinedReducer> =
   useSelector;
 
 export default rootReducer;
+

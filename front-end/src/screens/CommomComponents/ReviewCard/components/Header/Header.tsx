@@ -1,6 +1,7 @@
 import UserAvatar from "@app/screens/CommomComponents/UserAvatar/UserAvatar";
 import * as S from "./styles";
 import { FC, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   format,
   differenceInMinutes,
@@ -18,6 +19,8 @@ interface HeaderProps {
 }
 
 const Header: FC<HeaderProps> = ({ user, createdAt }) => {
+  const navigate = useNavigate();
+
   const formattedCreatedAt = useMemo(() => {
     const creationTime = new Date(createdAt);
     const now = new Date();
@@ -42,13 +45,19 @@ const Header: FC<HeaderProps> = ({ user, createdAt }) => {
     }
   }, [createdAt]);
 
+  const handleUserClick = () => {
+    navigate(`/user/${user.uid}`);
+  };
+
   return (
     <S.ReviewHeader>
-      <UserAvatar profileImgUrl={user.profilePicture} />
-      <S.ReviewUserInfo>
-        <S.ReviewUserName>{user.username}</S.ReviewUserName>
-        <S.ReviewTime>{formattedCreatedAt}</S.ReviewTime>
-      </S.ReviewUserInfo>
+      <S.ClickableUserInfo onClick={handleUserClick}>
+        <UserAvatar profileImgUrl={user.profilePicture} />
+        <S.ReviewUserInfo>
+          <S.ReviewUserName>{user.username}</S.ReviewUserName>
+          <S.ReviewTime>{formattedCreatedAt}</S.ReviewTime>
+        </S.ReviewUserInfo>
+      </S.ClickableUserInfo>
     </S.ReviewHeader>
   );
 };
