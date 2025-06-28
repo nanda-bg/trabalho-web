@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -92,7 +93,7 @@ public class UserService {
         }
 
         // Verificar se o username foi alterado
-        if (existingUser.getUsername() != user.getUsername() || existingUser.getUsername() == null || user.getUsername() == null) {
+        if (!Objects.equals(existingUser.getUsername(), user.getUsername()) || existingUser.getUsername() == null || user.getUsername() == null) {
             // Verificar se o novo username já existe
             if (checkUsernameExists(user.getUsername())) {
                 throw new UserUsernameImmutableFieldException("Username já está em uso por outro usuário!");
