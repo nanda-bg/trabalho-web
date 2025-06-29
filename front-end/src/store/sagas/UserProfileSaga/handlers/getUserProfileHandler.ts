@@ -1,7 +1,7 @@
 import axios from "axios";
-import { call, put } from "redux-saga/effects";
+import { call, put, select } from "redux-saga/effects";
 import {
-    listUserFollowers,
+  listUserFollowers,
   listUserFollowing,
   setUserProfileSlice,
   setUserProfileSliceField,
@@ -13,10 +13,11 @@ export function* getUserProfileHandler({
   payload,
 }: GetUserProfilePayloadAction) {
   try {
+    const { isLoading } = yield select((state) => state.userProfileSlice);
     yield put(
       setUserProfileSliceField({
         key: "isLoading",
-        value: { profile: true, reviews: false, favorites: false, followers: false, following: false, followAction: false },
+        value: { ...isLoading, profile: true },
       })
     );
     yield put(setUserProfileSliceField({ key: "error", value: null }));
@@ -32,14 +33,11 @@ export function* getUserProfileHandler({
     yield put(
       setUserProfileSlice({
         selectedUser: data,
-        followersCount: data.followers || 0,
-        followingCount: data.following || 0,
       })
     );
 
     yield put(listUserFollowers({ userId: payload.userId }));
     yield put(listUserFollowing({ userId: payload.userId }));
-
   } catch (error) {
     yield put(
       setUserProfileSliceField({
@@ -48,10 +46,11 @@ export function* getUserProfileHandler({
       })
     );
   } finally {
+    const { isLoading } = yield select((state) => state.userProfileSlice);
     yield put(
       setUserProfileSliceField({
         key: "isLoading",
-        value: { profile: false, reviews: false, favorites: false, followers: false, following: false, followAction: false },
+        value: { ...isLoading, profile: false },
       })
     );
   }

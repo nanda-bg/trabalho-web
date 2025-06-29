@@ -12,6 +12,14 @@ export function* listUserFollowingHandler({
   payload,
 }: ListUserFollowingPayloadAction) {
   try {
+    const { isLoading } = yield select((state) => state.userProfileSlice);
+    yield put(
+      setUserProfileSliceField({
+        key: "isLoading",
+        value: { ...isLoading, following: true },
+      })
+    );
+
     const { userId } = yield select((state) => state.userSlice);
 
     const token = Cookies.get("token");

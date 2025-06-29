@@ -7,7 +7,6 @@ export interface UserProfileState {
   isLoading: {
     profile: boolean;
     reviews: boolean;
-    favorites: boolean;
     followers: boolean;
     following: boolean;
     followAction: boolean;
@@ -24,10 +23,7 @@ export interface UserProfileState {
   isFollowingCurrentUser: boolean;
   lastReviewId: string | null;
   lastFavoriteId: string | null;
-  hasMore: {
-    reviews: boolean;
-    favorites: boolean;
-  };
+  hasMore: boolean;
 }
 
 export type GetUserProfilePayloadAction = PayloadAction<{
@@ -35,10 +31,6 @@ export type GetUserProfilePayloadAction = PayloadAction<{
 }>;
 
 export type ListUserReviewsPayloadAction = PayloadAction<{
-  userId: string;
-}>;
-
-export type ListUserFavoritesPayloadAction = PayloadAction<{
   userId: string;
 }>;
 

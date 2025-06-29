@@ -5,7 +5,6 @@ import { useParams } from "react-router-dom";
 import {
   getUserProfile,
   listUserReviews,
-  listUserFavorites,
   followUser,
   resetUserProfileSlice,
   listUserFollowers,
@@ -16,10 +15,7 @@ import { GlobalStyle } from "@app/styles/GlobalStyles";
 import SecondaryHeader from "../CommomComponents/SecondaryHeader/SecondaryHeader";
 import UserAvatar from "../CommomComponents/UserAvatar/UserAvatar";
 import ReviewCard from "../CommomComponents/ReviewCard/ReviewCard";
-import HorizontalBooksList from "../CommomComponents/HorizontalBooksList/HorizontalBooksList";
 import { UserPlus, UserMinus } from "lucide-react";
-
-type ActiveTab = "reviews" | "favorites";
 
 const UserProfileScreen: FC = () => {
   const dispatch = useDispatch();
@@ -29,7 +25,6 @@ const UserProfileScreen: FC = () => {
   const {
     selectedUser,
     userReviews,
-    userFavorites,
     followersCount,
     followingCount,
     isFollowing,
@@ -39,45 +34,22 @@ const UserProfileScreen: FC = () => {
     error,
   } = useAppSelector((state) => state.userProfileSlice);
 
-  const [activeTab, setActiveTab] = useState<ActiveTab>("reviews");
-
   const containerRef = useRef(null);
   const lastItemRef = useRef(null);
   const [hasCalledListEnd, setHasCalledListEnd] = useState(false);
 
   const isOwnProfile = currentUserId === userId;
 
-  const currentData = activeTab === "reviews" ? userReviews : userFavorites;
-  const currentIsLoading = isLoading[activeTab];
-  const currentHasMore = hasMore[activeTab];
-
   const onListEnd = useCallback(() => {
-    if (!hasCalledListEnd && currentHasMore && !currentIsLoading && userId) {
-      if (activeTab === "reviews") {
-        dispatch(listUserReviews({ userId }));
-      } else {
-        dispatch(listUserFavorites({ userId }));
-      }
+    if (!hasCalledListEnd && hasMore && !isLoading["reviews"] && userId) {
+      dispatch(listUserReviews({ userId }));
       setHasCalledListEnd(true);
     }
-  }, [
-    hasCalledListEnd,
-    currentHasMore,
-    currentIsLoading,
-    activeTab,
-    userId,
-    dispatch,
-  ]);
-
-  useEffect(() => {
-    dispatch(listUserFollowers({ userId }));
-    dispatch(listUserFollowing({ userId }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId]);
+  }, [hasCalledListEnd, hasMore, isLoading, userId, dispatch]);
 
   useEffect(() => {
     setHasCalledListEnd(false);
-  }, [currentData.length]);
+  }, [userReviews.length]);
 
   useEffect(() => {
     if (!lastItemRef.current) return;
@@ -96,7 +68,7 @@ const UserProfileScreen: FC = () => {
     return () => {
       observer.disconnect();
     };
-  }, [currentData, onListEnd]);
+  }, [userReviews, onListEnd]);
 
   useEffect(() => {
     if (userId) {
@@ -105,15 +77,6 @@ const UserProfileScreen: FC = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
-
-  const handleTabChange = (tab: ActiveTab) => {
-    setActiveTab(tab);
-    setHasCalledListEnd(false);
-
-    if (tab === "favorites" && userFavorites.length === 0 && userId) {
-      dispatch(listUserFavorites({ userId }));
-    }
-  };
 
   const handleFollowToggle = () => {
     if (!userId) return;
@@ -127,7 +90,7 @@ const UserProfileScreen: FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (isLoading.profile) {
+  if (isLoading.profile || isLoading.followers || isLoading.following) {
     return (
       <>
         <GlobalStyle />
@@ -200,74 +163,45 @@ const UserProfileScreen: FC = () => {
                   ) : (
                     <>
                       <UserPlus size={16} />
-                      {isFollowingCurrentUser
-                        ? "Seguir de volta"
-                        : "Seguir"}
+                      {isFollowingCurrentUser ? "Seguir de volta" : "Seguir"}
                     </>
                   )}
                 </S.FollowButton>
               )}
+
+              <S.Bio>{selectedUser.bio}</S.Bio>
             </S.ProfileHeader>
 
-            <S.TabsContainer>
-              <S.Tab
-                active={activeTab === "reviews"}
-                onClick={() => handleTabChange("reviews")}
-              >
-                Avaliações
-              </S.Tab>
-              <S.Tab
-                active={activeTab === "favorites"}
-                onClick={() => handleTabChange("favorites")}
-              >
-                Favoritos
-              </S.Tab>
-            </S.TabsContainer>
-
             <S.Body>
-              {error ? (
-                <S.ErrorMessage>{error}</S.ErrorMessage>
-              ) : activeTab === "reviews" ? (
-                currentData.length > 0 ? (
-                  <S.ReviewsList>
-                    {userReviews.map((review, index) => {
-                      const isLastReview = index === userReviews.length - 1;
-                      return (
-                        <div
-                          key={review.reviewId}
-                          ref={isLastReview ? lastItemRef : null}
-                        >
-                          <ReviewCard review={review} />
-                        </div>
-                      );
-                    })}
-                  </S.ReviewsList>
-                ) : !currentIsLoading ? (
-                  <S.EmptyState>
-                    <S.EmptyMessage>
-                      {isOwnProfile
-                        ? "Você ainda não fez nenhuma avaliação."
-                        : "Este usuário ainda não fez nenhuma avaliação."}
-                    </S.EmptyMessage>
-                  </S.EmptyState>
-                ) : null
-              ) : currentData.length > 0 ? (
-                <HorizontalBooksList
-                  books={userFavorites}
-                  isLoading={currentIsLoading}
-                  onEndReached={onListEnd}
-                />
-              ) : !currentIsLoading ? (
+              {error && <S.ErrorMessage>{error}</S.ErrorMessage>}
+
+              {!error && userReviews.length > 0 && (
+                <S.ReviewsList>
+                  {userReviews.map((review, index) => {
+                    const isLastReview = index === userReviews.length - 1;
+                    return (
+                      <div
+                        key={review.reviewId}
+                        ref={isLastReview ? lastItemRef : null}
+                      >
+                        <ReviewCard review={review} />
+                      </div>
+                    );
+                  })}
+                </S.ReviewsList>
+              )}
+
+              {!error && userReviews.length === 0 && !isLoading["reviews"] && (
                 <S.EmptyState>
                   <S.EmptyMessage>
                     {isOwnProfile
-                      ? "Você ainda não tem livros favoritos."
-                      : "Este usuário ainda não tem livros favoritos."}
+                      ? "Você ainda não fez nenhuma avaliação."
+                      : "Este usuário ainda não fez nenhuma avaliação."}
                   </S.EmptyMessage>
                 </S.EmptyState>
-              ) : null}
+              )}
 
-              {currentIsLoading && <S.LoadingSpinner />}
+              {isLoading["reviews"] && <S.LoadingSpinner />}
             </S.Body>
           </>
         )}

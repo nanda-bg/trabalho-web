@@ -87,34 +87,6 @@ export const FollowButton = styled.button<{ following: boolean }>`
   }
 `;
 
-export const TabsContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  padding: 16px;
-  gap: 8px;
-  max-width: 900px;
-  margin: 0 auto;
-`;
-
-export const Tab = styled.button<{ active: boolean }>`
-  flex: 1;
-  padding: 12px 16px;
-  border-radius: 16px;
-  font-size: 14px;
-  font-weight: 500;
-  border: none;
-  cursor: pointer;
-  background-color: ${(props) =>
-    props.active ? "#ff0080" : "rgba(255, 255, 255, 0.1)"};
-  color: ${(props) => (props.active ? "white" : "#ccc")};
-  transition: all 0.2s ease;
-  max-width: 200px;
-
-  &:hover {
-    opacity: 0.9;
-  }
-`;
-
 export const Body = styled.main`
   max-width: 900px;
   margin: 0 auto;
@@ -194,4 +166,10 @@ export const ErrorContainer = styled.div`
   justify-content: center;
   align-items: center;
   min-height: 400px;
+`;
+
+export const Bio = styled.p`
+  font-size: 16px;
+  color: #ffffff;
+  text-align: center;
 `;

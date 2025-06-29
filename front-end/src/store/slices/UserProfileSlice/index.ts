@@ -8,7 +8,6 @@ import {
   UserProfileState,
   GetUserProfilePayloadAction,
   ListUserReviewsPayloadAction,
-  ListUserFavoritesPayloadAction,
   ListUserFollowersPayloadAction,
   ListUserFollowingPayloadAction,
   FollowUserPayloadAction,
@@ -18,7 +17,6 @@ export const initialState: UserProfileState = {
   isLoading: {
     profile: false,
     reviews: false,
-    favorites: false,
     followers: false,
     following: false,
     followAction: false,
@@ -35,10 +33,7 @@ export const initialState: UserProfileState = {
   isFollowingCurrentUser: false,
   lastReviewId: null,
   lastFavoriteId: null,
-  hasMore: {
-    reviews: true,
-    favorites: true,
-  },
+  hasMore: true,
 };
 
 const userProfileSlice = createSlice({
@@ -55,7 +50,6 @@ const userProfileSlice = createSlice({
     ) => setStateSliceReducer<UserProfileState>(state, action),
     getUserProfile: (_state, _action: GetUserProfilePayloadAction) => {},
     listUserReviews: (_state, _action: ListUserReviewsPayloadAction) => {},
-    listUserFavorites: (_state, _action: ListUserFavoritesPayloadAction) => {},
     listUserFollowers: (_state, _action: ListUserFollowersPayloadAction) => {},
     listUserFollowing: (_state, _action: ListUserFollowingPayloadAction) => {},
     followUser: (_state, _action: FollowUserPayloadAction) => {},
@@ -68,7 +62,6 @@ export const {
   setUserProfileSlice,
   getUserProfile,
   listUserReviews,
-  listUserFavorites,
   listUserFollowers,
   listUserFollowing,
   followUser,

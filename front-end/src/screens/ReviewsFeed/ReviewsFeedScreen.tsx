@@ -73,7 +73,7 @@ const ReviewsFeedScreen: FC = () => {
       dispatch(listFriendReviews({}));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [myReviews.length, isLoading.myReviews, friendReviews.length, isLoading.friendReviews, userId]);
 
   const handleTabChange = (tab: ActiveTab) => {
     setActiveTab(tab);
