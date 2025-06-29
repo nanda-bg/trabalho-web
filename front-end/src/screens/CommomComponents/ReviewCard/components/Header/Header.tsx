@@ -25,8 +25,9 @@ const Header: FC<HeaderProps> = ({ user, createdAt }) => {
     const creationTime = new Date(createdAt);
     const now = new Date();
 
-    const creationTimeUTC = new Date(creationTime.getTime());
-    const nowUTC = new Date(now.getTime());
+    const creationTimeUTC = new Date(creationTime.getTime() + creationTime.getTimezoneOffset() * 60000);
+    const nowUTC = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
+
 
     const diffInMinutes = differenceInMinutes(nowUTC, creationTimeUTC);
     const diffInHours = differenceInHours(nowUTC, creationTimeUTC);

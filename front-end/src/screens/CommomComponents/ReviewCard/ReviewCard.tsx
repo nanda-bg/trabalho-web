@@ -9,7 +9,6 @@ interface ReviewCardProps {
 }
 
 const ReviewCard: FC<ReviewCardProps> = ({ review }) => {
-  console.log("review: ", review);
   const [showSpoiler, setShowSpoiler] = useState(!review.spoiler);
   const [showFullReview, setShowFullReview] = useState(false);
 
