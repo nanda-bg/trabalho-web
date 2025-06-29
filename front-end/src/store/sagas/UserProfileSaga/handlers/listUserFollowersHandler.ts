@@ -38,7 +38,6 @@ export function* listUserFollowersHandler({
       })
     );
   } catch (error) {
-    console.error("Error fetching user followers:", error); //apaga
     yield put(
       setUserProfileSliceField({
         key: "error",

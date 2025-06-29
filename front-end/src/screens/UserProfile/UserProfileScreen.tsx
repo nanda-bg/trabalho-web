@@ -72,7 +72,7 @@ const UserProfileScreen: FC = () => {
   useEffect(() => {
     dispatch(listUserFollowers({ userId }));
     dispatch(listUserFollowing({ userId }));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   useEffect(() => {
@@ -195,14 +195,14 @@ const UserProfileScreen: FC = () => {
                   ) : isFollowing ? (
                     <>
                       <UserMinus size={16} />
-                      {isFollowingCurrentUser
-                        ? "Seguir de volta"
-                        : "Deixar de seguir"}
+                      Deixar de seguir
                     </>
                   ) : (
                     <>
                       <UserPlus size={16} />
-                      Seguir
+                      {isFollowingCurrentUser
+                        ? "Seguir de volta"
+                        : "Seguir"}
                     </>
                   )}
                 </S.FollowButton>
