@@ -6,6 +6,7 @@ import {
 import { setStateSliceReducer } from "../../utils/setStateSliceReducer";
 import { ReviewsFeedState, ListMyReviewsPayloadAction, ListFriendReviewsPayloadAction } from "./types";
 
+
 export const initialState: ReviewsFeedState = {
   isLoading: { myReviews: false, friendReviews: false },
   error: null,
@@ -13,6 +14,7 @@ export const initialState: ReviewsFeedState = {
   friendReviews: [],
   lastReviewId: { myReviews: null, friendReviews: null },
   hasMore: { myReviews: true, friendReviews: true },
+  activeTab: "myReviews", 
 };
 
 const reviewsFeedSlice = createSlice({

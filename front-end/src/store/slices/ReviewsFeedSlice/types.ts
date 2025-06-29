@@ -8,6 +8,7 @@ export interface ReviewsFeedState {
   friendReviews: Review[];
   lastReviewId: { myReviews: string | null; friendReviews: string | null };
   hasMore: { myReviews: boolean; friendReviews: boolean };
+  activeTab: ActiveTab;
 }
 
 export type ListMyReviewsPayloadAction = PayloadAction<{
@@ -15,3 +16,5 @@ export type ListMyReviewsPayloadAction = PayloadAction<{
 }>;
 
 export type ListFriendReviewsPayloadAction = PayloadAction<{}>;
+
+export type ActiveTab = "myReviews" | "friendReviews";

@@ -5,23 +5,22 @@ import {
   listMyReviews,
   listFriendReviews,
   resetReviewsFeedSlice,
+  setReviewsFeedSliceField,
+  setReviewsFeedSlice,
 } from "@app/store/slices/ReviewsFeedSlice";
 import * as S from "./styles";
 import { GlobalStyle } from "@app/styles/GlobalStyles";
 import PrimaryHeader from "../CommomComponents/PrimaryHeader/PrimaryHeader";
 import ReviewCard from "../CommomComponents/ReviewCard/ReviewCard";
-
-type ActiveTab = "myReviews" | "friendReviews";
+import { ActiveTab } from "@app/store/slices/ReviewsFeedSlice/types";
+import { set } from "date-fns";
 
 const ReviewsFeedScreen: FC = () => {
   const dispatch = useDispatch();
-  const { myReviews, friendReviews, hasMore, isLoading, error } = useAppSelector(
-    (state) => state.reviewsFeedSlice
-  );
+  const { myReviews, friendReviews, hasMore, isLoading, error, activeTab } =
+    useAppSelector((state) => state.reviewsFeedSlice);
 
   const { userId } = useAppSelector((state) => state.userSlice);
-
-  const [activeTab, setActiveTab] = useState<ActiveTab>("myReviews");
 
   const containerRef = useRef(null);
   const lastReviewRef = useRef(null);
@@ -40,7 +39,14 @@ const ReviewsFeedScreen: FC = () => {
       }
       setHasCalledListEnd(true);
     }
-  }, [hasCalledListEnd, currentHasMore, currentIsLoading, activeTab, userId, dispatch]);
+  }, [
+    hasCalledListEnd,
+    currentHasMore,
+    currentIsLoading,
+    activeTab,
+    userId,
+    dispatch,
+  ]);
 
   useEffect(() => {
     setHasCalledListEnd(false);
@@ -73,16 +79,25 @@ const ReviewsFeedScreen: FC = () => {
       dispatch(listFriendReviews({}));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [myReviews.length, isLoading.myReviews, friendReviews.length, isLoading.friendReviews, userId]);
+  }, [myReviews.length, friendReviews.length, userId]);
 
   const handleTabChange = (tab: ActiveTab) => {
-    setActiveTab(tab);
+    dispatch(setReviewsFeedSliceField({ key: "activeTab", value: tab }));
     setHasCalledListEnd(false);
   };
 
   useEffect(() => {
     return () => {
-      dispatch(resetReviewsFeedSlice());
+      dispatch(
+        setReviewsFeedSlice({
+          isLoading: { myReviews: false, friendReviews: false },
+          error: null,
+          myReviews: [],
+          friendReviews: [],
+          lastReviewId: { myReviews: null, friendReviews: null },
+          hasMore: { myReviews: true, friendReviews: true },
+        })
+      );
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -116,7 +131,10 @@ const ReviewsFeedScreen: FC = () => {
               {currentReviews.map((review, index) => {
                 const isLastReview = index === currentReviews.length - 1;
                 return (
-                  <div key={review.reviewId} ref={isLastReview ? lastReviewRef : null}>
+                  <div
+                    key={review.reviewId}
+                    ref={isLastReview ? lastReviewRef : null}
+                  >
                     <ReviewCard review={review} />
                   </div>
                 );
