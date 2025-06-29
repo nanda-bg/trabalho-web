@@ -63,8 +63,11 @@ export const GeneralErrorContainer = styled.div`
 `;
 
 export const SuccessMessage = styled.text`
+  display: flex;
   font-size: 14px;
   text-align: center;
+  justify-self: center;
+  margin-top: 16px;
 `;
 
 const spin = keyframes`

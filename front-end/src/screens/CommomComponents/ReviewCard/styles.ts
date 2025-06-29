@@ -1,3 +1,4 @@
+import { FC, HTMLAttributes } from "react";
 import styled, { css } from "styled-components";
 
 export const ReviewCard = styled.div`
@@ -27,8 +28,8 @@ export const NoCover = styled.img`
   width: 90px;
   height: 120px;
   align-self: center;
-  background-color:rgb(202, 202, 204);
-`
+  background-color: rgb(202, 202, 204);
+`;
 
 export const ReviewInfo = styled.div`
   display: flex;
@@ -91,12 +92,24 @@ export const SpoilerButton = styled.button`
   }
 `;
 
-export const ReviewContent = styled.p<{ spoiler?: boolean }>`
+interface ReviewContentProps extends HTMLAttributes<HTMLParagraphElement> {
+  showFullReview?: boolean;
+  spoiler?: boolean;
+}
+
+export const ReviewContent: FC<ReviewContentProps> = styled.p<ReviewContentProps>`
   font-size: 14px;
   line-height: 1.5;
   margin-bottom: 12px;
   display: -webkit-box;
-  -webkit-line-clamp: 5;
+  ${({ showFullReview }) =>
+    showFullReview
+      ? css`
+          -webkit-line-clamp: unset;
+        `
+      : css`
+          -webkit-line-clamp: 5;
+        `}
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -135,4 +148,13 @@ export const Star = styled.div<{ filled: boolean; half?: boolean }>`
       overflow: hidden;
     }
   `}
+`;
+
+export const SeeMoreButton = styled.button`
+  background-color: transparent;
+  color: #ff0080;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0 8px;
 `;

@@ -49,5 +49,6 @@ export function* handleLogout() {
     );
   } finally {
     yield put(setLoginSliceField({ key: "isLoading", value: false }));
+    sessionStorage.removeItem("redirectAfterLogin"); 
   }
 }

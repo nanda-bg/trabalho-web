@@ -29,7 +29,7 @@ export function* listMyReviewsHandler({
 
     const { data }: AxiosResponse<Review[]> = yield call(
       axios.get,
-      `/reviews/user/${payload.userId}`,
+      `/api/reviews/user/${payload.userId}`,
       {
         params: {
           lastReviewId: lastReviewId.myReviews,

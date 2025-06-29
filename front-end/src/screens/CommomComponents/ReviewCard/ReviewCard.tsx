@@ -10,20 +10,26 @@ interface ReviewCardProps {
 
 const ReviewCard: FC<ReviewCardProps> = ({ review }) => {
   const [showSpoiler, setShowSpoiler] = useState(!review.spoiler);
+  const [showFullReview, setShowFullReview] = useState(false);
 
   const handleShowSpoiler = () => {
     setShowSpoiler(true);
   };
 
+  const toggleReview = () => {
+    setShowFullReview(!showFullReview);
+  };
+
+  const isLongReview = review.reviewText.length > 300;
+
   return (
     <S.ReviewCard>
       <Header createdAt={review.date} user={review.user} />
       <S.InfoContainer>
-
         {review.book?.coverUrl ? (
           <S.BookCover
-            src={review.book?.coverUrl}
-            alt={`Cover of the book ${review.book?.title}`}
+            src={review.book.coverUrl}
+            alt={`Cover of the book ${review.book.title}`}
           />
         ) : (
           <S.NoCover
@@ -35,11 +41,9 @@ const ReviewCard: FC<ReviewCardProps> = ({ review }) => {
           />
         )}
 
-
         <S.ReviewInfo>
           <div>
             <S.BookTitle>{review.book?.title}</S.BookTitle>
-
             <S.Rating>
               {[1, 2, 3, 4, 5].map((star) => (
                 <S.Star
@@ -67,8 +71,18 @@ const ReviewCard: FC<ReviewCardProps> = ({ review }) => {
             </S.SpoilerContainer>
           )}
 
-          <S.ReviewContent spoiler={!showSpoiler}>
-            {review.reviewText}
+          <S.ReviewContent
+            spoiler={!showSpoiler}
+            showFullReview={showFullReview}
+          >
+            {showFullReview || !isLongReview
+              ? review.reviewText
+              : `${review.reviewText.slice(0, 300)}...`}
+            {isLongReview && (
+              <S.SeeMoreButton onClick={toggleReview}>
+                {showFullReview ? "Ver menos" : "Ver mais"}
+              </S.SeeMoreButton>
+            )}
           </S.ReviewContent>
         </S.ReviewInfo>
       </S.InfoContainer>

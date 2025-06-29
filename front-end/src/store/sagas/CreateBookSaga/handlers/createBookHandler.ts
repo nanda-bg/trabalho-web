@@ -18,8 +18,8 @@ export function* createBookHandler({ payload }: CreateBookPayloadAction) {
     );
 
     const token = Cookies.get("token");
-     
-    yield call(
+
+    const { data } = yield call(
       axios.post,
       `/api/books`,
       {
@@ -36,7 +36,7 @@ export function* createBookHandler({ payload }: CreateBookPayloadAction) {
     yield put(
       setCreateBookSliceField({
         key: "success",
-        value: true,
+        value: data,
       })
     );
   } catch (error) {

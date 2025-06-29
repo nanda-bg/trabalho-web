@@ -9,7 +9,7 @@ import { CreateBookPayloadAction, CreateBookState } from "./types";
 export const initialState: CreateBookState = {
   isLoading: false,
   error: null,
-  success: false,
+  success: null,
 };
 
 const createBookSlice = createSlice({

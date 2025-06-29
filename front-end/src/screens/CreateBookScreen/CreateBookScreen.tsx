@@ -10,7 +10,10 @@ import Loading from "./components/LoadingAnimation/LoadingAnimation";
 import PrimaryHeader from "../CommomComponents/PrimaryHeader/PrimaryHeader";
 import ErrorAlert from "../Authentication/commonComponents/ErrorAlert/ErrorAlert";
 import AuthorsGroup from "./components/AuthorsGroup/AuthorsGroup";
-import { createBook } from "@app/store/slices/CreateBookSlice";
+import {
+  createBook,
+  resetCreateBookSlice,
+} from "@app/store/slices/CreateBookSlice";
 import Guide from "./components/Guide/Guide";
 import CoverSection from "./components/CoverSection/CoverSection";
 
@@ -37,7 +40,12 @@ export default function CreateBookScreen() {
     if (type !== "CONTRIBUIDOR") {
       navigation("/home");
     }
-  });
+
+    return () => {
+      dispatch(resetCreateBookSlice());
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const [book, setBook] = useState<BookData>({
     title: "",
@@ -148,7 +156,7 @@ export default function CreateBookScreen() {
       <S.Content>
         <Guide />
 
-        <CoverSection book={book} setBook={setBook}/>
+        <CoverSection book={book} setBook={setBook} />
 
         <S.FormSection>
           <S.InputGroup>
@@ -247,9 +255,7 @@ export default function CreateBookScreen() {
         </S.GeneralErrorContainer>
       )}
 
-      {success && (
-        <S.SuccessMessage>Livro criado com sucesso!</S.SuccessMessage>
-      )}
+      {success && <S.SuccessMessage>{success}</S.SuccessMessage>}
     </S.Container>
   );
 }

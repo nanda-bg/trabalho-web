@@ -29,7 +29,7 @@ export function* listFriendReviewsHandler({
 
     const { data }: AxiosResponse<Review[]> = yield call(
       axios.get,
-      `/reviews/feed`,
+      `/api/reviews/feed`,
       {
         params: {
           lastReviewId: lastReviewId.friendReviews,

@@ -66,7 +66,6 @@ const ReviewsFeedScreen: FC = () => {
   }, [currentReviews, onListEnd]);
 
   useEffect(() => {
-    // Carrega dados iniciais
     if (myReviews.length === 0 && !isLoading.myReviews) {
       dispatch(listMyReviews({ userId }));
     }

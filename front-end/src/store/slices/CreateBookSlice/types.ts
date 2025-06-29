@@ -3,7 +3,7 @@ import { PayloadAction } from "@reduxjs/toolkit";
 export interface CreateBookState {
   isLoading: boolean;
   error: string | null;
-  success: boolean;
+  success: string | null;
 }
 
 export type CreateBookPayloadAction = PayloadAction<{
