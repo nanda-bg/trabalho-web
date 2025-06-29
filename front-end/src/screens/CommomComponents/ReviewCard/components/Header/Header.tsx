@@ -24,6 +24,7 @@ const Header: FC<HeaderProps> = ({ user, createdAt }) => {
   const formattedCreatedAt = useMemo(() => {
     console.log("createdAt: ", createdAt);
     const creationTime = new Date(createdAt);
+    console.log("creationTime: ", creationTime)
     const now = new Date();
 
     const creationTimeUTC = new Date(
@@ -34,11 +35,11 @@ const Header: FC<HeaderProps> = ({ user, createdAt }) => {
     console.log("Creation Time UTC:", creationTimeUTC);
     console.log("Now UTC:", nowUTC);
 
-    const diffInMinutes = differenceInMinutes(nowUTC, creationTimeUTC);
-    const diffInHours = differenceInHours(nowUTC, creationTimeUTC);
-    const diffInDays = differenceInDays(nowUTC, creationTimeUTC);
-    const diffInWeeks = differenceInWeeks(nowUTC, creationTimeUTC);
-    const diffInMonths = differenceInMonths(nowUTC, creationTimeUTC);
+    const diffInMinutes = differenceInMinutes(nowUTC, creationTime);
+    const diffInHours = differenceInHours(nowUTC, creationTime);
+    const diffInDays = differenceInDays(nowUTC, creationTime);
+    const diffInWeeks = differenceInWeeks(nowUTC, creationTime);
+    const diffInMonths = differenceInMonths(nowUTC, creationTime);
 
     if (diffInMinutes < 1) {
       return "Agora";
