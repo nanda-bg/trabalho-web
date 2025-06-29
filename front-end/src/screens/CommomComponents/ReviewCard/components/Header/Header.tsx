@@ -22,8 +22,12 @@ const Header: FC<HeaderProps> = ({ user, createdAt }) => {
   const navigate = useNavigate();
 
   const formattedCreatedAt = useMemo(() => {
+    console.log("user da review: ", user);
+    console.log("entrou no formattedCreatedAt")
     const creationTime = new Date(createdAt);
+    console.log("creationTime: ", creationTime)
     const now = new Date();
+    console.log("now: ", now)
     const diffInMinutes = differenceInMinutes(now, creationTime);
     const diffInHours = differenceInHours(now, creationTime);
     const diffInDays = differenceInDays(now, creationTime);
