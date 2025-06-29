@@ -22,18 +22,10 @@ const Header: FC<HeaderProps> = ({ user, createdAt }) => {
   const navigate = useNavigate();
 
   const formattedCreatedAt = useMemo(() => {
-    console.log("createdAt: ", createdAt);
     const creationTime = new Date(createdAt);
-    console.log("creationTime: ", creationTime)
     const now = new Date();
 
-    const creationTimeUTC = new Date(
-      creationTime.getTime() + creationTime.getTimezoneOffset() * 60000
-    );
     const nowUTC = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
-
-    console.log("Creation Time UTC:", creationTimeUTC);
-    console.log("Now UTC:", nowUTC);
 
     const diffInMinutes = differenceInMinutes(nowUTC, creationTime);
     const diffInHours = differenceInHours(nowUTC, creationTime);
