@@ -115,7 +115,6 @@ const UserProfileScreen: FC = () => {
   };
 
   const handleFollowToggle = () => {
-    userId; //apaga
     if (!userId) return;
     dispatch(followUser({ userId }));
   };
