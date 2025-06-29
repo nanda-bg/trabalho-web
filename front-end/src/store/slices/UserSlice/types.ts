@@ -27,3 +27,11 @@ export type UpdateProfilePayloadAction = PayloadAction<{
 export type FetchUserInfoPayloadAction = PayloadAction<{
   uid: string;
 }>;
+
+export type ListFollowersPayloadAction = PayloadAction<{
+  userId: string;
+}>;
+
+export type ListFollowingPayloadAction = PayloadAction<{
+  userId: string;
+}>;

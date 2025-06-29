@@ -1,4 +1,4 @@
-import { setUserSlice, setUserSliceField } from "@app/store/slices/UserSlice";
+import { listFollowers, listFollowing, setUserSlice, setUserSliceField } from "@app/store/slices/UserSlice";
 import { FetchUserInfoPayloadAction } from "@app/store/slices/UserSlice/types";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -16,6 +16,9 @@ export function* fetchUserInfoHandler({ payload }: FetchUserInfoPayloadAction) {
       },
     });
 
+    yield put(listFollowers({ userId: data.uid }));
+    yield put(listFollowing({ userId: data.uid }));
+
     yield put(
       setUserSlice({
         userId: data.uid,
@@ -24,8 +27,6 @@ export function* fetchUserInfoHandler({ payload }: FetchUserInfoPayloadAction) {
         name: data.name,
         profilePicture: data.profilePicture,
         bio: data.bio,
-        followers: data.followers,
-        following: data.following,
         type: data.userType,
       })
     );

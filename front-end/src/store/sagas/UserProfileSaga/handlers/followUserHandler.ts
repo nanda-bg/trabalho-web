@@ -6,7 +6,7 @@ import {
 } from "@app/store/slices/UserProfileSlice";
 import { FollowUserPayloadAction } from "@app/store/slices/UserProfileSlice/types";
 import Cookies from "js-cookie";
-import { fetchUserInfo } from "@app/store/slices/UserSlice";
+import { listFollowers, listFollowing } from "@app/store/slices/UserSlice";
 
 export function* followUserHandler({ payload }: FollowUserPayloadAction) {
   try {
@@ -35,7 +35,8 @@ export function* followUserHandler({ payload }: FollowUserPayloadAction) {
     const { userId: currentUserId } = yield select((state) => state.userSlice);
 
     yield put(getUserProfile({ userId: payload.userId }));
-    yield put(fetchUserInfo({ uid: currentUserId }));
+    yield put(listFollowers({ userId: currentUserId }));
+    yield put(listFollowing({ userId: currentUserId }));
   } catch (error) {
     yield put(
       setUserProfileSliceField({

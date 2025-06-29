@@ -1,6 +1,8 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import {
   FetchUserInfoPayloadAction,
+  ListFollowersPayloadAction,
+  ListFollowingPayloadAction,
   UpdateProfilePayloadAction,
   UserState,
 } from "./types";
@@ -36,6 +38,8 @@ const userSlice = createSlice({
       setStateSliceReducer<UserState>(state, action),
     fetchUserInfo: (_state, _action: FetchUserInfoPayloadAction) => {},
     updateProfile: (_state, _action: UpdateProfilePayloadAction) => {},
+    listFollowers: (_state, _action: ListFollowersPayloadAction) => {},
+    listFollowing: (_state, _action: ListFollowingPayloadAction) => {},
     resetUserSlice: () => initialState,
   },
 });
@@ -45,6 +49,8 @@ export const {
   setUserSlice,
   fetchUserInfo,
   updateProfile,
+  listFollowers,
+  listFollowing,
   resetUserSlice,
 } = userSlice.actions;
 export default userSlice;
