@@ -22,17 +22,17 @@ const Header: FC<HeaderProps> = ({ user, createdAt }) => {
   const navigate = useNavigate();
 
   const formattedCreatedAt = useMemo(() => {
-    console.log("user da review: ", user);
-    console.log("entrou no formattedCreatedAt")
     const creationTime = new Date(createdAt);
-    console.log("creationTime: ", creationTime)
     const now = new Date();
-    console.log("now: ", now)
-    const diffInMinutes = differenceInMinutes(now, creationTime);
-    const diffInHours = differenceInHours(now, creationTime);
-    const diffInDays = differenceInDays(now, creationTime);
-    const diffInWeeks = differenceInWeeks(now, creationTime);
-    const diffInMonths = differenceInMonths(now, creationTime);
+
+    const creationTimeUTC = new Date(creationTime.getTime());
+    const nowUTC = new Date(now.getTime());
+
+    const diffInMinutes = differenceInMinutes(nowUTC, creationTimeUTC);
+    const diffInHours = differenceInHours(nowUTC, creationTimeUTC);
+    const diffInDays = differenceInDays(nowUTC, creationTimeUTC);
+    const diffInWeeks = differenceInWeeks(nowUTC, creationTimeUTC);
+    const diffInMonths = differenceInMonths(nowUTC, creationTimeUTC);
 
     if (diffInMinutes < 1) {
       return "Agora";
