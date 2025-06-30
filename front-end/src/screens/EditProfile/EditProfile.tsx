@@ -186,7 +186,7 @@ export default function EditProfile() {
             />
           </S.InputGroup>
 
-          {reviewsByUser?.length > 0 && (
+          {reviewsByUser?.length > 5 && (
             <S.InputGroup>
               <S.Label>Tipo de perfil</S.Label>
               <UserTypeRatio
