@@ -101,6 +101,11 @@ export const ReviewsList = styled.div`
   flex-direction: column;
   gap: 16px;
   align-items: center;
+
+    & > * {
+    width: 100%;
+    max-width: 700px;
+  }
 `;
 
 export const ErrorMessage = styled.div`
