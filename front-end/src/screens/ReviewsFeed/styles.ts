@@ -51,6 +51,13 @@ export const ReviewsList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 16px;
+  align-items: center;
+  width: 100%;
+  
+  & > * {
+    width: 100%;
+    max-width: 700px;
+  }
 `;
 
 export const ErrorMessage = styled.div`
@@ -84,7 +91,7 @@ export const LoadingSpinner = styled.div`
   display: flex;
   justify-content: center;
   padding: 20px;
-  
+
   &::after {
     content: "";
     width: 40px;

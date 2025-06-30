@@ -8,6 +8,8 @@ export const ReviewCard = styled.div`
   margin-bottom: 16px;
   display: flex;
   flex-direction: column;
+  max-width: 700px;
+  width: 100%;
 `;
 
 export const InfoContainer = styled.div`
