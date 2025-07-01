@@ -31,30 +31,28 @@ public class SecurityFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        // Extrai e valida token
         String token = extractToken(request);
         try {
             if (token != null) {
-
-            String userId = authService.verifyToken(token);
+            String userId = authService.verifyToken(token); // VALIDA TOKEN VIA FIREBASE E OBTÉM UID
             // Criar autenticação Spring Security
             UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList());
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            request.setAttribute("userId", userId); //
+            request.setAttribute("userId", userId); // ADICIONA UID AO REQUEST PARA USO NOS CONTROLLERS
 
             }
         } catch (FirebaseAuthException e) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType("application/json");
-            response.getWriter().write("{\"error\":\"UNAUTHORIZED\",\"message\":\"Token inválido\"}");
+            response.getWriter().write("{error:UNAUTHORIZED,message:Token inválido}");
             return;
         }
         filterChain.doFilter(request, response);
     }
 
+    // EXTRAI TOKEN DO HEADER "Authorization: Bearer <token>"
     private String extractToken(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
@@ -63,7 +61,7 @@ public class SecurityFilter extends OncePerRequestFilter {
         return null;
     }
 
-
+    // DEFINE QUAIS ROTAS NÃO PASSAM PELO FILTRO
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();

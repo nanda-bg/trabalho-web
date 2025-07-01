@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @Repository
@@ -52,7 +51,7 @@ public class BookRepository {
                 .orderBy("relevanceScore", Query.Direction.DESCENDING)
                 .limit(pageSize);
 
-        // Se não é a primeira página, use cursor
+        // Se não é a primeira página, usa cursor
         if (lastBookId != null && !lastBookId.isEmpty()) {
             System.out.println("Reading cursor document: " + lastBookId);
             DocumentSnapshot lastDoc = firestore.collection(COLLECTION_NAME)
@@ -243,27 +242,6 @@ public class BookRepository {
         return true;
     }
 
-    public boolean updateBookFields(String bookId, Map<String, Object> fields) throws ExecutionException, InterruptedException {
-        if (bookId == null || bookId.isEmpty() || fields == null || fields.isEmpty()) {
-            return false;
-        }
-
-        Firestore firestore = FirestoreClient.getFirestore();
-        DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(bookId);
-
-        // Verifica se o documento existe
-        DocumentSnapshot document = docRef.get().get();
-        if (!document.exists()) {
-            return false;
-        }
-
-        // Atualiza apenas os campos fornecidos
-        ApiFuture<WriteResult> writeResult = docRef.update(fields);
-        writeResult.get(); // Aguarda a operação ser concluída
-
-        return true;
-    }
-
     public boolean deleteBook(String bookId) throws ExecutionException, InterruptedException {
         if (bookId == null || bookId.isEmpty()) {
             return false;
@@ -283,83 +261,5 @@ public class BookRepository {
         writeResult.get(); // Aguarda a operação ser concluída
 
         return true;
-    }
-
-    //MÉTOD PARA CONVERSÃO MANUAL PARA EVITAR ClassCastException
-    private Book convertMapToBook(Map<String, Object> data, String bookId) {
-        Book book = new Book();
-
-        try {
-            // Definir o bookId primeiro
-            book.setBookId(bookId);
-
-            // Converter campos básicos com verificação de null
-            if (data.get("title") != null) {
-                book.setTitle(data.get("title").toString());
-            }
-
-            if (data.get("description") != null) {
-                book.setDescription(data.get("description").toString());
-            }
-
-            if (data.get("coverUrl") != null) {
-                book.setCoverUrl(data.get("coverUrl").toString());
-            }
-
-            if (data.get("genre") != null) {
-                book.setGenre(data.get("genre").toString());
-            }
-
-            // Converter campos numéricos com tratamento de tipo
-            if (data.get("publicationYear") != null) {
-                Object yearObj = data.get("publicationYear");
-                if (yearObj instanceof Number) {
-                    book.setPublicationYear(((Number) yearObj).intValue());
-                }
-            }
-
-            if (data.get("pagesCount") != null) {
-                Object pagesObj = data.get("pagesCount");
-                if (pagesObj instanceof Number) {
-                    book.setPagesCount(((Number) pagesObj).intValue());
-                }
-            }
-
-            if (data.get("ratingsCount") != null) {
-                Object ratingsObj = data.get("ratingsCount");
-                if (ratingsObj instanceof Number) {
-                    book.setRatingsCount(((Number) ratingsObj).intValue());
-                }
-            }
-
-            if (data.get("averageRating") != null) {
-                Object avgRatingObj = data.get("averageRating");
-                if (avgRatingObj instanceof Number) {
-                    book.setAverageRating(((Number) avgRatingObj).doubleValue());
-                }
-            }
-
-            if (data.get("relevanceScore") != null) {
-                Object relevanceObj = data.get("relevanceScore");
-                if (relevanceObj instanceof Number) {
-                    book.setRelevanceScore(((Number) relevanceObj).doubleValue());
-                }
-            }
-
-            // Converter lista de autores
-            if (data.get("authors") != null && data.get("authors") instanceof List) {
-                @SuppressWarnings("unchecked")
-                List<String> authors = (List<String>) data.get("authors");
-                book.setAuthors(new ArrayList<>(authors));
-            }
-
-            System.out.println("Manual book conversion completed for: " + book.getTitle());
-
-        } catch (Exception e) {
-            System.out.println("Error in manual conversion: " + e.getMessage());
-            throw e;
-        }
-
-        return book;
     }
 }

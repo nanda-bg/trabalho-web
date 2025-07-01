@@ -95,6 +95,7 @@ public class ReviewService {
         bookService.invalidateBookCache(bookId);
     }
 
+    // CÁLCULO DE RELEVÂNCIA - Usa fórmula Bayesiana para ranking
     private double calculateRelevanceScore(Double averageRating, Integer ratingsCount) {
         double R = 3.0; // Rating médio assumido (escala 1-5)
         double W = 10.0; // Peso do prior (equivale a 10 ratings)
@@ -102,18 +103,13 @@ public class ReviewService {
         if (averageRating == null) averageRating = 0.0;
         if (ratingsCount == null) ratingsCount = 0;
 
-        // Fórmula Bayesiana
         return (W * R + ratingsCount * averageRating) / (W + ratingsCount);
-    }
-
-    public List<ReviewDTO> getAllReviews() throws ExecutionException, InterruptedException, IOException {
-        return getAllReviewsWithDetails();
     }
 
     @Cacheable(value = "reviews-paginated", key = "#lastReviewId + '_' + #pageSize")
     public List<ReviewDTO> getReviewsWithPagination(String lastReviewId, Integer pageSize)
             throws ExecutionException, InterruptedException, IOException {
-        // SÓ EXECUTA se não estiver no cache
+
         int actualPageSize = (pageSize != null && pageSize > 0) ? pageSize : 20;
         List<Review> reviews = reviewRepository.getReviewsWithPagination(lastReviewId, actualPageSize);
 
@@ -127,7 +123,6 @@ public class ReviewService {
         long startTime = System.currentTimeMillis();
         System.out.println("[FEED] Starting optimized feed for userId: " + userId);
 
-        // Get following relationships - OTIMIZADO
         List<String> followingUserIds = getFollowingUserIds(userId);
         System.out.println("[FEED] Found " + followingUserIds.size() + " followed users");
 
@@ -136,7 +131,6 @@ public class ReviewService {
             return new ArrayList<>();
         }
 
-        // Firestore 'in' constraint: máximo 30 valores
         if (followingUserIds.size() > 30) {
             followingUserIds = followingUserIds.subList(0, 30);
             System.out.println("[FEED] Limited to 30 users due to Firestore constraints");
@@ -145,12 +139,10 @@ public class ReviewService {
         Firestore firestore = FirestoreClient.getFirestore();
         int actualPageSize = (pageSize != null && pageSize > 0) ? pageSize : 20;
 
-        // Create user references
         List<DocumentReference> followingRefs = followingUserIds.stream()
                 .map(id -> firestore.collection("users").document(id))
                 .collect(Collectors.toList());
 
-        // Build optimized query with index
         Query query = firestore.collection("reviews")
                 .whereIn("userRef", followingRefs)
                 .orderBy("date", Query.Direction.DESCENDING)
@@ -158,7 +150,6 @@ public class ReviewService {
 
         int totalReads = 0;
 
-        // Handle pagination cursor
         if (lastReviewId != null && !lastReviewId.isEmpty()) {
             System.out.println("[FEED] Using pagination cursor: " + lastReviewId);
             DocumentSnapshot lastDoc = firestore.collection("reviews")
@@ -169,7 +160,6 @@ public class ReviewService {
             query = query.startAfter(lastDoc);
         }
 
-        // Execute query with index
         System.out.println("[FEED] Executing indexed query...");
         try {
             ApiFuture<QuerySnapshot> future = query.get();
@@ -194,7 +184,6 @@ public class ReviewService {
         } catch (Exception e) {
             System.out.println("[FEED] Query failed: " + e.getMessage());
 
-            // Check for specific index errors
             if (e.getMessage().contains("index") || e.getMessage().contains("FAILED_PRECONDITION")) {
                 System.out.println("[FEED] Index still propagating or incorrect structure");
                 System.out.println("Expected: userRef (ASC) + date (DESC)");
@@ -229,7 +218,6 @@ public class ReviewService {
     public List<ReviewDTO> getReviewsByBookId(String bookId) throws ExecutionException, InterruptedException, IOException {
         List<Review> reviews = reviewRepository.getReviewsByBookId(bookId);
 
-        // Otimização para buscar usuários em lote
         Map<String, ApiFuture<DocumentSnapshot>> userFutures = new HashMap<>();
         Firestore firestore = FirestoreClient.getFirestore();
 
@@ -240,14 +228,12 @@ public class ReviewService {
             }
         }
 
-        // Cache dos usuários
         Map<String, User> userCache = new HashMap<>();
         for (Map.Entry<String, ApiFuture<DocumentSnapshot>> entry : userFutures.entrySet()) {
             User user = entry.getValue().get().toObject(User.class);
             userCache.put(entry.getKey(), user);
         }
 
-        // Buscar dados do livro uma única vez
         DocumentSnapshot bookSnapshot = firestore.collection("books").document(bookId).get().get();
         Book book = bookSnapshot.toObject(Book.class);
 
@@ -356,7 +342,6 @@ public class ReviewService {
 
     @CacheEvict(value = {"review-details", "reviews-paginated", "reviews-by-book", "reviews-by-user", "reviews-feed"}, key = "#reviewId")
     public boolean deleteReview(String reviewId) throws ExecutionException, InterruptedException, IOException {
-        // Obter a review antes de excluí-la para saber qual livro atualizar
         Review review = reviewRepository.getReviewById(reviewId);
         if (review == null) {
             return false;
@@ -366,26 +351,10 @@ public class ReviewService {
         boolean deleted = reviewRepository.deleteReview(reviewId);
 
         if (deleted) {
-            // Atualizar a média de avaliação e contador do livro
             updateBookRating(bookId);
         }
 
         return deleted;
-    }
-
-    // Atualizar apenas o contador de likes
-    public boolean incrementLikeCount(String reviewId) throws ExecutionException, InterruptedException, IOException {
-        try {
-            return reviewRepository.incrementLikeCount(reviewId);
-        } catch (FirestoreException e) {
-            // Log detalhado do erro
-            System.err.println("Erro na transação do Firestore: " + e.getMessage());
-            if (e.getMessage().contains("PERMISSION_DENIED")) {
-                // Lidar com erros de permissão
-                System.err.println("Erro de permissão ao atualizar documento");
-            }
-            throw e;
-        }
     }
 
     public boolean toggleLike(String userUid, String reviewId) throws ExecutionException, InterruptedException, IOException {
@@ -451,7 +420,6 @@ public class ReviewService {
             }
         }
 
-        // Cache dos usuários e livros
         Map<String, User> userCache = new HashMap<>();
         Map<String, Book> bookCache = new HashMap<>();
 
@@ -506,11 +474,9 @@ public class ReviewService {
         dto.setLikeCount(entity.getLikeCount());
         dto.setSpoiler(entity.isSpoiler());
 
-        // Buscar dados em paralelo para melhor performance
         ApiFuture<DocumentSnapshot> userFuture = entity.getUserRef().get();
         ApiFuture<DocumentSnapshot> bookFuture = entity.getBookRef().get();
 
-        // Aguardar ambas as consultas
         User user = userFuture.get().toObject(User.class);
         Book book = bookFuture.get().toObject(Book.class);
 
@@ -580,25 +546,5 @@ public class ReviewService {
                     return dto;
                 })
                 .collect(Collectors.toList());
-    }
-
-    public User getUserFromReview(Review review) throws ExecutionException, InterruptedException {
-        DocumentSnapshot userSnapshot = review.getUserRef().get().get();
-        return userSnapshot.toObject(User.class);
-    }
-
-    public Book getBookFromReview(Review review) throws ExecutionException, InterruptedException {
-        DocumentSnapshot bookSnapshot = review.getBookRef().get().get();
-        return bookSnapshot.toObject(Book.class);
-    }
-
-    @CacheEvict(value = {"reviews-by-book", "reviews-by-user", "reviews-paginated"}, allEntries = true)
-    public void evictReviewCaches(String bookId, String userId) {
-        // Invalida caches relacionados
-    }
-
-    @CacheEvict(value = {"review-details", "reviews-paginated", "reviews-by-book", "reviews-by-user"}, allEntries = true)
-    public void invalidateAllReviewCaches() {
-        // Invalida todos os caches de reviews
     }
 }

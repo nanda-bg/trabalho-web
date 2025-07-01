@@ -173,7 +173,7 @@ public class ReviewController {
     })
     public ResponseEntity<List<ReviewDTO>> getAllReviews() {
         try {
-            return new ResponseEntity<>(reviewService.getAllReviews(), HttpStatus.OK);
+            return new ResponseEntity<>(reviewService.getAllReviewsWithDetails(), HttpStatus.OK);
         } catch (ExecutionException | InterruptedException | IOException e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -282,7 +282,6 @@ public class ReviewController {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
     @GetMapping("/{reviewId}")
     @Operation(

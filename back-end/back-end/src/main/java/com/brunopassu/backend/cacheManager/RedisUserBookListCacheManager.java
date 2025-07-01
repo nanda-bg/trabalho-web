@@ -41,7 +41,7 @@ public class RedisUserBookListCacheManager {
     }
 
     private void invalidateFavoritesCache(String userId) {
-        System.out.println("🗑️ [CACHE INVALIDATION] Invalidating favorites cache for userId: " + userId);
+        System.out.println("[CACHE INVALIDATION] Invalidating favorites cache for userId: " + userId);
 
         // Padrão para cache de favoritos: userId_lastItemId_pageSize_sortOrder
         String pattern = "*user-favorites*" + userId + "*";
@@ -57,7 +57,7 @@ public class RedisUserBookListCacheManager {
     }
 
     private void invalidateFutureReadsCache(String userId) {
-        System.out.println("🗑️ [CACHE INVALIDATION] Invalidating future reads cache for userId: " + userId);
+        System.out.println("[CACHE INVALIDATION] Invalidating future reads cache for userId: " + userId);
 
         // Padrão para cache de leituras futuras: userId_lastItemId_pageSize_sortOrder
         String pattern = "*user-future-reads*" + userId + "*";
@@ -73,7 +73,7 @@ public class RedisUserBookListCacheManager {
     }
 
     private void invalidateExistenceCache(String userId) {
-        System.out.println("🗑️ [CACHE INVALIDATION] Invalidating existence cache for userId: " + userId);
+        System.out.println("[CACHE INVALIDATION] Invalidating existence cache for userId: " + userId);
 
         // Padrão para cache de verificação: userId_bookId
         String favoritesPattern = "*book-in-favorites*" + userId + "*";
@@ -132,7 +132,7 @@ public class RedisUserBookListCacheManager {
 
     // Método específico para invalidar cache quando um livro específico é removido
     public void invalidateSpecificBookCache(String userId, String bookId) {
-        System.out.println("🗑️ [CACHE INVALIDATION] Invalidating cache for specific book removal - userId: " + userId + ", bookId: " + bookId);
+        System.out.println("[CACHE INVALIDATION] Invalidating cache for specific book removal - userId: " + userId + ", bookId: " + bookId);
 
         // Invalidar todas as listas do usuário (mais seguro)
         invalidateUserBookListCaches(userId);

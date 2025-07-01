@@ -5,15 +5,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
 
-    @Autowired
-    private FirebaseAuth firebaseAuth;
-
+    // CRIA USUÁRIO NO FIREBASE AUTHENTICATION
     public UserRecord createUser(String email, String password) throws FirebaseAuthException, UserAlreadyExistsException {
 
         try {
@@ -28,6 +25,7 @@ public class AuthService {
         }
     }
 
+    //VALIDA TOKEN FIREBASE E RETORNA UID DO USUÁRIO -> EXCLUSIVO PARA AUTENTICAÇÃO
     public String verifyToken(String idToken) throws FirebaseAuthException {
         System.out.println("==== AUTH SERVICE - VERIFY TOKEN ====");
         System.out.println("Verificando token: " + idToken.substring(0, Math.min(idToken.length(), 20)) + "...");
@@ -43,6 +41,7 @@ public class AuthService {
         }
     }
 
+    //MÉTODOS
     public String getUserIdFromToken(String idToken) {
         try {
             // Remove o prefixo "Bearer " se existir

@@ -40,7 +40,7 @@ O LITLOG conta com as seguintes funcionalidades principais:
 ## Tecnologias Utilizadas
 
 * **Frontend:** React, TypeScript
-* **Backend:** Java, Redis, Firebase
+* **Backend:** Java (SpringBoot), Redis, Firebase, Docker
 
 ---
 

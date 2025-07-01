@@ -114,6 +114,7 @@ public class BookService {
                 .size() > 0;
     }
 
+    //ERRADO!
     public boolean checkUserType(@RequestHeader HttpHeaders request) throws ExecutionException, InterruptedException {
         //PEGA O TOKEN DO HEADER
         List<String> list = request.get("authorization");
@@ -133,40 +134,11 @@ public class BookService {
         }
     }
 
-    /*
-    // Invalidar cache quando relevanceScore é atualizado
-    @CacheEvict(value = {"book-details", "books-paginated", "books-by-genre", "books-genre-paginated"}, key = "#bookId")
-    public void updateRelevanceScore(String bookId) throws ExecutionException, InterruptedException {
-        Book book = getBookById(bookId);
-        if (book != null) {
-            double relevanceScore = calculateRelevanceScore(
-                    book.getAverageRating(),
-                    book.getRatingsCount()
-            );
-
-            Map<String, Object> updates = new HashMap<>();
-            updates.put("relevanceScore", relevanceScore);
-            bookRepository.updateBookFields(bookId, updates);
-        }
-    }
-
-    private double calculateRelevanceScore(Double averageRating, Integer ratingsCount) {
-        double R = 3.0; // Rating médio assumido
-        double W = 10.0; // Peso do prior
-
-        if (averageRating == null) averageRating = 0.0;
-        if (ratingsCount == null) ratingsCount = 0;
-
-        return (W * R + ratingsCount * averageRating) / (W + ratingsCount);
-    }
-     */
-
     @CacheEvict(value = {"book-details", "books-by-genre"}, key = "#bookId")
     public void evictGenreCache(String genre) {
         // INVALIDAR CACHE
     }
-    @CacheEvict(value = {"book-details", "books-paginated"}, key = "#bookId")
+    @CacheEvict(value = {"book-details", "books-paginated", "books-genre-paginated"}, allEntries = true)
     public void invalidateBookCache(String bookId) {
-        // Já invalida "book-details" E "books-paginated"
     }
 }

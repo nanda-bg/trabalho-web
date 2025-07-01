@@ -34,8 +34,8 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-resources/**").permitAll()
                         .requestMatchers("/webjars/**").permitAll()
                         .requestMatchers("/custom-swagger.css").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().authenticated() //TODOS OS OUTROS REQUESTS PRECISAM DE AUTENTICAÇÃO
                 )
-                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class).build();
+                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class).build(); //Adiciona filtro Firebase antes do padrão
     }
 }
